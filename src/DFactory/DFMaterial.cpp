@@ -94,6 +94,10 @@ uint16_t DFMaterial::AddTexture(std::string filePath) noexcept {
 
 	uint16_t index = 0;
 
+	std::string checkPath = constPath + filePath;
+	struct stat buffer;
+	(stat(checkPath.c_str(), &buffer) == 0) ? filePath : filePath = "default//default.png";
+
 	for (const auto& it : m_Textures) {
 
 		if (it->name == filePath || it->filePath == filePath) {
@@ -112,7 +116,7 @@ uint16_t DFMaterial::AddTexture(std::string name, std::string filePath) noexcept
 	
 	std::string checkPath = constPath + filePath;
 	struct stat buffer;
-	(stat(checkPath.c_str(), &buffer) == 0) ? 0 : filePath = "default.png";
+	(stat(checkPath.c_str(), &buffer) == 0) ? filePath : filePath = "default//default.png";
 
 	for (const auto& it : m_Textures) {
 

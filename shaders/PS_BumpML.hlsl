@@ -34,24 +34,26 @@ struct VSInput
 
 Texture2D texColor : register(t0);
 Texture2D texNormal : register(t1);
+Texture2D texSpecular : register(t2);
 SamplerState smplr;
 
 float4 main(VSInput VS) : SV_TARGET
 {
     //retrieving texture pixel
     float4 colorTex = texColor.Sample(smplr, VS.tex);
-    float4 colorNormal = texNormal.Sample(smplr, VS.tex);
+    float4 normalTex = texNormal.Sample(smplr, VS.tex);
+    float4 specularTex = texSpecular.Sample(smplr, VS.tex);
 
     //global variables
     float4 specular = { 0.0f, 0.0f, 0.0f, 0.0f };
     float4 globalDiffuse = { 0.0f, 0.0f, 0.0f, 0.0f };
 
     //set normal map range from (0, +1) to (-1, +1)
-    colorNormal = (colorNormal * 2.0f) - 1.0f;
+    normalTex = (normalTex * 2.0f) - 1.0f;
 
     //calculate bump color
-    float3 bump = normalize(colorNormal.x * VS.tangent + colorNormal.y * -VS.binormal + colorNormal.z * VS.W_Normal);
-    float3 bumpPL = normalize(colorNormal.x * VS.tangent + colorNormal.y * -VS.binormal + colorNormal.z * VS.WV_Normal);
+    float3 bump = normalize(normalTex.x * VS.tangent + normalTex.y * VS.binormal + normalTex.z * VS.W_Normal);
+    float3 bumpPL = normalize(normalTex.x * VS.tangent + normalTex.y * VS.binormal + normalTex.z * VS.WV_Normal);
 
     //calculate point lights
     for (uint i = 0; i < numPLights.x; i++)
@@ -83,7 +85,9 @@ float4 main(VSInput VS) : SV_TARGET
         specular = pow(saturate(dot(vecRefl, -VS.viewDir)), M_SpecPower) * M_SpecIntensity;
         
         vecRefl = normalize(2.0f * L_DirIntensity * VS.W_Normal - L_DirPos);
-        specular += pow(saturate(dot(vecRefl, -VS.viewDir)), M_SpecPower) * M_SpecIntensity;
+        specular += pow(saturate(dot(vecRefl, -VS.viewDir)), M_SpecPower) * M_SpecIntensity * 2.0f;
+        
+        specular *= specularTex;
     }
     //final color
     return float4(globalDiffuse + M_Ambient + specular) * colorTex;

@@ -101,7 +101,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	if (mesh.mMaterialIndex >= 0)
 	{
 		aiMaterial* pMaterial = ppMaterials[mesh.mMaterialIndex];
-		aiString texColorName, texNormalName;
+		aiString texColorName, texNormalName, texSpecularName;
 
 		if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 		{
@@ -112,7 +112,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 		}
 		else	//if imported model has no color textures = use the default checkerboard one
 		{
-			pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(*pD3DMgr, *pMatMgr->GetTexture(pMatMgr->AddTexture("default.png")), 0u);
+			pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(*pD3DMgr, *pMatMgr->GetTexture(pMatMgr->AddTexture("default//default.png")), 0u);
 			newMesh.meshMat = "Mat_Default";
 		}
 
@@ -122,6 +122,29 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			std::string texNormalPath(texNormalName.C_Str());
 			pBinds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*pD3DMgr, *pMatMgr->GetTexture(pMatMgr->AddTexture(texNormalPath)), 1u);
 		}
+		else
+		{
+			pBinds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*pD3DMgr, *pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_n.png")), 1u);
+		}
+
+		if (pMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0)
+		{
+			pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &texSpecularName);
+			std::string texSpecularPath(texSpecularName.C_Str());
+			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*pD3DMgr, *pMatMgr->GetTexture(pMatMgr->AddTexture(texSpecularPath)), 2u);
+		}
+		else
+		{
+			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*pD3DMgr, *pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_s.png")), 2u);
+		}
+
+		/*
+		if (pMaterial->GetTextureCount(aiTextureType_REFLECTION) > 0)
+		{
+			pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &texSpecularName);
+			std::string texSpecularPath(texSpecularName.C_Str());
+			pBinds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*pD3DMgr, *pMatMgr->GetTexture(pMatMgr->AddTexture(texSpecularPath)), 3u);
+		}*/
 	}
 
 	pBinds[Bind::idSampler] = std::make_unique<Bind::Sampler>(*pD3DMgr);
@@ -145,7 +168,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	{
 		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.16f, 0.0f };
 		float matIntensity = 1.2f;
-		float specIntensity = 2.0f;
+		float specIntensity = 1.6f;
 		float specPower = 160.0f;
 		float _padding;
 	} material;

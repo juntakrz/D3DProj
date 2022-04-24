@@ -83,16 +83,17 @@ void DFactory::DrawFrame() noexcept
 		}
 
 		// draw the model
-		//it.meshes[0].pMesh->Draw(*pD3DMgr);
+		it.pRootNode->Draw(*pD3DMgr);
 
+		//it.meshes[0].pMesh->Draw(*pD3DMgr);
+		/*
 		if (it.meshes.size() > 1 && debug.int64bit > -1 && debug.int64bit < it.meshes.size()) {
 				it.meshes[debug.int64bit].pMesh->Draw(*pD3DMgr);
 		}
 		else
 		{
 			it.pRootNode->Draw(*pD3DMgr);
-		}
-		//it.pRootNode->Draw(*pD3DMgr);
+		}*/
 	}
 	
 	LightM->Draw(*pD3DMgr);
