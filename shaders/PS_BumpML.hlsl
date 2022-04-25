@@ -43,6 +43,8 @@ float4 main(VSInput VS) : SV_TARGET
     float4 colorTex = texColor.Sample(smplr, VS.tex);
     float4 normalTex = texNormal.Sample(smplr, VS.tex);
     float4 specularTex = texSpecular.Sample(smplr, VS.tex);
+    
+    colorTex.rgb = pow(colorTex.rgb, 1.0f);
 
     //global variables
     float4 specular = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -85,10 +87,19 @@ float4 main(VSInput VS) : SV_TARGET
         specular = pow(saturate(dot(vecRefl, -VS.viewDir)), M_SpecPower) * M_SpecIntensity;
         
         vecRefl = normalize(2.0f * L_DirIntensity * VS.W_Normal - L_DirPos);
-        specular += pow(saturate(dot(vecRefl, -VS.viewDir)), M_SpecPower) * M_SpecIntensity * 2.0f;
+        specular += pow(saturate(dot(vecRefl, -VS.viewDir)), M_SpecPower) * M_SpecIntensity * 1.2f;
         
-        specular *= specularTex;
+        specularTex = (specularTex * 2.0f) - 1.0f;
+        specular -= specularTex;
     }
+    
+    //applying contrast, brightness and saturation curve
+    colorTex.rgb = (colorTex.rgb - 0.5f) * 1.5f + 0.5f;
+    colorTex.rgb += 0.08f;
+ 
+    float3 luminance = dot(float3(0.299, 0.587, 0.114), colorTex.rgb);
+    colorTex.rgb = lerp(luminance, colorTex.rgb, 0.7f);
+    
     //final color
     return float4(globalDiffuse + M_Ambient + specular) * colorTex;
 }

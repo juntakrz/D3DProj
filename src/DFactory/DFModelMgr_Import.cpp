@@ -167,9 +167,9 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	struct PSConstBuffer
 	{
 		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.16f, 0.0f };
-		float matIntensity = 1.2f;
-		float specIntensity = 1.6f;
-		float specPower = 160.0f;
+		float matIntensity = 1.0f;
+		float specIntensity = 3.0f;
+		float specPower = 320.0f;
 		float _padding;
 	} material;
 

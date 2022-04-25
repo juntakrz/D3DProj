@@ -20,17 +20,17 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 	newMat.shaderPixel = pDesc->shaders.pixel;
 	newMat.shaderVertex = pDesc->shaders.vertex;
 
-	if (pDesc->textures.base != "") {
-		newMat.pTexBase = GetTexture(AddTexture(pDesc->textures.base));
-	}
+	pDesc->textures.base != "" ?
+		newMat.pTexBase = GetTexture(AddTexture(pDesc->textures.base))
+		: newMat.pTexBase = GetTexture(AddTexture("default//default.png"));
 
-	if (pDesc->textures.normal != "") {
-		newMat.pTexNormal = GetTexture(AddTexture(pDesc->textures.normal));
-	}
+	pDesc->textures.normal != "" ?
+		newMat.pTexNormal = GetTexture(AddTexture(pDesc->textures.normal))
+		: newMat.pTexNormal = GetTexture(AddTexture("default//default_n.png"));
 
-	if (pDesc->textures.extra1 != "") {
-		newMat.pTexEx1 = GetTexture(AddTexture(pDesc->textures.extra1));
-	}
+	pDesc->textures.extra1 != "" ?
+		newMat.pTexEx1 = GetTexture(AddTexture(pDesc->textures.extra1))
+		: newMat.pTexEx1 = GetTexture(AddTexture("default//default_s.png"));
 
 	if (pDesc->textures.extra2 != "") {
 		newMat.pTexEx2 = GetTexture(AddTexture(pDesc->textures.extra2));
@@ -139,7 +139,7 @@ DFSurface* DFMaterial::GetTexture(std::string name) const noexcept {
 		}
 	}
 
-	return GetTexture("default.png");
+	return GetTexture("default//default.png");
 }
 
 DFSurface* DFMaterial::GetTexture(uint16_t index) const noexcept {
