@@ -32,9 +32,9 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 		newMat.pTexEx1 = GetTexture(AddTexture(pDesc->textures.extra1))
 		: newMat.pTexEx1 = GetTexture(AddTexture("default//default_s.png"));
 
-	if (pDesc->textures.extra2 != "") {
-		newMat.pTexEx2 = GetTexture(AddTexture(pDesc->textures.extra2));
-	}
+	pDesc->textures.extra2 != "" ?
+		newMat.pTexEx2 = GetTexture(AddTexture(pDesc->textures.extra2))
+		: newMat.pTexEx2 = GetTexture(AddTexture("default//default_s.png"));
 
 	newMat.ambientColor = pDesc->material.ambientColor;
 	newMat.matIntensity = pDesc->material.matIntensity;

@@ -89,8 +89,7 @@ float4 main(VSInput VS) : SV_TARGET
         vecRefl = normalize(2.0f * L_DirIntensity * VS.W_Normal - L_DirPos);
         specular += pow(saturate(dot(vecRefl, -VS.viewDir)), M_SpecPower) * M_SpecIntensity * 1.2f;
         
-        specularTex = (specularTex * 2.0f) - 1.0f;
-        specular -= specularTex;
+        specular *= specularTex;
     }
     
     //applying contrast, brightness and saturation curve
