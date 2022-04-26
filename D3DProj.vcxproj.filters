@@ -391,5 +391,7 @@
     <FxCompile Include="shaders\VS_StandardML.hlsl" />
     <FxCompile Include="shaders\PS_BumpML.hlsl" />
     <FxCompile Include="shaders\VS_BumpML.hlsl" />
+    <FxCompile Include="shaders\PS_PBS.hlsl" />
+    <FxCompile Include="shaders\VS_PBS.hlsl" />
   </ItemGroup>
 </Project>

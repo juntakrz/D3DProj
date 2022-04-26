@@ -76,12 +76,20 @@ void MeshCore::SetMaterial(std::string name) noexcept
 		m_Binds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTexNormal, 1u);
 	}
 
-	if (mat.pTexEx1 != nullptr) {
-		m_Binds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTexEx1, 2u);
+	if (mat.pTex2 != nullptr) {
+		m_Binds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex2, 2u);
 	}
 
-	if (mat.pTexEx2 != nullptr) {
-		m_Binds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTexEx2, 3u);
+	if (mat.pTex3 != nullptr) {
+		m_Binds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex3, 3u);
+	}
+
+	if (mat.pTex4 != nullptr) {
+		m_Binds[Bind::idTexture4] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex4, 4u);
+	}
+
+	if (mat.pTex5 != nullptr) {
+		m_Binds[Bind::idTexture5] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex5, 5u);
 	}
 
 	auto pVS = std::make_unique<Bind::VertexShader>(*m_pD3DMgr, "shaders//" + mat.shaderVertex + ".cso");

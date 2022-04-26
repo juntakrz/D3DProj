@@ -28,13 +28,21 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 		newMat.pTexNormal = GetTexture(AddTexture(pDesc->textures.normal))
 		: newMat.pTexNormal = GetTexture(AddTexture("default//default_n.png"));
 
-	pDesc->textures.extra1 != "" ?
-		newMat.pTexEx1 = GetTexture(AddTexture(pDesc->textures.extra1))
-		: newMat.pTexEx1 = GetTexture(AddTexture("default//default_s.png"));
+	pDesc->textures.tex2 != "" ?
+		newMat.pTex2 = GetTexture(AddTexture(pDesc->textures.tex2))
+		: newMat.pTex2 = GetTexture(AddTexture("default//default_s.png"));
 
-	pDesc->textures.extra2 != "" ?
-		newMat.pTexEx2 = GetTexture(AddTexture(pDesc->textures.extra2))
-		: newMat.pTexEx2 = GetTexture(AddTexture("default//default_s.png"));
+	pDesc->textures.tex3 != "" ?
+		newMat.pTex3 = GetTexture(AddTexture(pDesc->textures.tex3))
+		: newMat.pTex3 = GetTexture(AddTexture("default//default_s.png"));
+
+	pDesc->textures.tex4 != "" ?
+		newMat.pTex4 = GetTexture(AddTexture(pDesc->textures.tex4))
+		: newMat.pTex4 = GetTexture(AddTexture("default//default_s.png"));
+
+	pDesc->textures.tex5 != "" ?
+		newMat.pTex5 = GetTexture(AddTexture(pDesc->textures.tex5))
+		: newMat.pTex5 = GetTexture(AddTexture("default//default_s.png"));
 
 	newMat.ambientColor = pDesc->material.ambientColor;
 	newMat.matIntensity = pDesc->material.matIntensity;

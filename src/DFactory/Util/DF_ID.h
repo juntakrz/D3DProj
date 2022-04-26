@@ -6,7 +6,7 @@ namespace Bind
 	{
 		idIndexBuffer, idVertexBuffer, idSampler, idInputLayout, idTransform,
 		idVertexShader, idPixelShader,
-		idTexture0, idTexture1, idTexture2, idTexture3,
+		idTexture0, idTexture1, idTexture2, idTexture3, idTexture4, idTexture5,
 		idConstVertexBuf0, idConstPixelBuf0,
 		idTopology
 	};

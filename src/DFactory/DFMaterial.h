@@ -16,8 +16,10 @@ class DFMaterial
 		std::string shaderVertex, shaderPixel;
 		DFSurface* pTexBase = nullptr;
 		DFSurface* pTexNormal = nullptr;
-		DFSurface* pTexEx1 = nullptr;
-		DFSurface* pTexEx2 = nullptr;
+		DFSurface* pTex2 = nullptr;
+		DFSurface* pTex3 = nullptr;
+		DFSurface* pTex4 = nullptr;
+		DFSurface* pTex5 = nullptr;
 
 		XMFLOAT4 ambientColor;
 		float matIntensity;
@@ -50,7 +52,7 @@ public:
 
 		struct
 		{
-			std::string base = "default.png", normal = "", extra1 = "", extra2 = "";
+			std::string base = "default.png", normal = "", tex2 = "", tex3 = "", tex4 = "", tex5 = "";
 		} textures;
 
 		struct

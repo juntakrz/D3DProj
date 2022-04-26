@@ -156,10 +156,13 @@ void DFMain::LoadScreen() noexcept
 	//Mat_Metal
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Metal";
-	DFMatDesc.shaders.vertex = "VS_BumpML";
-	DFMatDesc.shaders.pixel = "PS_BumpML";
-	DFMatDesc.textures.base = "metal1.png";
-	DFMatDesc.textures.normal = "metal1_normal.png";
+	DFMatDesc.shaders.vertex = "VS_PBS";
+	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.textures.base = "Fore_Section_BaseColor.png";
+	DFMatDesc.textures.normal = "Fore_Section_Normal.png";
+	DFMatDesc.textures.tex2 = "Fore_Section_Metallic.png";
+	DFMatDesc.textures.tex3 = "Fore_Section_Roughness.png";
+	DFMatDesc.textures.tex4 = "Tachi_LP_Fore_Section_AO.png";
 	DFMatDesc.material.specIntensity = 4.0f;
 	DFMatDesc.material.specPower = 90.0f;
 
@@ -199,13 +202,13 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(44.0f, 44.0f, 44.0f);
 	DF.ModelM->SetRotation(-DirectX::XM_PI - 0.6f, -0.4f, -DirectX::XM_PI + 0.3f);
 	*/
-	/*
+	
 	DF.ModelM->Create(DF::idSphere, "MdlSphere1", 16);
 	DF.ModelM->SetScaling(6.0f, 6.0f, 6.0f);
 	DF.ModelM->SetRotation(0.5f, 0.5f, 0.5f);
-	DF.ModelM->SetPos(0.0f, -5.0f, 3.0f);
+	DF.ModelM->SetPos(0.0f, -3.0f, 3.0f);
 	DF.ModelM->SetMaterial("Mat_Metal");
-	*/
+	
 	Animate();
 	
 	//DF.LMgr->ShowPLMeshes() = true;
