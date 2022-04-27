@@ -9,11 +9,11 @@ cbuffer M_Material : register(b0)
 cbuffer L_DirLight : register(b1)
 {
     float3 L_DirPos;
-    float1 L_DirInt; 
+    float1 L_DirInt;
     float4 L_DirDiffuse;
 };
 
-cbuffer L_PointLight  : register(b2)
+cbuffer L_PointLight : register(b2)
 {
     float3 L_Pos[4];
     float4 L_Diffuse[4];
@@ -88,15 +88,15 @@ float4 main(PSInput iPS) : SV_TARGET
 {
     //init values
     float3 albedo = { 0.5f, 0.0f, 0.0f };
-    float metallic = 0.4f;
-    float roughness = 0.33f;
+    float metallic = 0.0f;
+    float roughness = 0.0f;
     float ao = 1.0f;
-    
-    float3 lpos = { -12.0f, 15.0f, 25.0f };
-    float3 lcolor = { 1.0, 1.0, 1.0 };
     
     float3 N = iPS.W_Normal; //normal
     float3 V = normalize(iPS.camPos - iPS.worldPos); //view vector
+    
+    float3 L = { 0.0, 0.0, 0.0 };
+    float3 radiance = { 0.0, 0.0, 0.0 };
     
     float3 Lo = { 0.0f, 0.0f, 0.0f };
     float3 color = { 0.0f, 0.0f, 0.0f };
@@ -109,21 +109,25 @@ float4 main(PSInput iPS) : SV_TARGET
     //float4 tRoughness = texRoughness.Sample(smplr, iPS.tex);
     //float4 tAO = texAO.Sample(smplr, iPS.tex);
     
-    lpos = L_DirPos * 15.0f;
-    
-    for (int i = -1; i < numPLights.x; i++)
+    for (int i = 0; i < numPLights.x + 1; i++)
     {
-        float3 L = normalize(lpos - iPS.worldPos); //light vector
-        float3 H = normalize(V + L); //halfway vector
+        if (i == 0)
+        {
+            L = normalize(L_DirPos);
+            radiance = L_DirDiffuse.rgb * L_DirInt;
+        }
+        else
+        {
+            L = normalize(L_Pos[i - 1] - iPS.worldPos);
+            float distance = length(L_Pos[i - 1] - iPS.worldPos);
+            float attenuation = 1.0 / (distance * distance);
+            radiance = L_Diffuse[i - 1].rgb * attenuation * L_DirInt * 100.0;
+        }
+        float3 H = normalize(V + L);
     
-        float distance = length(lpos - iPS.worldPos);
-        float attenuation = 1.0 / (distance * distance);
-        float3 radiance = L_DirDiffuse * attenuation * L_DirInt * 200.0;
-    
-        //weird math shennanigans
+        //PBS math
         float NDF = DistributionGGX(N, H, roughness);
         float G = GeometrySmith(N, V, L, roughness);
-        //float3 F = FresnelSchlick(max(dot(H, V), 0.0), F0);
         float3 F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
     
         //specular formula
@@ -138,10 +142,10 @@ float4 main(PSInput iPS) : SV_TARGET
     
         float NdotL = max(dot(N, L), 0.0);
         Lo += (Kd * albedo / PI + specular) * radiance * NdotL;
-    
-        float3 ambient = 0.0003 * albedo * ao;
-        color = ambient + Lo;
     }
+    
+    float3 ambient = 0.0003 * albedo * ao;
+    color = ambient + Lo;
     
     color = color / (color + 1.0);
     color = pow(color, 1.0 / 2.2);

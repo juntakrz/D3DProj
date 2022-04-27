@@ -11,16 +11,16 @@ DFMain::DFMain(DFactory::DFACTORY_INIT_DESC* pDesc) : DF(DFactory::Init(pDesc))
 
 void DFMain::DrawFrame()
 {
-	deltaA += 0.001f;
+	deltaA += 0.0001f;
 	
 	// MdlStars
-	DF.ModelM->Select(1);
+	DF.ModelM->Select(2);
 	DF.ModelM->SetPos(DF.Camera()->GetPos().x, DF.Camera()->GetPos().y, DF.Camera()->GetPos().z);
 	
 	// MdlMars
-	//DF.ModelM->Select(1);
-	//DF.ModelM->SetPos(DF.Camera()->GetPos().x + 600.0f, DF.Camera()->GetPos().y - 1600.0f, DF.Camera()->GetPos().z + 4000.0f);
-	//DF.ModelM->SetRotation(-0.4f, deltaA, -0.4f);
+	DF.ModelM->Select(1);
+	DF.ModelM->SetPos(DF.Camera()->GetPos().x + 600.0f, DF.Camera()->GetPos().y - 1600.0f, DF.Camera()->GetPos().z + 4000.0f);
+	DF.ModelM->SetRotation(-0.4f, deltaA, -0.4f);
 
 	DF.LightM->PL(0).pMesh->DEBUG_Rotate(0.01f);
 	DF.LightM->PL(1).pMesh->DEBUG_Rotate(-0.01f);
@@ -124,7 +124,7 @@ void DFMain::LoadScreen() noexcept
 	DF.DrawFrame();
 
 	DF.EndFrame();
-	/*
+	
 	//Mat_Mars
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Mars";
@@ -140,7 +140,7 @@ void DFMain::LoadScreen() noexcept
 	DF.MatM->MatAdd(&DFMatDesc);
 
 	Animate();
-	*/
+	
 	//Mat_Stars
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Stars";
@@ -157,7 +157,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Metal";
 	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.shaders.pixel = "PS_PBS1";
 	//DFMatDesc.textures.base = "Fore_Section_BaseColor.png";
 	//DFMatDesc.textures.normal = "Fore_Section_Normal.png";
 	//DFMatDesc.textures.tex2 = "Fore_Section_Metallic.png";
@@ -169,7 +169,7 @@ void DFMain::LoadScreen() noexcept
 	DF.MatM->MatAdd(&DFMatDesc);
 
 	Animate();
-	/*
+	
 	//MdlMars
 	DF.ModelM->Create(DF::idSphere, "MdlMars", 64);
 	DF.ModelM->SetMaterial("Mat_Mars");
@@ -177,7 +177,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(2800.0f, 2800.0f, 2800.0f);
 	DF.ModelM->SetRotation(-0.4f, 0.0f, -0.4f);
 	//DF.Mesh()->SetRotationY(-0.00005f);
-	*/
+	
 	Animate();
 
 	//MdlStars
@@ -204,9 +204,9 @@ void DFMain::LoadScreen() noexcept
 	*/
 	
 	DF.ModelM->Create(DF::idSphere, "MdlSphere1", 64);
-	DF.ModelM->SetScaling(10.0f, 10.0f, 10.0f);
+	//DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
 	DF.ModelM->SetRotation(0.5f, 0.5f, 0.5f);
-	DF.ModelM->SetPos(0.0f, 0.0f, 0.0f);
+	DF.ModelM->SetPos(0.0f, -10.0f, 20.0f);
 	DF.ModelM->SetMaterial("Mat_Metal");
 	
 	Animate();
@@ -239,7 +239,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Select(0);
 	DF.ModelM->Delete();
 
-	DF.Camera()->SetPos(0.0f, 0.0f, -10.0f);
+	DF.Camera()->SetPos(0.0f, -10.0f, 17.0f);
 }
 
 void DFMain::CreateMaterials() noexcept
