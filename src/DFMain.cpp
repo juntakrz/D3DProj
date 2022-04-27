@@ -163,6 +163,10 @@ void DFMain::LoadScreen() noexcept
 	//DFMatDesc.textures.tex2 = "Fore_Section_Metallic.png";
 	//DFMatDesc.textures.tex3 = "Fore_Section_Roughness.png";
 	//DFMatDesc.textures.tex4 = "Tachi_LP_Fore_Section_AO.png";
+	DFMatDesc.textures.base = "iron//rustediron2_basecolor.png";
+	DFMatDesc.textures.normal = "iron//rustediron2_normal.png";
+	DFMatDesc.textures.tex2 = "iron//rustediron2_metallic.png";
+	DFMatDesc.textures.tex3 = "iron//rustediron2_roughness.png";
 	DFMatDesc.material.specIntensity = 4.0f;
 	DFMatDesc.material.specPower = 90.0f;
 

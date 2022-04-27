@@ -87,10 +87,16 @@ float3 FresnelSchlick(float cosTheta, float3 F0)
 float4 main(PSInput iPS) : SV_TARGET
 {
     //init values
-    float3 albedo = { 0.5f, 0.0f, 0.0f };
-    float metallic = 0.0f;
-    float roughness = 0.0f;
+    //float3 albedo = { 0.5f, 0.0f, 0.0f };
+    //float metallic = 0.0f;
+    //float roughness = 0.0f;
     float ao = 1.0f;
+    
+    float3 albedo = pow(texDiffuse.Sample(smplr, iPS.tex), 2.2);
+    float3 nmap = texNormal.Sample(smplr, iPS.tex);
+    float metallic = texMetallic.Sample(smplr, iPS.tex).r;
+    float roughness = texRoughness.Sample(smplr, iPS.tex).r;
+    //float ao = texAO.Sample(smplr, iPS.tex).r;
     
     float3 N = iPS.W_Normal; //normal
     float3 V = normalize(iPS.camPos - iPS.worldPos); //view vector
@@ -102,12 +108,6 @@ float4 main(PSInput iPS) : SV_TARGET
     float3 color = { 0.0f, 0.0f, 0.0f };
     float3 F0 = { 0.4, 0.4, 0.4 };
     F0 = lerp(F0, albedo, metallic);
-    
-    //float4 albedo = pow(texDiffuse.Sample(smplr, iPS.tex), 2.2);
-    //float3 N = texNormal.Sample(smplr, iPS.tex);
-    //float4 tMetallic = texMetallic.Sample(smplr, iPS.tex);
-    //float4 tRoughness = texRoughness.Sample(smplr, iPS.tex);
-    //float4 tAO = texAO.Sample(smplr, iPS.tex);
     
     for (int i = 0; i < numPLights.x + 1; i++)
     {
@@ -144,7 +144,7 @@ float4 main(PSInput iPS) : SV_TARGET
         Lo += (Kd * albedo / PI + specular) * radiance * NdotL;
     }
     
-    float3 ambient = 0.0003 * albedo * ao;
+    float3 ambient = 0.03 * M_Ambient.rgb * ao;
     color = ambient + Lo;
     
     color = color / (color + 1.0);
