@@ -9,13 +9,14 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 		pDescription->WndTitle.c_str());
 
 	// retrieve D3DMgr
-	_SInstance.pD3DMgr = &_SInstance.pWndMgr->D3D();
+	DFData::pD3DM = &_SInstance.pWndMgr->D3D();
+	_SInstance.pD3DMgr = DFData::pD3DM;
 
 	// set Direct3D default viewport size
 	_SInstance.pD3DMgr->SetDefaultViewportSize(_SInstance.pWndMgr->GetWindowSize());
 
 	// init light manager
-	_SInstance.LightM = &LightMgr::Get(_SInstance.pD3DMgr);
+	_SInstance.LightM = &LightMgr::Get();
 
 	// init model manager
 	_SInstance.ModelM = &DFModelMgr::Get();
@@ -79,11 +80,11 @@ void DFactory::DrawFrame() noexcept
 		// determine which light sources will affect a certain mesh
 		for (auto& mesh : it.meshes)
 		{
-			LightM->Bind(*pD3DMgr, Camera()->m_XMView, mesh.pMesh.get());
+			LightM->Bind(Camera()->m_XMView, mesh.pMesh.get());
 		}
 
 		// draw the model
-		it.pRootNode->Draw(*pD3DMgr);
+		it.pRootNode->Draw();
 
 		//it.meshes[0].pMesh->Draw(*pD3DMgr);
 		/*
@@ -96,7 +97,7 @@ void DFactory::DrawFrame() noexcept
 		}*/
 	}
 	
-	LightM->Draw(*pD3DMgr);
+	LightM->Draw();
 }
 
 void DFactory::SetSimulationSpeed(const float simSpeedFactor) noexcept

@@ -264,3 +264,8 @@ void D3DMgr::DrawIndexed(const UINT& count) noexcept
 {
 	D3D_THROW_INFO(m_pContext->DrawIndexed(count, 0u, 0u));
 }
+
+ID3D11Device* D3DMgr::GetDevice() noexcept
+{
+	return m_pDevice.Get();
+}

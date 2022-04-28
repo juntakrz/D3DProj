@@ -6,7 +6,8 @@
 #include "WndMgr/WndMgr.h"
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
-#include "Util/DF_ID.h"
+//#include "Util/DF_ID.h"
+#include "Util/DF_Data.h"
 
 class DFactory
 {

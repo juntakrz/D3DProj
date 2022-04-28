@@ -177,6 +177,12 @@
     <ClCompile Include="src\DFactory\DFModelMgr_Import.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFactory\Util\DDSTextureLoader11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\Util\DF_Data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -354,6 +360,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\Util\DF_ID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\Util\DDSTextureLoader11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\Util\DF_Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

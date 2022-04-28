@@ -2,17 +2,17 @@
 
 DFMaterial& MeshCore::MatMgr = DFMaterial::Get();
 
-void MeshCore::Draw(D3DMgr& d3dMgr)
+void MeshCore::Draw()
 {
 	for (const auto& it : m_Binds)
 	{
-		it ? it->Bind(d3dMgr) : void();
+		it ? it->Bind() : void();
 	}
 	for (const auto& it : GetStaticBinds())
 	{
-		it->Bind(d3dMgr);
+		it->Bind();
 	}
-	d3dMgr.DrawIndexed(m_pCIndexBuffer->GetCount());
+	DFData::pD3DM->DrawIndexed(m_pCIndexBuffer->GetCount());
 }
 
 const Bind::IndexBuffer* MeshCore::GetIndexBuffer() const noexcept
@@ -46,7 +46,7 @@ void MeshCore::AddMaterialBind(uint16_t matIndex) noexcept
 
 	//bind it to pixel shader cbuffer slot 0
 	m_Binds[Bind::idConstPixelBuf0] =
-		std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(*m_pD3DMgr, matCBuffer, 0u);
+		std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
 }
 
 std::vector<std::unique_ptr<Bind::IBind>>* MeshCore::GetBinds() noexcept
@@ -67,35 +67,35 @@ void MeshCore::SetMaterial(std::string name) noexcept
 
 	// update binds
 	if (mat.pTexBase != nullptr) {
-		m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTexBase);
+		m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(*mat.pTexBase);
 	}
 
 	if (mat.pTexNormal != nullptr) {
-		m_Binds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTexNormal, 1u);
+		m_Binds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*mat.pTexNormal, 1u);
 	}
 
 	if (mat.pTex2 != nullptr) {
-		m_Binds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex2, 2u);
+		m_Binds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*mat.pTex2, 2u);
 	}
 
 	if (mat.pTex3 != nullptr) {
-		m_Binds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex3, 3u);
+		m_Binds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*mat.pTex3, 3u);
 	}
 
 	if (mat.pTex4 != nullptr) {
-		m_Binds[Bind::idTexture4] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex4, 4u);
+		m_Binds[Bind::idTexture4] = std::make_unique<Bind::Texture>(*mat.pTex4, 4u);
 	}
 
 	if (mat.pTex5 != nullptr) {
-		m_Binds[Bind::idTexture5] = std::make_unique<Bind::Texture>(*m_pD3DMgr, *mat.pTex5, 5u);
+		m_Binds[Bind::idTexture5] = std::make_unique<Bind::Texture>(*mat.pTex5, 5u);
 	}
 
-	auto pVS = std::make_unique<Bind::VertexShader>(*m_pD3DMgr, "shaders//" + mat.shaderVertex + ".cso");
+	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + mat.shaderVertex + ".cso");
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(*m_pD3DMgr, "shaders//" + mat.shaderPixel + ".cso");
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + mat.shaderPixel + ".cso");
 
-	m_Binds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(*m_pD3DMgr, matCBuffer, 0u);
+	m_Binds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 	{
@@ -105,7 +105,7 @@ void MeshCore::SetMaterial(std::string name) noexcept
 		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(*m_pD3DMgr, ied, pVSByteCode);
+	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(ied, pVSByteCode);
 }
 
 void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
@@ -114,10 +114,10 @@ void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
 	(inVS == "") ? inVS = MatMgr.Mat(m_matIndex).shaderVertex : MatMgr.Mat(m_matIndex).shaderVertex = inVS;
 	(inPS == "") ? inPS = MatMgr.Mat(m_matIndex).shaderPixel : MatMgr.Mat(m_matIndex).shaderPixel = inPS;
 
-	auto pVS = std::make_unique<Bind::VertexShader>(*m_pD3DMgr, "shaders//" + inVS + ".cso");
+	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + inVS + ".cso");
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(*m_pD3DMgr, "shaders//" + inPS + ".cso");
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + inPS + ".cso");
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 	{
@@ -127,5 +127,5 @@ void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
 		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(*m_pD3DMgr, ied, pVSByteCode);
+	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(ied, pVSByteCode);
 }

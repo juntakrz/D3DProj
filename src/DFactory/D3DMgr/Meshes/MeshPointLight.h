@@ -16,12 +16,12 @@ private:
 public:
 	static bool m_showAllMeshes;
 
-	MeshPointLight(D3DMgr& d3dMgr);
+	MeshPointLight();
 
 	void EnableLightMesh() noexcept;
 	void DisableLightMesh() noexcept;
 
-	void Draw(D3DMgr& d3dMgr) noexcept;
+	void Draw() noexcept;
 
 	void DEBUG_Rotate(float delta = 0.0f) noexcept;
 

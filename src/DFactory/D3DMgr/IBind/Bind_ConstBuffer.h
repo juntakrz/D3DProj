@@ -10,10 +10,10 @@ namespace Bind
 	class ConstBuffer : public IBind
 	{
 	public:
-		ConstBuffer(D3DMgr& d3dMgr, UINT slot = 0)
+		ConstBuffer(UINT slot = 0)
 			: m_slot(slot)
 		{
-			D3D_DXGIDEBUG(d3dMgr);
+			D3D_DXGIDEBUG(*DFData::pD3DM);
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.Usage = D3D11_USAGE_DYNAMIC;
@@ -23,12 +23,12 @@ namespace Bind
 			bd.ByteWidth = sizeof(C);
 			bd.StructureByteStride = 0u;				//not an array
 
-			D3D_THROW(GetDevice(d3dMgr)->CreateBuffer(&bd, nullptr, &m_pConstBuffer));
+			D3D_THROW(GetDevice()->CreateBuffer(&bd, nullptr, &m_pConstBuffer));
 		};
-		ConstBuffer(D3DMgr& d3dMgr, const C& cbuf, UINT slot = 0)
+		ConstBuffer(const C& cbuf, UINT slot = 0)
 			: m_slot(slot)
 		{
-			D3D_DXGIDEBUG(d3dMgr);
+			D3D_DXGIDEBUG(*DFData::pD3DM);
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.Usage = D3D11_USAGE_DYNAMIC;
@@ -41,29 +41,29 @@ namespace Bind
 			D3D11_SUBRESOURCE_DATA sd = {};
 			sd.pSysMem = &cbuf;
 
-			D3D_THROW(GetDevice(d3dMgr)->CreateBuffer(&bd, &sd, &m_pConstBuffer));
+			D3D_THROW(GetDevice()->CreateBuffer(&bd, &sd, &m_pConstBuffer));
 		};
-		void Update(D3DMgr& d3dMgr, const C& cbuf)
+		void Update(const C& cbuf)
 		{
-			D3D_DXGIDEBUG(d3dMgr);
+			D3D_DXGIDEBUG(*DFData::pD3DM);
 
 			D3D11_MAPPED_SUBRESOURCE msr = {};
-			D3D_THROW(GetContext(d3dMgr)->Map(m_pConstBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr));
+			D3D_THROW(GetContext()->Map(m_pConstBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr));
 			memcpy(msr.pData, &cbuf, sizeof(cbuf));
-			GetContext(d3dMgr)->Unmap(m_pConstBuffer.Get(), 0u);
+			GetContext()->Unmap(m_pConstBuffer.Get(), 0u);
 		};
 		
-		void Update(D3DMgr& d3dMgr, const std::vector<C>* cbuf, int size)
+		void Update(const std::vector<C>* cbuf, int size)
 		{
-			D3D_DXGIDEBUG(d3dMgr);
+			D3D_DXGIDEBUG(*DFData::pD3DM);
 
 			std::vector<C> tbuf(cbuf->size());
 			memcpy(tbuf.data(), cbuf->data(), sizeof(C) * cbuf->size());
 
 			D3D11_MAPPED_SUBRESOURCE msr = {};
-			D3D_THROW(GetContext(d3dMgr)->Map(m_pConstBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr));
+			D3D_THROW(GetContext()->Map(m_pConstBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr));
 			memcpy(msr.pData, tbuf.data(), sizeof(C) * cbuf->size());
-			GetContext(d3dMgr)->Unmap(m_pConstBuffer.Get(), 0u);
+			GetContext()->Unmap(m_pConstBuffer.Get(), 0u);
 		};
 
 	protected:
@@ -79,9 +79,9 @@ namespace Bind
 		using IBind::GetContext;
 	public:
 		using ConstBuffer<C>::ConstBuffer;
-		void Bind(D3DMgr& d3dMgr) noexcept override
+		void Bind() noexcept override
 		{
-			GetContext(d3dMgr)->VSSetConstantBuffers(m_slot, 1u, m_pConstBuffer.GetAddressOf());
+			GetContext()->VSSetConstantBuffers(m_slot, 1u, m_pConstBuffer.GetAddressOf());
 		};
 	};
 
@@ -94,9 +94,9 @@ namespace Bind
 		using IBind::GetContext;
 	public:
 		using ConstBuffer<C>::ConstBuffer;
-		void Bind(D3DMgr& d3dMgr) noexcept override
+		void Bind() noexcept override
 		{
-			GetContext(d3dMgr)->PSSetConstantBuffers(m_slot, 1u, m_pConstBuffer.GetAddressOf());
+			GetContext()->PSSetConstantBuffers(m_slot, 1u, m_pConstBuffer.GetAddressOf());
 		};
 	};
 }

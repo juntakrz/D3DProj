@@ -3,12 +3,12 @@
 namespace Bind
 {
 
-	InputLayout::InputLayout(D3DMgr& d3dMgr, const std::vector<D3D11_INPUT_ELEMENT_DESC>& d3dIEDesc, ID3DBlob* pVSBytecode)
+	InputLayout::InputLayout(const std::vector<D3D11_INPUT_ELEMENT_DESC>& d3dIEDesc, ID3DBlob* pVSBytecode)
 	{
-		D3D_DXGIDEBUG(d3dMgr);
+		D3D_DXGIDEBUG(*DFData::pD3DM);
 
 		//creating D3D input layout
-		D3D_THROW_INFO(GetDevice(d3dMgr)->CreateInputLayout(
+		D3D_THROW_INFO(GetDevice()->CreateInputLayout(
 			d3dIEDesc.data(),
 			(UINT)std::size(d3dIEDesc),
 			pVSBytecode->GetBufferPointer(),
@@ -17,8 +17,8 @@ namespace Bind
 		));
 	}
 
-	void InputLayout::Bind(D3DMgr& d3dMgr) noexcept
+	void InputLayout::Bind() noexcept
 	{
-		GetContext(d3dMgr)->IASetInputLayout(pInputLayout.Get());
+		GetContext()->IASetInputLayout(pInputLayout.Get());
 	}
 }

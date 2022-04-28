@@ -206,26 +206,21 @@ void DFMain::LoadScreen() noexcept
 	
 	Animate();
 	/*
+	//MdlTachi
 	DF.ModelM->Create(DF::idImport, "MdlTachi", "tachilp1.obj");
-	DF.ModelM->SetShaders("VS_Classic", "PS_Classic");
-	DF.ModelM->SetScaling(0.5f, 0.5f, 0.5f);
-	DF.ModelM->SetPos(0.0f, -30.0f, 70.0f);
+	DF.ModelM->SetShaders("VS_Standard", "PS_Standard");
+	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
+	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
 	*/
 	/*
-	DF.ModelM->Create(DF::idImport, "MdlRoci", "Roci2.obj");
-	DF.ModelM->SetShaders("VS_BumpML", "PS_BumpML");
-	DF.ModelM->SetPos(30.0f, -50.0f, 40.0f);
-	DF.ModelM->SetScaling(44.0f, 44.0f, 44.0f);
-	DF.ModelM->SetRotation(-DirectX::XM_PI - 0.6f, -0.4f, -DirectX::XM_PI + 0.3f);
-	*/
-	
+	//MdlSphere1
 	DF.ModelM->Create(DF::idSphere, "MdlSphere1", 64);
 	DF.ModelM->SetScaling(0.8f, 0.8f, 0.8f);
 	DF.ModelM->SetRotation(0.5f, 0.5f, 0.5f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetMaterial("Mat_PBSMetal");
-	
+	*/
 	Animate();
 	
 	//DF.LMgr->ShowPLMeshes() = true;

@@ -2,13 +2,13 @@
 
 namespace Bind
 {
-	ID3D11Device* IBind::GetDevice(D3DMgr& d3dMgr) noexcept
+	ID3D11Device* IBind::GetDevice() noexcept
 	{
-		return d3dMgr.m_pDevice.Get();
+		return DFData::pD3DM->m_pDevice.Get();
 	}
 
-	ID3D11DeviceContext* IBind::GetContext(D3DMgr& d3dMgr) noexcept
+	ID3D11DeviceContext* IBind::GetContext() noexcept
 	{
-		return d3dMgr.m_pContext.Get();
+		return DFData::pD3DM->m_pContext.Get();
 	}
 }

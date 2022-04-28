@@ -1,13 +1,11 @@
 #include "MeshImport.h"
 
-MeshImport::MeshImport(D3DMgr* pD3DMgr, std::vector<std::unique_ptr<Bind::IBind>> pBinds)
+MeshImport::MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds)
 {
-	m_pD3DMgr = pD3DMgr;
-
 	if (!IsStaticBindsInitialized())
 	{
 		//create and bind topology
-		AddStaticBind(std::make_unique<Bind::Topology>(*m_pD3DMgr, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+		AddStaticBind(std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 	}
 	else
 	{
@@ -24,7 +22,7 @@ MeshImport::MeshImport(D3DMgr* pD3DMgr, std::vector<std::unique_ptr<Bind::IBind>
 		pBinds[id] != nullptr ? AddBind(std::move(pBinds[id]), id) : void();
 	}
 
-	AddBind(std::make_unique<Bind::TransformConstBuffer>(*m_pD3DMgr, *this), Bind::idTransform);
+	AddBind(std::make_unique<Bind::TransformConstBuffer>(*this), Bind::idTransform);
 }
 
 XMMATRIX MeshImport::GetTransformXM() const noexcept

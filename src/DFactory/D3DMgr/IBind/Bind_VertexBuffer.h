@@ -9,9 +9,9 @@ namespace Bind
 	{
 	public:
 		template<typename V>
-		VertexBuffer(D3DMgr& d3dMgr, const std::vector<V>& vertices) : m_stride(sizeof(V))
+		VertexBuffer(const std::vector<V>& vertices) : m_stride(sizeof(V))
 		{
-			D3D_DXGIDEBUG(d3dMgr);
+			D3D_DXGIDEBUG(*DFData::pD3DM);
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.Usage = D3D11_USAGE_DEFAULT;				//GPU read and write
@@ -25,12 +25,12 @@ namespace Bind
 			sd.pSysMem = vertices.data();				//pointer to the resource memory data read according to the above settings
 
 			//takes buffer and subresource descriptors and returns a ptr to the created buffer
-			D3D_THROW(GetDevice(d3dMgr)->CreateBuffer(&bd, &sd, &m_pVertexBuffer));
+			D3D_THROW(GetDevice()->CreateBuffer(&bd, &sd, &m_pVertexBuffer));
 		}
 
-		VertexBuffer(D3DMgr& d3dMgr, const Vrtx::Buffer& vertices) : m_stride((UINT)vertices.GetLayout().Size())
+		VertexBuffer(const Vrtx::Buffer& vertices) : m_stride((UINT)vertices.GetLayout().Size())
 		{
-			D3D_DXGIDEBUG(d3dMgr);
+			D3D_DXGIDEBUG(*DFData::pD3DM);
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.Usage = D3D11_USAGE_DEFAULT;				//GPU read and write
@@ -44,13 +44,13 @@ namespace Bind
 			sd.pSysMem = vertices.GetData();			//pointer to the resource memory data read according to the above settings
 
 			//takes buffer and subresource descriptors and returns a ptr to the created buffer
-			D3D_THROW(GetDevice(d3dMgr)->CreateBuffer(&bd, &sd, &m_pVertexBuffer));
+			D3D_THROW(GetDevice()->CreateBuffer(&bd, &sd, &m_pVertexBuffer));
 		}
 
-		void Bind(D3DMgr& d3dMgr) noexcept override
+		void Bind() noexcept override
 		{
 			const UINT offset = 0u;						//offset to the first vertex array element
-			GetContext(d3dMgr)->IASetVertexBuffers(0u, 1u, m_pVertexBuffer.GetAddressOf(), &m_stride, &offset);
+			GetContext()->IASetVertexBuffers(0u, 1u, m_pVertexBuffer.GetAddressOf(), &m_stride, &offset);
 		}
 
 	protected:

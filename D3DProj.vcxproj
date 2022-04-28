@@ -166,6 +166,8 @@
     <ClCompile Include="src\DFactory\DFModelMgr_Import.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Node.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Transform.cpp" />
+    <ClCompile Include="src\DFactory\Util\DDSTextureLoader11.cpp" />
+    <ClCompile Include="src\DFactory\Util\DF_Data.cpp" />
     <ClCompile Include="src\DFMain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -263,6 +265,8 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\CApp.h" />
+    <ClInclude Include="src\DFactory\Util\DDSTextureLoader11.h" />
+    <ClInclude Include="src\DFactory\Util\DF_Data.h" />
     <ClInclude Include="src\DFactory\Util\DF_ID.h" />
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshImport.h" />
     <ClInclude Include="src\DFactory\DFModelMgr.h" />

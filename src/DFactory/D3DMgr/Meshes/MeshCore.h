@@ -55,7 +55,6 @@ private:
 	const Bind::IndexBuffer* m_pCIndexBuffer = nullptr;
 
 protected:
-	D3DMgr* m_pD3DMgr = nullptr;
 	uint16_t m_matIndex = 0;
 
 	void AddBind(std::unique_ptr<Bind::IBind> bindObj, uint8_t id) noexcept;
@@ -88,7 +87,7 @@ public:
 	MeshCore(const MeshCore&) = delete;
 	~MeshCore() = default;
 
-	void Draw(D3DMgr& d3dMgr);
+	void Draw();
 
 	virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
 	void XMUpdate(FXMMATRIX transform) noexcept;

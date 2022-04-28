@@ -29,15 +29,15 @@ void DFModelNode::XMUpdate(FXMMATRIX transform) noexcept
 	}
 }
 
-void DFModelNode::Draw(D3DMgr& d3dMgr) const noexcept
+void DFModelNode::Draw() const noexcept
 {
 	for (const auto& mesh : m_pMeshes)
 	{
-		mesh->Draw(d3dMgr);
+		mesh->Draw();
 	}
 
 	for (const auto& pNode : m_pChildNodes)
 	{
-		pNode->Draw(d3dMgr);
+		pNode->Draw();
 	}
 }

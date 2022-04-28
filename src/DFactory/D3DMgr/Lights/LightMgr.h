@@ -7,10 +7,6 @@
 class LightMgr
 {
 private:
-	D3DMgr* m_d3dMgr;
-
-	//DirectX::XMFLOAT3 defaultPos = { 0.0f, 0.0f, 0.0f };
-
 	static const uint16_t m_maxPLights = 4;
 	uint16_t m_selPLight = 0;
 
@@ -43,15 +39,15 @@ private:
 	mutable Bind::ConstPixelBuffer<PointLight_ConstPSBuffer> pointBuffer;
 
 public:
-	LightMgr(D3DMgr* d3dMgr) 
-		: m_d3dMgr(d3dMgr), dirBuffer(*d3dMgr, 1u), pointBuffer(*d3dMgr, 2u) {
+	LightMgr() 
+		: dirBuffer(1u), pointBuffer(2u) {
 		m_PLights.reserve(16);
 	};
 	~LightMgr() = default;
 	LightMgr(const LightMgr&) = delete;
 
-	static LightMgr& Get(D3DMgr* d3dMgr = nullptr) noexcept {
-		static LightMgr _SInstance{d3dMgr};
+	static LightMgr& Get() noexcept {
+		static LightMgr _SInstance;
 		return _SInstance;
 	}
 
@@ -73,6 +69,6 @@ public:
 	void ShowControls() noexcept;
 	void Reset() noexcept;
 
-	void Draw(D3DMgr& d3dMgr) const noexcept;
-	void Bind(D3DMgr& d3dMgr, const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept;
+	void Draw() const noexcept;
+	void Bind(const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept;
 };

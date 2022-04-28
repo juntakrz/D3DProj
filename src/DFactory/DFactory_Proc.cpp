@@ -13,12 +13,12 @@ void DFactory::CProc::ProcessCamera() noexcept
 	m_camRot.x = 0.0f;
 	m_camRot.y = 0.0f;
 
-	pKbd->IsKeyDown('W') ? m_camDir.z += 0.01f : 0.0f;
-	pKbd->IsKeyDown('S') ? m_camDir.z += -0.01f : 0.0f;
-	pKbd->IsKeyDown('A') ? m_camDir.x += -0.01f : 0.0f;
-	pKbd->IsKeyDown('D') ? m_camDir.x += 0.01f : 0.0f;
-	pKbd->IsKeyDown('R') ? m_camDir.y += 0.01f : 0.0f;
-	pKbd->IsKeyDown('F') ? m_camDir.y += -0.01f : 0.0f;
+	pKbd->IsKeyDown('W') ? m_camDir.z += 0.03f : 0.0f;
+	pKbd->IsKeyDown('S') ? m_camDir.z += -0.03f : 0.0f;
+	pKbd->IsKeyDown('A') ? m_camDir.x += -0.03f : 0.0f;
+	pKbd->IsKeyDown('D') ? m_camDir.x += 0.03f : 0.0f;
+	pKbd->IsKeyDown('R') ? m_camDir.y += 0.03f : 0.0f;
+	pKbd->IsKeyDown('F') ? m_camDir.y += -0.03f : 0.0f;
 
 	switch (pMouse->IsCursorOn())
 	{
@@ -93,4 +93,5 @@ void DFactory::CProc::ProcessFunctions() noexcept
 	}
 
 	pKbd->IsKeyDown('0') ? pDF->ModelM->DEBUG_ShowModelList() : void();
+	pKbd->IsKeyDown('9') ? pDF->MatM->DEBUG_ShowTextureIndex() : void();
 }

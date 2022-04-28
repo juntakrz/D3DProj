@@ -40,7 +40,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		newMesh.meshid = 1;
 		newMesh.meshMat = "Mat_Default";
 		newMesh.meshName = "Plane" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshPlane>(*pD3DMgr, newMesh.meshMat, paramA, paramB);
+		newMesh.pMesh = std::make_unique<MeshPlane>(newMesh.meshMat, paramA, paramB);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -59,7 +59,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		newMesh.meshid = 1;
 		newMesh.meshMat = "Mat_Default";
 		newMesh.meshName = "Cube" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshCube>(*pD3DMgr, newMesh.meshMat);
+		newMesh.pMesh = std::make_unique<MeshCube>(newMesh.meshMat);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -80,7 +80,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		newMesh.meshid = 1;
 		newMesh.meshMat = "Mat_Default";
 		newMesh.meshName = "Sphere" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshSphere>(*pD3DMgr, newMesh.meshMat, paramA);
+		newMesh.pMesh = std::make_unique<MeshSphere>(newMesh.meshMat, paramA);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -101,7 +101,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		newMesh.meshid = 1;
 		newMesh.meshMat = "Mat_Default";
 		newMesh.meshName = "SkySphere" + std::to_string(newMesh.meshid);
-		newMesh.pMesh = std::make_unique<MeshSphere>(*pD3DMgr, newMesh.meshMat, paramA, true);
+		newMesh.pMesh = std::make_unique<MeshSphere>(newMesh.meshMat, paramA, true);
 
 		newModel.id = newID;
 		newModel.name = name;

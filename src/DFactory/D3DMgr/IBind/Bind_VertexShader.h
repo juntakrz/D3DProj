@@ -7,8 +7,8 @@ namespace Bind
 	class VertexShader : public IBind
 	{
 	public:
-		VertexShader(D3DMgr& d3dMgr, const std::string& filePath) noexcept;
-		void Bind(D3DMgr& d3dMgr) noexcept override;
+		VertexShader(const std::string& filePath) noexcept;
+		void Bind() noexcept override;
 		ID3DBlob* GetByteCode() const noexcept;
 
 	protected:

@@ -30,14 +30,14 @@ void LightMgr::Reset() noexcept {
 	plData.pos[m_selPLight] = {0.0f, 0.0f, 0.0f};
 }
 
-void LightMgr::Draw(D3DMgr& d3dMgr) const noexcept {
+void LightMgr::Draw() const noexcept {
 
 	for (const auto& it : m_PLights) {
-		it.pMesh->Draw(d3dMgr);
+		it.pMesh->Draw();
 	}
 }
 
-void LightMgr::Bind(D3DMgr& d3dMgr, const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept {
+void LightMgr::Bind(const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept {
 
 	//this method calculates which point lights are within rendering distance of the model
 	//and fills the constant PS buffer with them
@@ -67,10 +67,10 @@ void LightMgr::Bind(D3DMgr& d3dMgr, const DirectX::XMMATRIX& camView, MeshCore* 
 	PointLight_ConstPSBuffer plDataCopy = plData;
 	
 
-	pointBuffer.Update(d3dMgr, plDataCopy);
-	pointBuffer.Bind(d3dMgr);
+	pointBuffer.Update(plDataCopy);
+	pointBuffer.Bind();
 
 	//updating and binding directional light buffer
-	dirBuffer.Update(d3dMgr, dlData);
-	dirBuffer.Bind(d3dMgr);
+	dirBuffer.Update(dlData);
+	dirBuffer.Bind();
 }

@@ -16,7 +16,7 @@ namespace Bind
 		static std::unique_ptr<ConstVertexBuffer<Transforms>> m_pConstVertexBuffer;
 		const MeshCore& parent;
 	public:
-		TransformConstBuffer(D3DMgr& d3dMgr, const MeshCore& parent);
-		void Bind(D3DMgr& d3dMgr) noexcept override;
+		TransformConstBuffer(const MeshCore& parent);
+		void Bind() noexcept override;
 	};
 }

@@ -2,6 +2,7 @@
 
 #include "../../pch.h"
 #include "DFSurface.h"
+#include "Util/DF_Data.h"
 
 class DFMaterial
 {
@@ -41,8 +42,16 @@ class DFMaterial
 		Texture(std::string A, std::string B, DFSurface C) : name(A), filePath(B), texture(std::move(C)) {};
 	};
 
+	struct DXTexture
+	{
+		std::string name;
+		std::string filePath;
+		COMPTR<ID3D11ShaderResourceView> pSRV;
+	};
+
 	std::vector<std::unique_ptr<Material>> m_Materials;
 	std::vector<std::unique_ptr<Texture>> m_Textures;
+	std::vector<DXTexture> m_DXTextures;
 
 public:
 
@@ -87,6 +96,7 @@ public:
 
 	uint16_t AddTexture(std::string filePath) noexcept;
 	uint16_t AddTexture(std::string name, std::string filePath) noexcept;
+	uint16_t AddTextureDDS(std::string filePath) noexcept;
 	DFSurface* GetTexture(std::string name) const noexcept;
 	DFSurface* GetTexture(uint16_t index) const noexcept;
 	uint16_t GetTextureIndex(std::string name) const noexcept;

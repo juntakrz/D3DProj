@@ -2,16 +2,16 @@
 
 namespace Bind
 {
-	PixelShader::PixelShader(D3DMgr& d3dMgr, const std::string& filePath) noexcept : m_FilePath(filePath.begin(), filePath.end())
+	PixelShader::PixelShader(const std::string& filePath) noexcept : m_FilePath(filePath.begin(), filePath.end())
 	{
-		D3D_DXGIDEBUG(d3dMgr);
+		D3D_DXGIDEBUG(*DFData::pD3DM);
 
 		D3D_THROW(D3DReadFileToBlob(m_FilePath.c_str(), &m_pBlob));
-		D3D_THROW(GetDevice(d3dMgr)->CreatePixelShader(m_pBlob->GetBufferPointer(), m_pBlob->GetBufferSize(), nullptr, &m_pPS));
+		D3D_THROW(GetDevice()->CreatePixelShader(m_pBlob->GetBufferPointer(), m_pBlob->GetBufferSize(), nullptr, &m_pPS));
 	}
 
-	void PixelShader::Bind(D3DMgr& d3dMgr) noexcept
+	void PixelShader::Bind() noexcept
 	{
-		GetContext(d3dMgr)->PSSetShader(m_pPS.Get(), nullptr, NULL);
+		GetContext()->PSSetShader(m_pPS.Get(), nullptr, NULL);
 	}
 }

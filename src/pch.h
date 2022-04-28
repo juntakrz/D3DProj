@@ -45,6 +45,9 @@ namespace Gdiplus
 #include "assimp/scene.h"           // Output data structure
 #include "assimp/postprocess.h"     // Post processing flags
 
+//D3D11 DDS Loader
+#include "DFactory/Util/DDSTextureLoader11.h"
+
 #ifdef _DEBUG
 #pragma comment (lib, "dxguid.lib")
 #include <dxgidebug.h>

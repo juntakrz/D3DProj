@@ -2,14 +2,12 @@
 
 bool MeshPointLight::m_showAllMeshes = false;
 
-MeshPointLight::MeshPointLight(D3DMgr& d3dMgr)
+MeshPointLight::MeshPointLight()
 {
-	m_pD3DMgr = &d3dMgr;
-
 	if (!IsStaticBindsInitialized())
 	{
 		//create and bind topology
-		AddStaticBind(std::make_unique<Bind::Topology>(d3dMgr, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+		AddStaticBind(std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 	}
 	else
 	{
@@ -21,30 +19,30 @@ MeshPointLight::MeshPointLight(D3DMgr& d3dMgr)
 	auto model = CSphere::Create<Vertex>(4);
 
 	//create and bind VertexBuffer with vertices
-	AddBind(std::make_unique<Bind::VertexBuffer>(d3dMgr, model.vertices), Bind::idVertexBuffer);
+	AddBind(std::make_unique<Bind::VertexBuffer>(model.vertices), Bind::idVertexBuffer);
 
 	//create and bind IndexBuffer with indices
-	AddIndexBuffer(std::make_unique<Bind::IndexBuffer>(d3dMgr, model.indices));
+	AddIndexBuffer(std::make_unique<Bind::IndexBuffer>(model.indices));
 
 	//create and bind vertex shader
 	std::string VSPath = "shaders//VS_Default.cso";
-	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(d3dMgr, VSPath);
+	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	AddBind(std::move(pVS), Bind::idVertexShader);
 
 	//create and bind pixel shader
 	std::string PSPath = "shaders//PS_Default.cso";
-	AddBind(std::make_unique<Bind::PixelShader>(d3dMgr, PSPath), Bind::idPixelShader);
+	AddBind(std::make_unique<Bind::PixelShader>(PSPath), Bind::idPixelShader);
 
 	//create and bind InputLayout
 	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	AddBind(std::make_unique<Bind::InputLayout>(d3dMgr, ied, pVSByteCode), Bind::idInputLayout);
+	AddBind(std::make_unique<Bind::InputLayout>(ied, pVSByteCode), Bind::idInputLayout);
 
 	//create and bind transform constant buffer
-	AddBind(std::make_unique<Bind::TransformConstBuffer>(d3dMgr, *this), Bind::idTransform);
+	AddBind(std::make_unique<Bind::TransformConstBuffer>(*this), Bind::idTransform);
 }
 
 void MeshPointLight::EnableLightMesh() noexcept
@@ -57,17 +55,17 @@ void MeshPointLight::DisableLightMesh() noexcept
 	m_showMesh = false;
 }
 
-void MeshPointLight::Draw(D3DMgr& d3dMgr) noexcept
+void MeshPointLight::Draw() noexcept
 {
 	for (const auto& it : *GetBinds())
 	{
-		it ? it->Bind(d3dMgr) : void();
+		it ? it->Bind() : void();
 	}
 	for (const auto& it : GetStaticBinds())
 	{
-		it->Bind(d3dMgr);
+		it->Bind();
 	}
-	(m_showMesh && m_showAllMeshes) ? d3dMgr.DrawIndexed(GetIndexBuffer()->GetCount()) : (void)0;
+	(m_showMesh && m_showAllMeshes) ? DFData::pD3DM->DrawIndexed(GetIndexBuffer()->GetCount()) : (void)0;
 }
 
 void MeshPointLight::DEBUG_Rotate(float delta) noexcept

@@ -29,7 +29,7 @@ private:
 public:
 	DFModelNode(std::vector<MeshCore*> pMeshes, const XMMATRIX& transform) noexcept;
 	void XMUpdate(FXMMATRIX transform) noexcept;
-	void Draw(D3DMgr& d3dMgr) const noexcept;
+	void Draw() const noexcept;
 };
 
 class DFModelMgr

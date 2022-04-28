@@ -3,10 +3,10 @@
 namespace Bind
 {
 
-	IndexBuffer::IndexBuffer(D3DMgr& d3dMgr, const std::vector<uint32_t>& indices) : m_count((UINT)indices.size())
+	IndexBuffer::IndexBuffer(const std::vector<uint32_t>& indices) : m_count((UINT)indices.size())
 	{
 
-		D3D_DXGIDEBUG(d3dMgr);
+		D3D_DXGIDEBUG(*DFData::pD3DM);
 
 		//descriptors
 		D3D11_BUFFER_DESC bd = {};
@@ -21,12 +21,12 @@ namespace Bind
 		sd.pSysMem = indices.data();
 
 		//create buffer
-		D3D_THROW(GetDevice(d3dMgr)->CreateBuffer(&bd, &sd, &m_pIndexBuffer));
+		D3D_THROW(GetDevice()->CreateBuffer(&bd, &sd, &m_pIndexBuffer));
 	}
 
-	void IndexBuffer::Bind(D3DMgr& d3dMgr) noexcept
+	void IndexBuffer::Bind() noexcept
 	{
-		GetContext(d3dMgr)->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+		GetContext()->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
 	}
 
 	uint32_t IndexBuffer::GetCount() const noexcept

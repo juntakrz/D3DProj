@@ -104,4 +104,6 @@ public:
 	CCamera* GetCamera() const noexcept;
 
 	void DrawIndexed(const UINT& count) noexcept;
+
+	ID3D11Device* GetDevice() noexcept;
 };

@@ -2,12 +2,11 @@
 
 namespace Bind
 {
-	Texture::Texture(D3DMgr& d3dMgr, const DFSurface& surface, UINT slot) : m_slot(slot)
+	Texture::Texture(const DFSurface& surface, UINT slot) : m_slot(slot)
 	{
-		D3D_DXGIDEBUG(d3dMgr);
+		D3D_DXGIDEBUG(*DFData::pD3DM);
 
 		//creating 2D texture as a shader resource
-
 		D3D11_TEXTURE2D_DESC texDesc = {};
 		texDesc.Width = surface.GetWidth();
 		texDesc.Height = surface.GetHeight();
@@ -26,7 +25,7 @@ namespace Bind
 		sd.SysMemPitch = surface.GetWidth() * sizeof(DFSurface::Color);	//memory distance between texture lines
 
 		COMPTR<ID3D11Texture2D> pTexture;
-		D3D_THROW(GetDevice(d3dMgr)->CreateTexture2D(&texDesc, &sd, &pTexture));
+		D3D_THROW(GetDevice()->CreateTexture2D(&texDesc, &sd, &pTexture));
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = texDesc.Format;
@@ -34,11 +33,19 @@ namespace Bind
 		srvDesc.Texture2D.MipLevels = 1;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 
-		D3D_THROW(GetDevice(d3dMgr)->CreateShaderResourceView(pTexture.Get(), &srvDesc, &m_pSRV));
+		D3D_THROW(GetDevice()->CreateShaderResourceView(pTexture.Get(), &srvDesc, &m_pSRV));
 	}
 
-	void Texture::Bind(D3DMgr& d3dMgr) noexcept
+	Texture::Texture(const COMPTR<ID3D11ShaderResourceView>* pSRV, UINT slot) : m_slot(slot)
 	{
-		GetContext(d3dMgr)->PSSetShaderResources(m_slot, 1u, m_pSRV.GetAddressOf());
+		D3D_DXGIDEBUG(*DFData::pD3DM);
+
+		pSRV->CopyTo(m_pSRV.GetAddressOf());
+		//m_pSRV = *pSRV;
+	}
+
+	void Texture::Bind() noexcept
+	{
+		GetContext()->PSSetShaderResources(m_slot, 1u, m_pSRV.GetAddressOf());
 	}
 }

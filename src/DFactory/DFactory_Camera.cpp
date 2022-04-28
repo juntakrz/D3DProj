@@ -86,7 +86,7 @@ void DFactory::CameraBindVS() noexcept
 	cameraConstBuffer.pos.y = m_Cameras[vars.activeCamera].pCam->GetPos().y;
 	cameraConstBuffer.pos.z = m_Cameras[vars.activeCamera].pCam->GetPos().z;
 
-	pCamCBuf = std::make_unique<Bind::ConstVertexBuffer<CameraConstVSBuffer>>(*pD3DMgr, cameraConstBuffer, 1u);
+	pCamCBuf = std::make_unique<Bind::ConstVertexBuffer<CameraConstVSBuffer>>(cameraConstBuffer, 1u);
 }
 
 void DFactory::CameraUpdateVS() noexcept
@@ -95,8 +95,8 @@ void DFactory::CameraUpdateVS() noexcept
 	cameraConstBuffer.pos.y = m_Cameras[vars.activeCamera].pCam->GetPos().y;
 	cameraConstBuffer.pos.z = m_Cameras[vars.activeCamera].pCam->GetPos().z;
 
-	pCamCBuf->Bind(*pD3DMgr);
-	pCamCBuf->Update(*pD3DMgr, cameraConstBuffer);
+	pCamCBuf->Bind();
+	pCamCBuf->Update(cameraConstBuffer);
 }
 
 CCamera* DFactory::Camera() noexcept

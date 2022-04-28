@@ -16,7 +16,7 @@ uint16_t LightMgr::PLAdd(std::string name, float x, float y, float z) noexcept {
 	PLight newPL{};
 	newPL.name = name;
 	newPL.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	newPL.pMesh = std::make_unique<MeshPointLight>(*m_d3dMgr);
+	newPL.pMesh = std::make_unique<MeshPointLight>();
 	newPL.pMesh->SetPos(x, y, z);
 	newPL.intensity = 1.0f;
 	m_PLights.push_back(std::move(newPL));

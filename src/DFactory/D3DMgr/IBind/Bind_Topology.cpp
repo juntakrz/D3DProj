@@ -2,13 +2,13 @@
 
 namespace Bind
 {
-	Topology::Topology(D3DMgr& d3dMgr, D3D11_PRIMITIVE_TOPOLOGY type) : m_type(type)
+	Topology::Topology(D3D11_PRIMITIVE_TOPOLOGY type) : m_type(type)
 	{
 		//
 	}
 
-	void Topology::Bind(D3DMgr& d3dMgr) noexcept
+	void Topology::Bind() noexcept
 	{
-		GetContext(d3dMgr)->IASetPrimitiveTopology(m_type);
+		GetContext()->IASetPrimitiveTopology(m_type);
 	}
 }
