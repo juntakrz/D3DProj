@@ -372,6 +372,7 @@
     <None Include="src\DFactory\D3DMgr\dxerr\DXTrace.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="shaders\include\HPS_PBS.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc">
@@ -389,10 +390,9 @@
     <FxCompile Include="shaders\VS_PhongTexture.hlsl" />
     <FxCompile Include="shaders\PS_StandardML.hlsl" />
     <FxCompile Include="shaders\VS_StandardML.hlsl" />
-    <FxCompile Include="shaders\PS_BumpML.hlsl" />
-    <FxCompile Include="shaders\VS_BumpML.hlsl" />
+    <FxCompile Include="shaders\PS_Standard.hlsl" />
+    <FxCompile Include="shaders\VS_Standard.hlsl" />
     <FxCompile Include="shaders\PS_PBS.hlsl" />
     <FxCompile Include="shaders\VS_PBS.hlsl" />
-    <FxCompile Include="shaders\PS_PBS1.hlsl" />
   </ItemGroup>
 </Project>

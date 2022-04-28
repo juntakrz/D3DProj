@@ -41,9 +41,8 @@ void MeshCore::AddMaterialBind(uint16_t matIndex) noexcept
 {
 	//prepare material buffer
 	matCBuffer.ambientColor = MatMgr.Mat(matIndex).ambientColor;
-	matCBuffer.matIntensity = MatMgr.Mat(matIndex).matIntensity;
-	matCBuffer.specIntensity = MatMgr.Mat(matIndex).specIntensity;
-	matCBuffer.specPower = MatMgr.Mat(matIndex).specPower;
+	matCBuffer.data = MatMgr.Mat(matIndex).data;
+	matCBuffer.F0 = MatMgr.Mat(matIndex).F0;
 
 	//bind it to pixel shader cbuffer slot 0
 	m_Binds[Bind::idConstPixelBuf0] =
@@ -63,9 +62,8 @@ void MeshCore::SetMaterial(std::string name) noexcept
 
 	// prepare material PS const buffer
 	matCBuffer.ambientColor = mat.ambientColor;
-	matCBuffer.matIntensity = mat.matIntensity;
-	matCBuffer.specIntensity = mat.specIntensity;
-	matCBuffer.specPower = mat.specPower;
+	matCBuffer.data = mat.data;
+	matCBuffer.F0 = mat.F0;
 
 	// update binds
 	if (mat.pTexBase != nullptr) {

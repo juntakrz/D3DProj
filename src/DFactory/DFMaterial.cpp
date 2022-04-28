@@ -45,9 +45,10 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 		: newMat.pTex5 = GetTexture(AddTexture("default//default_s.png"));
 
 	newMat.ambientColor = pDesc->material.ambientColor;
-	newMat.matIntensity = pDesc->material.matIntensity;
-	newMat.specIntensity = pDesc->material.specIntensity;
-	newMat.specPower = pDesc->material.specPower;
+	newMat.data.x = pDesc->material.matIntensity;
+	newMat.data.y = pDesc->material.reflectivity;
+	newMat.data.z = pDesc->material.pow_roughness;
+	newMat.F0 = pDesc->material.F0;
 
 	m_Materials.push_back(std::make_unique<DFMaterial::Material>(std::move(newMat)));
 	return index;

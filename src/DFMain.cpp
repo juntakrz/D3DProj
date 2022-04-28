@@ -128,14 +128,14 @@ void DFMain::LoadScreen() noexcept
 	//Mat_Mars
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Mars";
-	DFMatDesc.shaders.vertex = "VS_BumpML";
-	DFMatDesc.shaders.pixel = "PS_BumpML";
+	DFMatDesc.shaders.vertex = "VS_Classic";
+	DFMatDesc.shaders.pixel = "PS_Classic";
 	DFMatDesc.textures.base = "mars_4k_color.png";
 	DFMatDesc.textures.normal = "mars_4k_normal.png";
 	DFMatDesc.material.ambientColor = { 0.06f, 0.02f, 0.0f, 0.0f };
 	DFMatDesc.material.matIntensity = 2.9f;
-	DFMatDesc.material.specIntensity = 0.0f;
-	DFMatDesc.material.specPower = 0.1f;
+	DFMatDesc.material.reflectivity = 0.0f;
+	DFMatDesc.material.pow_roughness = 0.1f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -153,22 +153,31 @@ void DFMain::LoadScreen() noexcept
 
 	Animate();
 
+	//Mat_PBSMetal
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_PBSMetal";
+	DFMatDesc.shaders.vertex = "VS_PBS";
+	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.textures.base = "PBR//iron//rustediron2_basecolor.png";
+	DFMatDesc.textures.normal = "PBR//iron//rustediron2_normal.png";
+	DFMatDesc.textures.tex2 = "PBR//iron//rustediron2_metallic.png";
+	DFMatDesc.textures.tex3 = "PBR//iron//rustediron2_roughness.png";
+	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
+	DFMatDesc.material.reflectivity = 1.0f;
+	DFMatDesc.material.pow_roughness = 1.0f;
+
+	DF.MatM->MatAdd(&DFMatDesc);
+
 	//Mat_Metal
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Metal";
-	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS1";
-	//DFMatDesc.textures.base = "Fore_Section_BaseColor.png";
-	//DFMatDesc.textures.normal = "Fore_Section_Normal.png";
-	//DFMatDesc.textures.tex2 = "Fore_Section_Metallic.png";
-	//DFMatDesc.textures.tex3 = "Fore_Section_Roughness.png";
-	//DFMatDesc.textures.tex4 = "Tachi_LP_Fore_Section_AO.png";
-	DFMatDesc.textures.base = "iron//rustediron2_basecolor.png";
-	DFMatDesc.textures.normal = "iron//rustediron2_normal.png";
-	DFMatDesc.textures.tex2 = "iron//rustediron2_metallic.png";
-	DFMatDesc.textures.tex3 = "iron//rustediron2_roughness.png";
-	DFMatDesc.material.specIntensity = 4.0f;
-	DFMatDesc.material.specPower = 90.0f;
+	DFMatDesc.shaders.vertex = "VS_Standard";
+	DFMatDesc.shaders.pixel = "PS_Standard";
+	DFMatDesc.textures.base = "metal1.png";
+	DFMatDesc.textures.normal = "metal1_normal.png";
+	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
+	DFMatDesc.material.reflectivity = 1.5f;
+	DFMatDesc.material.pow_roughness = 1.2f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -194,8 +203,8 @@ void DFMain::LoadScreen() noexcept
 	Animate();
 	/*
 	DF.ModelM->Create(DF::idImport, "MdlTachi", "tachilp1.obj");
-	DF.ModelM->SetShaders("VS_BumpML", "PS_BumpML");
-	DF.ModelM->SetScaling(10.1f, 10.1f, 10.1f);
+	DF.ModelM->SetShaders("VS_Classic", "PS_Classic");
+	DF.ModelM->SetScaling(0.5f, 0.5f, 0.5f);
 	DF.ModelM->SetPos(0.0f, -30.0f, 70.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
 	*/
@@ -208,34 +217,31 @@ void DFMain::LoadScreen() noexcept
 	*/
 	
 	DF.ModelM->Create(DF::idSphere, "MdlSphere1", 64);
-	//DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
+	DF.ModelM->SetScaling(0.8f, 0.8f, 0.8f);
 	DF.ModelM->SetRotation(0.5f, 0.5f, 0.5f);
-	DF.ModelM->SetPos(0.0f, -10.0f, 20.0f);
-	DF.ModelM->SetMaterial("Mat_Metal");
+	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
+	DF.ModelM->SetMaterial("Mat_PBSMetal");
 	
 	Animate();
 	
 	//DF.LMgr->ShowPLMeshes() = true;
 	
-	//DF.AddLight("Light2", 40.0f, -40.0f, 50.0f);
-	DF.LightM->PLAdd("Light1", 10.0f, -52.0f, 35.0f);
+	DF.LightM->PLAdd("Light1", 0.8f, -0.2f, 8.0f);
 	//DF.LightM->PL().pMesh->SetRotationZ(0.05f);
-	DF.LightM->PL().intensity = 12.0f;
+	DF.LightM->PL().intensity = 0.1f;
 	DF.LightM->PL().color = { 1.0f, 0.4f, 0.0f, 1.0f };
 
 	Animate();
 
-	//DF.AddLight("Light3", -14.0f, -23.0f, 110.0f);
-	DF.LightM->PLAdd("Light2", -10.0f, -20.0f, 100.0f);
+	DF.LightM->PLAdd("Light2", -1.0f, 0.4f, 8.0f);
 	//DF.LightM->PL().pMesh->SetRotationZ(-0.05f);
-	DF.LightM->PL().intensity = 12.0f;
+	DF.LightM->PL().intensity = 0.3f;
 	DF.LightM->PL().color = { 1.0f, 0.4f, 0.0f, 1.0f };
 
 	Animate();
 
-	//DF.AddLight("Light4", 36.0f, -94.0f, -15.0f);
-	DF.LightM->PLAdd("Light3", 6.0f, -94.0f, -15.0f);
-	DF.LightM->PL().intensity = 12.0f;
+	DF.LightM->PLAdd("Light3", 0.0f, -2.0f, 6.0f);
+	DF.LightM->PL().intensity = 1.0f;
 	DF.LightM->PL().color = { 0.0f, 0.2f, 1.0f, 1.0f };
 
 	Animate();
@@ -243,7 +249,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Select(0);
 	DF.ModelM->Delete();
 
-	DF.Camera()->SetPos(0.0f, -10.0f, 17.0f);
+	DF.Camera()->SetPos(0.0f, 0.0f, 4.0f);
 }
 
 void DFMain::CreateMaterials() noexcept

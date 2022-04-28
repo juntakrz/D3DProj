@@ -23,10 +23,8 @@ protected:
 	struct MaterialPSConstBuffer		//material constant buffer for PS
 	{
 		DirectX::XMFLOAT4 ambientColor;
-		float matIntensity;
-		float specIntensity;
-		float specPower;
-		float _padding;
+		DirectX::XMFLOAT3A F0;
+		DirectX::XMFLOAT4 data;
 	} matCBuffer;
 
 	//DirectX variables

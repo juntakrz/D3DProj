@@ -22,9 +22,14 @@ class DFMaterial
 		DFSurface* pTex5 = nullptr;
 
 		XMFLOAT4 ambientColor;
-		float matIntensity;
-		float specIntensity;
-		float specPower;
+		XMFLOAT3A F0;
+		XMFLOAT4 data;
+		/* Material Data Structure
+		* 
+		x = material intensity
+		y = specular intensity	/ metalness (PBS)
+		z = specular power		/ roughness (PBS)
+		*/
 	};
 
 	struct Texture
@@ -58,10 +63,10 @@ public:
 		struct
 		{
 			XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+			XMFLOAT3A F0 = { 0.4f, 0.4f, 0.4f };		//basic metal
 			float matIntensity = 1.0f;
-			float specIntensity = 1.0f;
-			float specPower = 50.0f;
-
+			float reflectivity = 1.0f;
+			float pow_roughness = 1.0f;
 		} material;
 	};
 

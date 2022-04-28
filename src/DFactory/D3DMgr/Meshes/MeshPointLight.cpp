@@ -79,8 +79,8 @@ DirectX::XMMATRIX MeshPointLight::GetTransformXM() const noexcept
 {
 	//mod.rotation.z = GMath::WrapAngle(mod.rotation.z + -0.005f);
 
-	xmMain = DirectX::XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z)
-		* DirectX::XMMatrixTranslation(33.0f, 0.0f, 0.0f)
+	xmMain = DirectX::XMMatrixScaling(0.02f, 0.02f, 0.02f)
+		//* DirectX::XMMatrixTranslation(33.0f, 0.0f, 0.0f)
 		* DirectX::XMMatrixRotationRollPitchYaw(
 			GMath::WrapAngle(mod.rotation.x), GMath::WrapAngle(mod.rotation.y), GMath::WrapAngle(mod.rotation.z))
 		* DirectX::XMMatrixRotationRollPitchYaw(

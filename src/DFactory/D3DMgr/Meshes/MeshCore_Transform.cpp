@@ -3,7 +3,6 @@
 void MeshCore::XMUpdate(FXMMATRIX transform) noexcept
 {
 	//receive transform from the node and apply it to the mesh transform
-	//xmMain *= *transform;
 	xmMain = transform;
 }
 
