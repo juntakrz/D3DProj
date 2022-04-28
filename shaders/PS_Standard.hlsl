@@ -5,6 +5,7 @@ cbuffer M_Material : register(b0)
     float1 M_MatIntensity;
     float1 M_SpecIntensity;
     float1 M_SpecPower;
+    float1 M_UseReverseRefl;
 };
 
 cbuffer L_DirLight : register(b1)
@@ -16,9 +17,9 @@ cbuffer L_DirLight : register(b1)
 
 cbuffer L_PointLight : register(b2)
 {
-    float3 L_Pos[4];
-    float4 L_Diffuse[4];
-    float2 L_Intensity[4];
+    float3 L_PLPos[4];
+    float4 L_PLDiffuse[4];
+    float2 L_PLInt[4];
     uint4  numPLights;
 };
 
@@ -26,7 +27,7 @@ struct PSInput
 {
     float3 worldPos : POSITION0;
     float3 W_Normal : NORMAL0;
-    float2 tex : TEXCOORD;
+    float2 tex : TEXCOORD0;
     float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
     float3 viewDir : VECTOR0;
@@ -61,15 +62,13 @@ float4 main(PSInput iPS) : SV_TARGET
     for (uint i = 0; i < numPLights.x; i++)
     {
         //deconstructed normalized vector from light to object
-        float3 L_Vec = L_Pos[i] - iPS.worldPos;
+        float3 L_Vec = L_PLPos[i] - iPS.worldPos;
         float1 L_Dist = length(L_Vec);
         float3 L_Dir = L_Vec / L_Dist;
 
         //diffuse
-        //float1 L_Curve = 1.0f / L_Dist + (10.0f / (L_Dist * L_Dist));
-        float1 L_Curve = 1.0f / (L_Dist * L_Dist);
-        float1 L_Att = max(0.0f, dot(bump, L_Dir)) * L_Curve * L_Intensity[i].x;
-        globalDiffuse += L_Diffuse[i] * L_Att * M_MatIntensity;
+        float1 attenuation = 1.0f / (L_Dist * L_Dist) * max(0.0f, dot(bump, L_Dir));
+        globalDiffuse += L_PLDiffuse[i] * attenuation * L_PLInt[i].x * M_MatIntensity;
     }
 
     //calculate directional light intensity
@@ -87,9 +86,12 @@ float4 main(PSInput iPS) : SV_TARGET
         float3 vecRefl = normalize(2.0f * L_DirIntensity * -iPS.W_Normal - L_DirPos);
         specular = pow(saturate(dot(vecRefl, -iPS.viewDir)), specPower) * M_SpecIntensity;
         
-        vecRefl = normalize(2.0f * L_DirIntensity * iPS.W_Normal - L_DirPos);
-        specular += pow(saturate(dot(vecRefl, -iPS.viewDir)), specPower * 100.0f) * M_SpecIntensity * 1.2f;
-        
+        //unrealistic but artistic reverse reflection effect
+        if(M_UseReverseRefl > 0.0f)
+        {
+            vecRefl = normalize(2.0f * L_DirIntensity * iPS.W_Normal - L_DirPos);
+            specular += pow(saturate(dot(vecRefl, -iPS.viewDir)), specPower * 100.0f) * M_SpecIntensity * 1.2f;
+        }
         specular *= specularTex;
     }
     

@@ -65,8 +65,9 @@ public:
 			XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 			XMFLOAT3A F0 = { 0.4f, 0.4f, 0.4f };		//basic metal
 			float matIntensity = 1.0f;
-			float reflectivity = 1.0f;
+			float spec_metal = 1.0f;
 			float pow_roughness = 1.0f;
+			float extra = 0.0f;
 		} material;
 	};
 

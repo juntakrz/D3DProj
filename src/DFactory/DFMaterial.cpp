@@ -46,8 +46,9 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 
 	newMat.ambientColor = pDesc->material.ambientColor;
 	newMat.data.x = pDesc->material.matIntensity;
-	newMat.data.y = pDesc->material.reflectivity;
+	newMat.data.y = pDesc->material.spec_metal;
 	newMat.data.z = pDesc->material.pow_roughness;
+	newMat.data.w = pDesc->material.extra;
 	newMat.F0 = pDesc->material.F0;
 
 	m_Materials.push_back(std::make_unique<DFMaterial::Material>(std::move(newMat)));

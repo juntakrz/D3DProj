@@ -44,7 +44,7 @@ SamplerState smplr;
 float4 main(PSInput iPS) : SV_TARGET
 {
     //init values    
-    float4 baseMap = pow(texDiffuse.Sample(smplr, iPS.tex), 2.2);
+    float4 baseMap = texDiffuse.Sample(smplr, iPS.tex);
     float3 albedo = baseMap.rgb;
     float3 normalTex = texNormal.Sample(smplr, iPS.tex);
     float1 metallic = texMetallic.Sample(smplr, iPS.tex).r * M_Metalness;
@@ -54,6 +54,7 @@ float4 main(PSInput iPS) : SV_TARGET
     float3 L, radiance, color;
     
     float3 Lo = { 0.0f, 0.0f, 0.0f };
+    float1 matInt = M_MatIntensity * sRGBCoef;
     
     //calculate material composition
     float3 F0 = lerp(M_F0.rgb, albedo, metallic);
@@ -69,19 +70,19 @@ float4 main(PSInput iPS) : SV_TARGET
         if (i == 0)
         {
             L = normalize(L_DirPos);
-            radiance = L_DirDiffuse.rgb * L_DirInt * M_MatIntensity;
+            radiance = L_DirDiffuse.rgb * L_DirInt * matInt;
         }
         else
         {
             L = normalize(L_PLPos[i - 1] - iPS.worldPos);
             float1 distance = length(L_PLPos[i - 1] - iPS.worldPos);
             float1 attenuation = 1.0 / (distance * distance);
-            radiance = L_PLDiffuse[i - 1].rgb * attenuation * L_PLInt[i - 1].x;
+            radiance = L_PLDiffuse[i - 1].rgb * attenuation * L_PLInt[i - 1].x * M_MatIntensity * matInt;
         }
-        float3 H = normalize(V + L);        //half vector between view and light
+        float3 H = normalize(V + L); //half vector between view and light
     
         //Cook-Torrance BRDF
-        float1 NdotV = max(dot(N, V), 0.00000001f);        //prevent divide by zero
+        float1 NdotV = max(dot(N, V), 0.00000001f); //prevent divide by zero
         float1 NdotL = max(dot(N, L), 0.00000001f);
         float1 NdotH = max(dot(N, H), 0.0f);
         float1 HdotV = max(dot(H, V), 0.0f);
@@ -102,9 +103,6 @@ float4 main(PSInput iPS) : SV_TARGET
     
     float3 ambient = 0.03f * albedo * M_Ambient.rgb * ao;
     color = ambient + Lo;
-    
-    color = color / (color + 1.0f);
-    color = pow(color, 1.0f / 2.2f);
     
     return float4(color, baseMap.a);
 }

@@ -20,7 +20,7 @@ void DFMain::DrawFrame()
 	// MdlMars
 	DF.ModelM->Select(1);
 	DF.ModelM->SetPos(DF.Camera()->GetPos().x + 600.0f, DF.Camera()->GetPos().y - 1600.0f, DF.Camera()->GetPos().z + 4000.0f);
-	DF.ModelM->SetRotation(-0.4f, deltaA, -0.4f);
+	//DF.ModelM->SetRotation(-0.4f, deltaA, -0.4f);
 
 	DF.LightM->PL(0).pMesh->DEBUG_Rotate(0.01f);
 	DF.LightM->PL(1).pMesh->DEBUG_Rotate(-0.01f);
@@ -128,14 +128,14 @@ void DFMain::LoadScreen() noexcept
 	//Mat_Mars
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Mars";
-	DFMatDesc.shaders.vertex = "VS_Classic";
-	DFMatDesc.shaders.pixel = "PS_Classic";
+	DFMatDesc.shaders.vertex = "VS_Standard";
+	DFMatDesc.shaders.pixel = "PS_Standard";
 	DFMatDesc.textures.base = "mars_4k_color.png";
 	DFMatDesc.textures.normal = "mars_4k_normal.png";
 	DFMatDesc.material.ambientColor = { 0.06f, 0.02f, 0.0f, 0.0f };
 	DFMatDesc.material.matIntensity = 2.9f;
-	DFMatDesc.material.reflectivity = 0.0f;
-	DFMatDesc.material.pow_roughness = 0.1f;
+	DFMatDesc.material.spec_metal = 0.0f;
+	DFMatDesc.material.pow_roughness = 0.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -163,7 +163,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex2 = "PBR//iron//rustediron2_metallic.png";
 	DFMatDesc.textures.tex3 = "PBR//iron//rustediron2_roughness.png";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
-	DFMatDesc.material.reflectivity = 1.0f;
+	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
@@ -171,13 +171,17 @@ void DFMain::LoadScreen() noexcept
 	//Mat_Metal
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Metal";
-	DFMatDesc.shaders.vertex = "VS_Standard";
-	DFMatDesc.shaders.pixel = "PS_Standard";
+	DFMatDesc.shaders.vertex = "VS_PBS";
+	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
+	//DFMatDesc.shaders.vertex = "VS_Standard";
+	//DFMatDesc.shaders.pixel = "PS_Standard";
 	DFMatDesc.textures.base = "metal1.png";
 	DFMatDesc.textures.normal = "metal1_normal.png";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
-	DFMatDesc.material.reflectivity = 1.5f;
-	DFMatDesc.material.pow_roughness = 1.2f;
+	DFMatDesc.material.spec_metal = 0.2f;		//1.5
+	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
+	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
+	DFMatDesc.material.extra = 0.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 

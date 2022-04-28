@@ -34,7 +34,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc.textures.base = "default.png";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	DFMatDesc.material.matIntensity = 1.0f;
-	DFMatDesc.material.reflectivity = 0.0f;
+	DFMatDesc.material.spec_metal = 0.0f;
 	DFMatDesc.material.pow_roughness = 0.5f;
 	_SInstance.MatM->MatAdd(&DFMatDesc);
 

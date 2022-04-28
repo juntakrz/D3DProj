@@ -386,13 +386,12 @@
     <FxCompile Include="shaders\PS_BasicTexture.hlsl" />
     <FxCompile Include="shaders\PS_Phong.hlsl" />
     <FxCompile Include="shaders\VS_Phong.hlsl" />
-    <FxCompile Include="shaders\PS_PhongTexture.hlsl" />
-    <FxCompile Include="shaders\VS_PhongTexture.hlsl" />
-    <FxCompile Include="shaders\PS_StandardML.hlsl" />
-    <FxCompile Include="shaders\VS_StandardML.hlsl" />
+    <FxCompile Include="shaders\PS_Standard_L.hlsl" />
+    <FxCompile Include="shaders\VS_Standard_L.hlsl" />
     <FxCompile Include="shaders\PS_Standard.hlsl" />
     <FxCompile Include="shaders\VS_Standard.hlsl" />
     <FxCompile Include="shaders\PS_PBS.hlsl" />
     <FxCompile Include="shaders\VS_PBS.hlsl" />
+    <FxCompile Include="shaders\PS_PBS_NoHDR.hlsl" />
   </ItemGroup>
 </Project>
