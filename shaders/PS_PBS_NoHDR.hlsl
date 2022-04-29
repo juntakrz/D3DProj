@@ -65,7 +65,7 @@ float4 main(PSInput iPS) : SV_TARGET
     float3 N = normalize(normalTex.x * iPS.tangent + normalTex.y * iPS.binormal + normalTex.z * iPS.W_Normal);
     float3 V = normalize(iPS.camPos - iPS.worldPos); //view vector
     
-    for (int i = 0; i < numPLights.x + 1; i++)
+    for (uint i = 0; i < numPLights.x + 1; i++)
     {
         if (i == 0)
         {

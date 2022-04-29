@@ -102,15 +102,6 @@
     <ClCompile Include="src\DFactory\DFactory_Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\DFSurface_Except.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DFactory\DFSurface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DFactory\Util\GDIPlusMgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\DFactory\D3DMgr\IBind\Bind_Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -180,7 +171,13 @@
     <ClCompile Include="src\DFactory\Util\DDSTextureLoader11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\Util\DF_Data.cpp">
+    <ClCompile Include="src\DFactory\Common\DF_A.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\DFMaterial_Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -224,7 +221,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\Util\GfxMath.h">
+    <ClInclude Include="src\DFactory\Common\DF_Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\D3DMgr\D3DMgr_Def.h">
@@ -293,12 +290,6 @@
     <ClInclude Include="src\DFactory\DFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\DFSurface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DFactory\Util\GDIPlusMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -344,9 +335,6 @@
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshPointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\Util\Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\DFactory\DFMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -359,13 +347,13 @@
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshImport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\Util\DF_ID.h">
+    <ClInclude Include="src\DFactory\Common\DF_Const.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\Util\DDSTextureLoader11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\Util\DF_Data.h">
+    <ClInclude Include="src\DFactory\Common\DF_A.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -405,5 +393,7 @@
     <FxCompile Include="shaders\PS_PBS.hlsl" />
     <FxCompile Include="shaders\VS_PBS.hlsl" />
     <FxCompile Include="shaders\PS_PBS_NoHDR.hlsl" />
+    <FxCompile Include="shaders\VS_BasicRTT.hlsl" />
+    <FxCompile Include="shaders\PS_BasicRTT.hlsl" />
   </ItemGroup>
 </Project>

@@ -62,23 +62,16 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	mesh.mName.C_Str() ? newMesh.meshName = mesh.mName.C_Str() : newMesh.meshName = "AIMesh" + std::to_string(meshID);
 
 	// creating model input layout
-	Vrtx::Buffer vbuf(std::move(Vrtx::Layout{}
-		.Append(Vrtx::Layout::Position3D)
-		.Append(Vrtx::Layout::Texture2D)
-		.Append(Vrtx::Layout::Normal)
-		.Append(Vrtx::Layout::Tangent)
-		.Append(Vrtx::Layout::Binormal)
-	));
-
+	std::vector<DF::Vertex> vertices;
 	for (uint32_t i = 0; i < mesh.mNumVertices; i++)
 	{
-		vbuf.EmplaceBack(
+		vertices.push_back({
 			*reinterpret_cast<XMFLOAT3*>(&mesh.mVertices[i]),
 			*reinterpret_cast<XMFLOAT2*>(&mesh.mTextureCoords[0][i]),
 			*reinterpret_cast<XMFLOAT3*>(&mesh.mNormals[i]),
 			*reinterpret_cast<XMFLOAT3*>(&mesh.mTangents[i]),
 			*reinterpret_cast<XMFLOAT3*>(&mesh.mBitangents[i])
-		);
+		});
 	}
 
 	std::vector<uint32_t> indices;
@@ -240,20 +233,20 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	pBinds[Bind::idSampler] = std::make_unique<Bind::Sampler>();
 
-	pBinds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(vbuf);
+	pBinds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(vertices);
 	pBinds[Bind::idIndexBuffer] = std::make_unique<Bind::IndexBuffer>(indices);
 
 	//create and bind vertex shader
-	std::string VSPath = "shaders//" + pDFMat->shaderVertex + ".cso";
+	std::string VSPath = "shaders//" + pDFMat->shaderVertex + ".shd";
 	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	pBinds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + pDFMat->shaderPixel + ".cso";
+	std::string PSPath = "shaders//" + pDFMat->shaderPixel + ".shd";
 	pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
 
-	pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(vbuf.GetLayout().GetInputLayoutDesc(), pVSByteCode);
+	pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 
 	struct PSConstBuffer
 	{

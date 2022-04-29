@@ -4,11 +4,11 @@ namespace Bind
 {
 	ID3D11Device* IBind::GetDevice() noexcept
 	{
-		return DFData::pD3DM->m_pDevice.Get();
+		return DF::pD3DM->m_pDevice.Get();
 	}
 
 	ID3D11DeviceContext* IBind::GetContext() noexcept
 	{
-		return DFData::pD3DM->m_pContext.Get();
+		return DF::pD3DM->m_pContext.Get();
 	}
 }

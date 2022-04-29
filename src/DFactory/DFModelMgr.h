@@ -2,7 +2,7 @@
 
 #include "D3DMgr/Meshes/Mesh_Includes.h"
 #include "DFactory.h"
-#include "Util/DF_ID.h"
+//#include "Common/DF_ID.h"
 
 using namespace DirectX;
 
@@ -92,6 +92,7 @@ public:
 	void Delete(uint32_t modelID) noexcept;
 
 	void SetMaterial(std::string material = "Mat_Default", uint32_t meshID = 0) noexcept;
+	void SetMaterialRT(std::string material = "Mat_RTTDefault", uint32_t meshID = 0) noexcept;
 	void SetShaders(std::string VS = "", std::string PS = "", uint32_t meshID = 0) noexcept;
 
 	void DEBUG_ShowModelList() const noexcept;

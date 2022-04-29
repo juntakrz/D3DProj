@@ -4,10 +4,9 @@
 #include "D3DMgr/Lights/LightMgr.h"
 #include "D3DMgr/Cameras/CCamera.h"
 #include "WndMgr/WndMgr.h"
+#include "Common/DF_A.h"
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
-//#include "Util/DF_ID.h"
-#include "Util/DF_Data.h"
 
 class DFactory
 {

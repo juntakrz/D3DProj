@@ -26,11 +26,6 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		}
 	}
 
-	auto gen = [&](std::string name, uint16_t paramA, uint16_t paramB)
-	{
-		//
-	};
-
 	switch (type)
 	{
 	case DF::idPlane:
@@ -172,6 +167,26 @@ void DFModelMgr::SetMaterial(std::string material, uint32_t meshID) noexcept
 	else
 	{
 		m_Models[m_curModel].meshes[meshID].pMesh->SetMaterial(material);
+		m_Models[m_curModel].meshes[meshID].meshMat = matIndex;
+	}
+}
+
+void DFModelMgr::SetMaterialRT(std::string material, uint32_t meshID) noexcept
+{
+	uint16_t matIndex = pMatMgr->MatIndex(material);
+
+	// if ID is 0 - set material for all meshes
+	if (meshID == 0)
+	{
+		for (auto& it : m_Models[m_curModel].meshes)
+		{
+			it.pMesh->SetMaterialRT(material);
+			it.meshMat = matIndex;
+		}
+	}
+	else
+	{
+		m_Models[m_curModel].meshes[meshID].pMesh->SetMaterialRT(material);
 		m_Models[m_curModel].meshes[meshID].meshMat = matIndex;
 	}
 }

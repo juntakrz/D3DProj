@@ -9,12 +9,12 @@ namespace Bind
 		UINT m_slot = 0u;
 
 	public:
-		//Texture(const DFSurface& surface, UINT slot = 0);
-		Texture(ID3D11ShaderResourceView* m_pSRV, UINT slot = 0);
+		Texture(std::shared_ptr<ID3D11ShaderResourceView*> m_pSRV, UINT slot = 0);
 		void Bind() noexcept override;
+		void Unbind() noexcept override;
 
 	protected:
-		//COMPTR<ID3D11ShaderResourceView> m_pSRV;
-		ID3D11ShaderResourceView* m_pSRV = nullptr;
+		std::shared_ptr<ID3D11ShaderResourceView*> m_pSRV = nullptr;
+		ID3D11ShaderResourceView* nullSRV = nullptr;
 	};
 }
