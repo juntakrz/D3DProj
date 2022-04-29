@@ -22,27 +22,27 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 
 	pDesc->textures.base != "" ?
 		newMat.pTexBase = GetTexture(AddTexture(pDesc->textures.base))
-		: newMat.pTexBase = GetTexture(AddTexture("default//default.png"));
+		: newMat.pTexBase = GetTexture(AddTexture("default//default.dds"));
 
 	pDesc->textures.normal != "" ?
 		newMat.pTexNormal = GetTexture(AddTexture(pDesc->textures.normal))
-		: newMat.pTexNormal = GetTexture(AddTexture("default//default_n.png"));
+		: newMat.pTexNormal = GetTexture(AddTexture("default//default_n.dds"));
 
 	pDesc->textures.tex2 != "" ?
 		newMat.pTex2 = GetTexture(AddTexture(pDesc->textures.tex2))
-		: newMat.pTex2 = GetTexture(AddTexture("default//default_s.png"));
+		: newMat.pTex2 = GetTexture(AddTexture("default//default_s.dds"));
 
 	pDesc->textures.tex3 != "" ?
 		newMat.pTex3 = GetTexture(AddTexture(pDesc->textures.tex3))
-		: newMat.pTex3 = GetTexture(AddTexture("default//default_s.png"));
+		: newMat.pTex3 = GetTexture(AddTexture("default//default_s.dds"));
 
 	pDesc->textures.tex4 != "" ?
 		newMat.pTex4 = GetTexture(AddTexture(pDesc->textures.tex4))
-		: newMat.pTex4 = GetTexture(AddTexture("default//default_s.png"));
+		: newMat.pTex4 = GetTexture(AddTexture("default//default_s.dds"));
 
 	pDesc->textures.tex5 != "" ?
 		newMat.pTex5 = GetTexture(AddTexture(pDesc->textures.tex5))
-		: newMat.pTex5 = GetTexture(AddTexture("default//default_s.png"));
+		: newMat.pTex5 = GetTexture(AddTexture("default//default_s.dds"));
 
 	newMat.ambientColor = pDesc->material.ambientColor;
 	newMat.data.x = pDesc->material.matIntensity;
@@ -106,6 +106,58 @@ uint16_t DFMaterial::AddTexture(std::string filePath) noexcept {
 
 	std::string checkPath = constPath + filePath;
 	struct stat buffer;
+	(stat(checkPath.c_str(), &buffer) == 0) ? filePath : filePath = "default//default.dds";
+	/*if (stat(checkPath.c_str(), &buffer) != 0)
+	{
+		std::stringstream sstr;
+		sstr << "File not found at " << checkPath;
+		MessageBoxA(nullptr, std::string(sstr.str()).c_str(), "DFMaterial Error", MB_OK | MB_ICONWARNING);
+	}*/
+
+	for (const auto& it : m_DXTextures) {
+
+		if (it.name == filePath || it.filePath == filePath) {
+			return index;
+		}
+		index++;
+	}
+
+	DFMaterial::DXTexture dxt{};
+	dxt.name = filePath;
+	dxt.filePath = filePath;
+
+	filePath = constPath + filePath;
+	std::wstring wFilePath(filePath.begin(), filePath.end());
+
+	HRESULT hr = DirectX::CreateDDSTextureFromFile(DFData::pD3DM->GetDevice(), wFilePath.c_str(), nullptr, &dxt.pSRV);
+
+	if (hr != S_OK)
+	{
+		std::stringstream sstr;
+		sstr << "Error #" << hr << "" << "reading DDS texture at " << filePath;
+		MessageBoxA(nullptr, std::string(sstr.str()).c_str(), "DFMaterial Error", MB_OK | MB_ICONWARNING);
+	}
+
+	m_DXTextures.emplace_back(std::move(dxt));
+	return index;
+}
+
+ID3D11ShaderResourceView* DFMaterial::GetTexture(uint16_t index) noexcept
+{
+	if (index < m_DXTextures.size()) {
+		return m_DXTextures[index].pSRV;
+	}
+	else {
+		return m_DXTextures[0].pSRV;
+	}
+}
+
+uint16_t DFMaterial::AddTexturePNG(std::string filePath) noexcept {
+
+	uint16_t index = 0;
+
+	std::string checkPath = constPath + filePath;
+	struct stat buffer;
 	(stat(checkPath.c_str(), &buffer) == 0) ? filePath : filePath = "default//default.png";
 
 	for (const auto& it : m_Textures) {
@@ -120,37 +172,7 @@ uint16_t DFMaterial::AddTexture(std::string filePath) noexcept {
 	return index;
 }
 
-
-uint16_t DFMaterial::AddTextureDDS(std::string filePath) noexcept {
-
-	uint16_t index = 0;
-
-	std::string checkPath = constPath + filePath;
-	struct stat buffer;
-	(stat(checkPath.c_str(), &buffer) == 0) ? filePath : filePath = "default//default.dds";
-
-	for (const auto& it : m_Textures) {
-
-		if (it->name == filePath || it->filePath == filePath) {
-			return index;
-		}
-		index++;
-	}
-
-	std::wstring wFilePath(filePath.begin(), filePath.end());
-	wFilePath = L"textures//" + wFilePath;
-
-	DFMaterial::DXTexture dxt{};
-	dxt.name = filePath;
-	dxt.filePath = filePath;
-	HRESULT hr = DirectX::CreateDDSTextureFromFile(DFData::pD3DM->GetDevice(), wFilePath.c_str(), nullptr, dxt.pSRV.GetAddressOf());
-	//pRes->QueryInterface(IID_ID3D11Texture2D, (void**)&dxt.pTexture);
-
-	m_DXTextures.emplace_back(std::move(dxt));
-	return index;
-}
-
-uint16_t DFMaterial::AddTexture(std::string name, std::string filePath) noexcept {
+uint16_t DFMaterial::AddTexturePNG(std::string name, std::string filePath) noexcept {
 
 	uint16_t index = 0;
 	
@@ -170,7 +192,7 @@ uint16_t DFMaterial::AddTexture(std::string name, std::string filePath) noexcept
 	return index;
 }
 
-DFSurface* DFMaterial::GetTexture(std::string name) const noexcept {
+DFSurface* DFMaterial::GetTexturePNG(std::string name) const noexcept {
 
 	for (const auto& it : m_Textures) {
 
@@ -179,17 +201,17 @@ DFSurface* DFMaterial::GetTexture(std::string name) const noexcept {
 		}
 	}
 
-	return GetTexture("default//default.png");
+	return GetTexturePNG("default//default.png");
 }
 
-DFSurface* DFMaterial::GetTexture(uint16_t index) const noexcept {
+DFSurface* DFMaterial::GetTexturePNG(uint16_t index) const noexcept {
 
 	if (index < m_Textures.size()) {
 		return &m_Textures[index]->texture;
 	}
 }
 
-uint16_t DFMaterial::GetTextureIndex(std::string name) const noexcept {
+uint16_t DFMaterial::GetTextureIndexPNG(std::string name) const noexcept {
 
 	uint16_t index = 0;
 	for (const auto& it : m_Textures) {
@@ -205,20 +227,20 @@ uint16_t DFMaterial::GetTextureIndex(std::string name) const noexcept {
 
 void DFMaterial::DEBUG_ShowTextureIndex(uint16_t begin, uint16_t end) noexcept {
 
-	end > m_Textures.size() ? end = m_Textures.size() : 0;
+	end > m_DXTextures.size() ? end = m_DXTextures.size() : 0;
 	begin > end ? begin = end : 0;
 
 	std::stringstream sstr;
 	uint16_t index = 0;
 
-	for (const auto& it : m_Textures) {
+	for (const auto& it : m_DXTextures) {
 
 		if (index > end) {
 			break;
 		}
 
 		if (index >= begin) {
-			sstr << "[" << index << "] " << it->name << ": " << it->filePath << "\n";
+			sstr << "[" << index << "] " << it.name << ": " << it.filePath << "\n";
 		}
 
 		index++;

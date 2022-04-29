@@ -104,7 +104,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_LoadScr";
 	DFMatDesc.shaders.vertex = "VS_BasicTexture";
 	DFMatDesc.shaders.pixel = "PS_BasicTexture";
-	DFMatDesc.textures.base = "img_loadscr.png";
+	DFMatDesc.textures.base = "img_loadscr.dds";
 	DF.MatM->MatAdd(&DFMatDesc);
 
 	auto Animate = [&]() {
@@ -128,14 +128,14 @@ void DFMain::LoadScreen() noexcept
 	//Mat_Mars
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Mars";
-	DFMatDesc.shaders.vertex = "VS_Standard";
-	DFMatDesc.shaders.pixel = "PS_Standard";
-	DFMatDesc.textures.base = "mars_4k_color.png";
-	DFMatDesc.textures.normal = "mars_4k_normal.png";
+	DFMatDesc.shaders.vertex = "VS_PBS";
+	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.textures.base = "mars_4k_color.dds";
+	DFMatDesc.textures.normal = "mars_4k_normal.dds";
 	DFMatDesc.material.ambientColor = { 0.06f, 0.02f, 0.0f, 0.0f };
-	DFMatDesc.material.matIntensity = 2.9f;
+	DFMatDesc.material.matIntensity = 16.9f;	//2.9
 	DFMatDesc.material.spec_metal = 0.0f;
-	DFMatDesc.material.pow_roughness = 0.0f;
+	DFMatDesc.material.pow_roughness = 0.12f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -146,7 +146,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Stars";
 	DFMatDesc.shaders.vertex = "VS_BasicTexture";
 	DFMatDesc.shaders.pixel = "PS_BasicTexture";
-	DFMatDesc.textures.base = "stars_6k_color.png";
+	DFMatDesc.textures.base = "stars_6k_color.dds";
 	DFMatDesc.material.matIntensity = 0.1f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
@@ -158,14 +158,30 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_PBSMetal";
 	DFMatDesc.shaders.vertex = "VS_PBS";
 	DFMatDesc.shaders.pixel = "PS_PBS";
-	DFMatDesc.textures.base = "PBR//iron//rustediron2_basecolor.png";
-	DFMatDesc.textures.normal = "PBR//iron//rustediron2_normal.png";
-	DFMatDesc.textures.tex2 = "PBR//iron//rustediron2_metallic.png";
-	DFMatDesc.textures.tex3 = "PBR//iron//rustediron2_roughness.png";
+	DFMatDesc.textures.base = "PBR//iron//rustediron2_basecolor.dds";
+	DFMatDesc.textures.normal = "PBR//iron//rustediron2_normal.dds";
+	DFMatDesc.textures.tex2 = "PBR//iron//rustediron2_metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR//iron//rustediron2_roughness.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 
+	DF.MatM->MatAdd(&DFMatDesc);
+	/*
+	//Mat_Tachi_Fore
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_Tachi_Fore";
+	DFMatDesc.shaders.vertex = "VS_PBS";
+	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.textures.base = "PBR//tachilp1//Tachi_Fore_Color.dds";
+	DFMatDesc.textures.normal = "PBR//tachilp1//Tachi_Fore_Normal.dds";
+	DFMatDesc.textures.tex2 = "PBR//tachilp1//Tachi_Fore_Metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR//tachilp1//Tachi_Fore_Roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR//tachilp1//Tachi_Fore_AO.dds";
+	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
+	DFMatDesc.material.spec_metal = 1.0f;
+	DFMatDesc.material.pow_roughness = 1.0f;
+	*/
 	DF.MatM->MatAdd(&DFMatDesc);
 
 	//Mat_Metal
@@ -175,8 +191,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
 	//DFMatDesc.shaders.vertex = "VS_Standard";
 	//DFMatDesc.shaders.pixel = "PS_Standard";
-	DFMatDesc.textures.base = "metal1.png";
-	DFMatDesc.textures.normal = "metal1_normal.png";
+	DFMatDesc.textures.base = "metal1.dds";
+	DFMatDesc.textures.normal = "metal1_normal.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
 	DFMatDesc.material.spec_metal = 0.2f;		//1.5
 	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
@@ -205,41 +221,41 @@ void DFMain::LoadScreen() noexcept
 	//DF.Mesh()->SetRotationY(0.00002f);
 	
 	Animate();
-	/*
+	
 	//MdlTachi
 	DF.ModelM->Create(DF::idImport, "MdlTachi", "tachilp1.obj");
-	DF.ModelM->SetShaders("VS_Standard", "PS_Standard");
+	DF.ModelM->SetShaders("VS_PBS", "PS_PBS");
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
-	*/
+	
 	/*
 	//MdlSphere1
 	DF.ModelM->Create(DF::idSphere, "MdlSphere1", 64);
 	DF.ModelM->SetScaling(0.8f, 0.8f, 0.8f);
 	DF.ModelM->SetRotation(0.5f, 0.5f, 0.5f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
-	DF.ModelM->SetMaterial("Mat_PBSMetal");
+	DF.ModelM->SetMaterial("Mat_Tachi_Fore");
 	*/
 	Animate();
 	
 	//DF.LMgr->ShowPLMeshes() = true;
 	
-	DF.LightM->PLAdd("Light1", 0.8f, -0.2f, 8.0f);
+	DF.LightM->PLAdd("Light1", 0.6f, -0.2f, 8.0f);
 	//DF.LightM->PL().pMesh->SetRotationZ(0.05f);
-	DF.LightM->PL().intensity = 0.1f;
-	DF.LightM->PL().color = { 1.0f, 0.4f, 0.0f, 1.0f };
+	DF.LightM->PL().intensity = 0.3f;
+	DF.LightM->PL().color = { 1.0f, 0.0f, 0.0f, 1.0f };
 
 	Animate();
 
-	DF.LightM->PLAdd("Light2", -1.0f, 0.4f, 8.0f);
+	DF.LightM->PLAdd("Light2", -0.6f, 0.4f, 8.4f);
 	//DF.LightM->PL().pMesh->SetRotationZ(-0.05f);
 	DF.LightM->PL().intensity = 0.3f;
-	DF.LightM->PL().color = { 1.0f, 0.4f, 0.0f, 1.0f };
+	DF.LightM->PL().color = { 1.0f, 0.0f, 0.0f, 1.0f };
 
 	Animate();
 
-	DF.LightM->PLAdd("Light3", 0.0f, -2.0f, 6.0f);
+	DF.LightM->PLAdd("Light3", 0.7f, -1.2f, 6.2f);
 	DF.LightM->PL().intensity = 1.0f;
 	DF.LightM->PL().color = { 0.0f, 0.2f, 1.0f, 1.0f };
 

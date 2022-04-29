@@ -108,11 +108,11 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texColorName);
 			std::string texColorPath(texColorName.C_Str());
 			newMesh.meshMat = texColorName.C_Str();
-			pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture(texColorPath)), 0u);
+			pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture(texColorPath)), 0u);
 		}
 		else	//if imported model has no color textures = use the default checkerboard one
 		{
-			pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture("default//default.png")), 0u);
+			pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture("default//default.dds")), 0u);
 			newMesh.meshMat = "Mat_Default";
 		}
 
@@ -120,50 +120,50 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 		{
 			pMaterial->GetTexture(aiTextureType_NORMALS, 0, &texNormalName);
 			std::string texNormalPath(texNormalName.C_Str());
-			pBinds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture(texNormalPath)), 1u);
+			pBinds[Bind::idTexture1] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture(texNormalPath)), 1u);
 		}
 		else
 		{
-			pBinds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_n.png")), 1u);
+			pBinds[Bind::idTexture1] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_n.dds")), 1u);
 		}
 
 		if (pMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0 && pMaterial->GetTextureCount(aiTextureType_METALNESS) < 1)
 		{
 			pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &texSpecularName);
 			std::string texSpecularPath(texSpecularName.C_Str());
-			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture(texSpecularPath)), 2u);
+			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture(texSpecularPath)), 2u);
 		}
 		else if (pMaterial->GetTextureCount(aiTextureType_METALNESS) > 0 && pMaterial->GetTextureCount(aiTextureType_SPECULAR) < 1)
 		{
 			pMaterial->GetTexture(aiTextureType_METALNESS, 0, &texSpecularName);
 			std::string texSpecularPath(texSpecularName.C_Str());
-			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture(texSpecularPath)), 2u);
+			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture(texSpecularPath)), 2u);
 		}
 		else
 		{
-			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_s.png")), 2u);
+			pBinds[Bind::idTexture2] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_s.dds")), 2u);
 		}
 
 		if (pMaterial->GetTextureCount(aiTextureType_EMISSIVE) > 0)
 		{
 			pMaterial->GetTexture(aiTextureType_EMISSIVE, 0, &texRoughName);
 			std::string texRoughPath(texRoughName.C_Str());
-			pBinds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture(texRoughPath)), 3u);
+			pBinds[Bind::idTexture3] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture(texRoughPath)), 3u);
 		}
 		else
 		{
-			pBinds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_s.png")), 3u);
+			pBinds[Bind::idTexture3] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_s.png")), 3u);
 		}
 
 		if (pMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0)
 		{
 			pMaterial->GetTexture(aiTextureType_AMBIENT, 0, &texAOName);
 			std::string texAOPath(texAOName.C_Str());
-			pBinds[Bind::idTexture4] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture(texAOPath)), 4u);
+			pBinds[Bind::idTexture4] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture(texAOPath)), 4u);
 		}
 		else
 		{
-			pBinds[Bind::idTexture4] = std::make_unique<Bind::Texture>(*pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_s.png")), 4u);
+			pBinds[Bind::idTexture4] = std::make_unique<Bind::Texture>(pMatMgr->GetTexture(pMatMgr->AddTexture("default//default_s.dds")), 4u);
 		}
 	}
 
@@ -187,10 +187,10 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	struct PSConstBuffer
 	{
 		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.16f, 0.0f };
-		XMFLOAT3A F0 = { 0.4f, 0.4f, 0.4f };
+		XMFLOAT3A F0 = { 0.2f, 0.22f, 0.24f };
 		float matIntensity = 1.0f;
-		float spec_metal = 3.0f;
-		float pow_rough = 320.0f;
+		float spec_metal = 1.0f;
+		float pow_rough = 1.0f;
 		float extra = 0.0f;
 	} material;
 

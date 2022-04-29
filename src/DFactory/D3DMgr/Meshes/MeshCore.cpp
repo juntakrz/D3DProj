@@ -67,27 +67,27 @@ void MeshCore::SetMaterial(std::string name) noexcept
 
 	// update binds
 	if (mat.pTexBase != nullptr) {
-		m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(*mat.pTexBase);
+		m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(mat.pTexBase);
 	}
 
 	if (mat.pTexNormal != nullptr) {
-		m_Binds[Bind::idTexture1] = std::make_unique<Bind::Texture>(*mat.pTexNormal, 1u);
+		m_Binds[Bind::idTexture1] = std::make_unique<Bind::Texture>(mat.pTexNormal, 1u);
 	}
 
 	if (mat.pTex2 != nullptr) {
-		m_Binds[Bind::idTexture2] = std::make_unique<Bind::Texture>(*mat.pTex2, 2u);
+		m_Binds[Bind::idTexture2] = std::make_unique<Bind::Texture>(mat.pTex2, 2u);
 	}
 
 	if (mat.pTex3 != nullptr) {
-		m_Binds[Bind::idTexture3] = std::make_unique<Bind::Texture>(*mat.pTex3, 3u);
+		m_Binds[Bind::idTexture3] = std::make_unique<Bind::Texture>(mat.pTex3, 3u);
 	}
 
 	if (mat.pTex4 != nullptr) {
-		m_Binds[Bind::idTexture4] = std::make_unique<Bind::Texture>(*mat.pTex4, 4u);
+		m_Binds[Bind::idTexture4] = std::make_unique<Bind::Texture>(mat.pTex4, 4u);
 	}
 
 	if (mat.pTex5 != nullptr) {
-		m_Binds[Bind::idTexture5] = std::make_unique<Bind::Texture>(*mat.pTex5, 5u);
+		m_Binds[Bind::idTexture5] = std::make_unique<Bind::Texture>(mat.pTex5, 5u);
 	}
 
 	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + mat.shaderVertex + ".cso");

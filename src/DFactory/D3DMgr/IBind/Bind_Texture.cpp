@@ -2,6 +2,7 @@
 
 namespace Bind
 {
+	/*
 	Texture::Texture(const DFSurface& surface, UINT slot) : m_slot(slot)
 	{
 		D3D_DXGIDEBUG(*DFData::pD3DM);
@@ -35,17 +36,19 @@ namespace Bind
 
 		D3D_THROW(GetDevice()->CreateShaderResourceView(pTexture.Get(), &srvDesc, &m_pSRV));
 	}
-
-	Texture::Texture(const COMPTR<ID3D11ShaderResourceView>* pSRV, UINT slot) : m_slot(slot)
+	*/
+	Texture::Texture(ID3D11ShaderResourceView* pSRV, UINT slot) : m_slot(slot)
 	{
 		D3D_DXGIDEBUG(*DFData::pD3DM);
 
-		pSRV->CopyTo(m_pSRV.GetAddressOf());
-		//m_pSRV = *pSRV;
+		//m_pSRV = pSRV->Get();
+		//pSRV->CopyTo(m_pSRV.GetAddressOf());
+		m_pSRV = pSRV;
 	}
 
 	void Texture::Bind() noexcept
 	{
-		GetContext()->PSSetShaderResources(m_slot, 1u, m_pSRV.GetAddressOf());
+		//GetContext()->PSSetShaderResources(m_slot, 1u, m_pSRV.GetAddressOf());
+		GetContext()->PSSetShaderResources(m_slot, 1u, &m_pSRV);
 	}
 }

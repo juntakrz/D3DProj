@@ -15,12 +15,12 @@ class DFMaterial
 		std::string name;
 
 		std::string shaderVertex, shaderPixel;
-		DFSurface* pTexBase = nullptr;
-		DFSurface* pTexNormal = nullptr;
-		DFSurface* pTex2 = nullptr;
-		DFSurface* pTex3 = nullptr;
-		DFSurface* pTex4 = nullptr;
-		DFSurface* pTex5 = nullptr;
+		ID3D11ShaderResourceView* pTexBase = nullptr;
+		ID3D11ShaderResourceView* pTexNormal = nullptr;
+		ID3D11ShaderResourceView* pTex2 = nullptr;
+		ID3D11ShaderResourceView* pTex3 = nullptr;
+		ID3D11ShaderResourceView* pTex4 = nullptr;
+		ID3D11ShaderResourceView* pTex5 = nullptr;
 
 		XMFLOAT4 ambientColor;
 		XMFLOAT3A F0;
@@ -46,7 +46,7 @@ class DFMaterial
 	{
 		std::string name;
 		std::string filePath;
-		COMPTR<ID3D11ShaderResourceView> pSRV;
+		ID3D11ShaderResourceView* pSRV = nullptr;
 	};
 
 	std::vector<std::unique_ptr<Material>> m_Materials;
@@ -66,7 +66,7 @@ public:
 
 		struct
 		{
-			std::string base = "default.png", normal = "", tex2 = "", tex3 = "", tex4 = "", tex5 = "";
+			std::string base = "default.dds", normal = "", tex2 = "", tex3 = "", tex4 = "", tex5 = "";
 		} textures;
 
 		struct
@@ -95,11 +95,12 @@ public:
 	uint16_t MatIndex(std::string name) const noexcept;
 
 	uint16_t AddTexture(std::string filePath) noexcept;
-	uint16_t AddTexture(std::string name, std::string filePath) noexcept;
-	uint16_t AddTextureDDS(std::string filePath) noexcept;
-	DFSurface* GetTexture(std::string name) const noexcept;
-	DFSurface* GetTexture(uint16_t index) const noexcept;
-	uint16_t GetTextureIndex(std::string name) const noexcept;
+	ID3D11ShaderResourceView* GetTexture(uint16_t index) noexcept;
+	uint16_t AddTexturePNG(std::string filePath) noexcept;
+	uint16_t AddTexturePNG(std::string name, std::string filePath) noexcept;
+	DFSurface* GetTexturePNG(std::string name) const noexcept;
+	DFSurface* GetTexturePNG(uint16_t index) const noexcept;
+	uint16_t GetTextureIndexPNG(std::string name) const noexcept;
 
 	void DEBUG_ShowTextureIndex(uint16_t begin = 0, uint16_t end = 65535) noexcept;
 };
