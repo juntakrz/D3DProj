@@ -1,8 +1,8 @@
 #include "MeshCube.h"
 
-MeshCube::MeshCube(std::string material, uint16_t paramA, uint16_t paramB)
+MeshCube::MeshCube(uint16_t matId, uint16_t paramA, uint16_t paramB)
 {
-	m_matIndex = MatMgr.MatIndex(material);
+	m_matIndex = matId;
 
 	if (!IsStaticBindsInitialized())
 	{
@@ -25,13 +25,8 @@ MeshCube::MeshCube(std::string material, uint16_t paramA, uint16_t paramB)
 	}
 
 	//load color texture
-	AddBind(std::make_unique<Bind::Texture>(MatMgr.Mat(m_matIndex).pTexBase), Bind::idTexture0);
+	AddBind(std::make_unique<Bind::Texture>(MatMgr.TextureGet(0)), Bind::idTexture0);
 
-	//load normal texture (if exists)
-	const auto texNormal = MatMgr.Mat(material).pTexNormal;
-	if (texNormal != nullptr) {
-		AddBind(std::make_unique<Bind::Texture>(MatMgr.Mat(material).pTexNormal, 1u), Bind::idTexture1);
-	}
 	AddBind(std::make_unique<Bind::Sampler>(), Bind::idSampler);
 
 	//fill material const buffer

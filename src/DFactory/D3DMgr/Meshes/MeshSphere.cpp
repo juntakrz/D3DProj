@@ -1,8 +1,8 @@
 #include "MeshSphere.h"
 
-MeshSphere::MeshSphere(std::string material, uint16_t divisions, bool invertFaces)
+MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 {
-	m_matIndex = MatMgr.MatIndex(material);
+	m_matIndex = matId;
 	
 	if (!IsStaticBindsInitialized())
 	{
@@ -26,13 +26,8 @@ MeshSphere::MeshSphere(std::string material, uint16_t divisions, bool invertFace
 	AddIndexBuffer(std::make_unique<Bind::IndexBuffer>(model.indices));
 
 	//load color texture
-	AddBind(std::make_unique<Bind::Texture>(MatMgr.Mat(material).pTexBase), Bind::idTexture0);
+	AddBind(std::make_unique<Bind::Texture>(MatMgr.TextureGet(0)), Bind::idTexture0);
 
-	//load normal texture (if exists)
-	const auto texNormal = MatMgr.Mat(material).pTexNormal;
-	if (texNormal != nullptr) {
-		AddBind(std::make_unique<Bind::Texture>(MatMgr.Mat(material).pTexNormal, 1u), Bind::idTexture1);
-	}
 	AddBind(std::make_unique<Bind::Sampler>(), Bind::idSampler);
 
 	//fill material const buffer

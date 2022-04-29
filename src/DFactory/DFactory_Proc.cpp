@@ -88,10 +88,19 @@ void DFactory::CProc::ProcessFunctions() noexcept
 				pDF->debug.int64bit--;
 				break;
 			}
+			case '5':
+			{
+				pDF->ModelM->Select(3);
+				pDF->ModelM->Delete();
+				pDF->MatM->MatDelete(5);
+				pDF->MatM->MatDelete(5);
+				pDF->MatM->MatDelete(5);
+			}
 			}
 		}
 	}
 
-	pKbd->IsKeyDown('0') ? pDF->ModelM->DEBUG_ShowModelList() : void();
+	pKbd->IsKeyDown('8') ? pDF->MatM->DEBUG_ShowMaterialIndex() : void();
 	pKbd->IsKeyDown('9') ? pDF->MatM->DEBUG_ShowTextureIndex() : void();
+	pKbd->IsKeyDown('0') ? pDF->ModelM->DEBUG_ShowModelList() : void();
 }

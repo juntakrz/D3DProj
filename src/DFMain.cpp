@@ -104,7 +104,9 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_LoadScr";
 	DFMatDesc.shaders.vertex = "VS_BasicTexture";
 	DFMatDesc.shaders.pixel = "PS_BasicTexture";
-	DFMatDesc.textures.base = "img_loadscr.dds";
+	DFMatDesc.textures.tex0 = "img_loadscr.dds";
+	DFMatDesc.manageTextures = true;
+
 	DF.MatM->MatAdd(&DFMatDesc);
 
 	auto Animate = [&]() {
@@ -129,13 +131,13 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Mars";
 	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS";
-	DFMatDesc.textures.base = "mars_4k_color.dds";
-	DFMatDesc.textures.normal = "mars_4k_normal.dds";
+	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
+	DFMatDesc.textures.tex0 = "mars_4k_color.dds";
+	DFMatDesc.textures.tex1 = "mars_4k_normal.dds";
 	DFMatDesc.material.ambientColor = { 0.06f, 0.02f, 0.0f, 0.0f };
-	DFMatDesc.material.matIntensity = 16.9f;	//2.9
+	DFMatDesc.material.matIntensity = 2.9f;	//2.9
 	DFMatDesc.material.spec_metal = 0.0f;
-	DFMatDesc.material.pow_roughness = 0.12f;
+	DFMatDesc.material.pow_roughness = 0.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -146,7 +148,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Stars";
 	DFMatDesc.shaders.vertex = "VS_BasicTexture";
 	DFMatDesc.shaders.pixel = "PS_BasicTexture";
-	DFMatDesc.textures.base = "stars_6k_color.dds";
+	DFMatDesc.textures.tex0 = "stars_6k_color.dds";
 	DFMatDesc.material.matIntensity = 0.1f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
@@ -158,8 +160,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_PBSMetal";
 	DFMatDesc.shaders.vertex = "VS_PBS";
 	DFMatDesc.shaders.pixel = "PS_PBS";
-	DFMatDesc.textures.base = "PBR//iron//rustediron2_basecolor.dds";
-	DFMatDesc.textures.normal = "PBR//iron//rustediron2_normal.dds";
+	DFMatDesc.textures.tex0 = "PBR//iron//rustediron2_basecolor.dds";
+	DFMatDesc.textures.tex1 = "PBR//iron//rustediron2_normal.dds";
 	DFMatDesc.textures.tex2 = "PBR//iron//rustediron2_metallic.dds";
 	DFMatDesc.textures.tex3 = "PBR//iron//rustediron2_roughness.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
@@ -173,8 +175,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Tachi_Fore";
 	DFMatDesc.shaders.vertex = "VS_PBS";
 	DFMatDesc.shaders.pixel = "PS_PBS";
-	DFMatDesc.textures.base = "PBR//tachilp1//Tachi_Fore_Color.dds";
-	DFMatDesc.textures.normal = "PBR//tachilp1//Tachi_Fore_Normal.dds";
+	DFMatDesc.textures.tex0 = "PBR//tachilp1//Tachi_Fore_Color.dds";
+	DFMatDesc.textures.tex1 = "PBR//tachilp1//Tachi_Fore_Normal.dds";
 	DFMatDesc.textures.tex2 = "PBR//tachilp1//Tachi_Fore_Metallic.dds";
 	DFMatDesc.textures.tex3 = "PBR//tachilp1//Tachi_Fore_Roughness.dds";
 	DFMatDesc.textures.tex4 = "PBR//tachilp1//Tachi_Fore_AO.dds";
@@ -191,8 +193,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
 	//DFMatDesc.shaders.vertex = "VS_Standard";
 	//DFMatDesc.shaders.pixel = "PS_Standard";
-	DFMatDesc.textures.base = "metal1.dds";
-	DFMatDesc.textures.normal = "metal1_normal.dds";
+	DFMatDesc.textures.tex0 = "metal1.dds";
+	DFMatDesc.textures.tex1 = "metal1_normal.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
 	DFMatDesc.material.spec_metal = 0.2f;		//1.5
 	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
@@ -241,16 +243,16 @@ void DFMain::LoadScreen() noexcept
 	
 	//DF.LMgr->ShowPLMeshes() = true;
 	
-	DF.LightM->PLAdd("Light1", 0.6f, -0.2f, 8.0f);
+	DF.LightM->PLAdd("Light1", 0.17f, 0.515f, 8.55f);
 	//DF.LightM->PL().pMesh->SetRotationZ(0.05f);
-	DF.LightM->PL().intensity = 0.3f;
+	DF.LightM->PL().intensity = 0.14f;
 	DF.LightM->PL().color = { 1.0f, 0.0f, 0.0f, 1.0f };
 
 	Animate();
 
-	DF.LightM->PLAdd("Light2", -0.6f, 0.4f, 8.4f);
+	DF.LightM->PLAdd("Light2", -0.6f, 0.355f, 8.35f);
 	//DF.LightM->PL().pMesh->SetRotationZ(-0.05f);
-	DF.LightM->PL().intensity = 0.3f;
+	DF.LightM->PL().intensity = 0.14f;
 	DF.LightM->PL().color = { 1.0f, 0.0f, 0.0f, 1.0f };
 
 	Animate();
@@ -263,6 +265,7 @@ void DFMain::LoadScreen() noexcept
 
 	DF.ModelM->Select(0);
 	DF.ModelM->Delete();
+	DF.MatM->MatDelete(1);
 
 	DF.Camera()->SetPos(0.0f, 0.0f, 4.0f);
 }
