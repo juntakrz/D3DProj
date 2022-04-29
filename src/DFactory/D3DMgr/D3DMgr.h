@@ -26,6 +26,7 @@ class D3DMgr
 	COMPTR<ID3D11DeviceContext>			m_pContext;
 	COMPTR<ID3D11RenderTargetView>		m_pRenderTarget;
 	COMPTR<ID3D11DepthStencilView>		m_pDSV;
+	COMPTR<ID3D11BlendState>			m_pBlendState;
 
 #ifdef _DEBUG
 	CDXGIDebug dxgiDebug;

@@ -38,9 +38,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		paramA < 1 ? paramA = 1 : paramA;
 		paramB < 1 ? paramB = 1 : paramB;
 		newMesh.meshid = 1;
-		newMesh.meshMat = "Mat_Default";
+		newMesh.meshMat = pMatMgr->Mat(0).name;
 		newMesh.meshName = "Plane" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshPlane>(newMesh.meshMat, paramA, paramB);
+		newMesh.pMesh = std::make_unique<MeshPlane>(0, paramA, paramB);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -57,9 +57,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 	case DF::idCube:
 	{
 		newMesh.meshid = 1;
-		newMesh.meshMat = "Mat_Default";
+		newMesh.meshMat = pMatMgr->Mat(0).name;
 		newMesh.meshName = "Cube" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshCube>(newMesh.meshMat);
+		newMesh.pMesh = std::make_unique<MeshCube>(0);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -78,9 +78,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		(paramA < 1) ? paramA = 32 : paramA;
 		
 		newMesh.meshid = 1;
-		newMesh.meshMat = "Mat_Default";
+		newMesh.meshMat = pMatMgr->Mat(0).name;
 		newMesh.meshName = "Sphere" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshSphere>(newMesh.meshMat, paramA);
+		newMesh.pMesh = std::make_unique<MeshSphere>(0, paramA);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -99,9 +99,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		(paramA < 1) ? paramA = 12 : paramA;
 
 		newMesh.meshid = 1;
-		newMesh.meshMat = "Mat_Default";
+		newMesh.meshMat = pMatMgr->Mat(0).name;
 		newMesh.meshName = "SkySphere" + std::to_string(newMesh.meshid);
-		newMesh.pMesh = std::make_unique<MeshSphere>(newMesh.meshMat, paramA, true);
+		newMesh.pMesh = std::make_unique<MeshSphere>(0, paramA, true);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -158,19 +158,21 @@ void DFModelMgr::Delete() noexcept
 
 void DFModelMgr::SetMaterial(std::string material, uint32_t meshID) noexcept
 {
+	uint16_t matIndex = pMatMgr->MatIndex(material);
+
 	// if ID is 0 - set material for all meshes
 	if (meshID == 0)
 	{
 		for (auto& it : m_Models[m_curModel].meshes)
 		{
 			it.pMesh->SetMaterial(material);
-			it.meshMat = material;
+			it.meshMat = matIndex;
 		}
 	}
 	else
 	{
 		m_Models[m_curModel].meshes[meshID].pMesh->SetMaterial(material);
-		m_Models[m_curModel].meshes[meshID].meshMat = material;
+		m_Models[m_curModel].meshes[meshID].meshMat = matIndex;
 	}
 }
 

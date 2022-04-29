@@ -6,6 +6,6 @@
 class MeshCube : public MeshBase<MeshCube>
 {
 public:
-	MeshCube(std::string material, uint16_t paramA = 1, uint16_t paramB = 1);
+	MeshCube(uint16_t matId, uint16_t paramA = 1, uint16_t paramB = 1);
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 };

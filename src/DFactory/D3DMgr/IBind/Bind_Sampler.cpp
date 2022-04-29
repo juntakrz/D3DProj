@@ -11,6 +11,7 @@ namespace Bind
 		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.MinLOD = 0;
 
 		D3D_THROW(GetDevice()->CreateSamplerState(&samplerDesc, &m_pSampler));
 	}

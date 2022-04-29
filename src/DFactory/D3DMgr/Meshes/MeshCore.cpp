@@ -58,7 +58,6 @@ void MeshCore::SetMaterial(std::string name) noexcept
 {
 	// get material object
 	const auto& mat = MatMgr.Mat(name);
-	m_matIndex = MatMgr.MatIndex(name);
 
 	// prepare material PS const buffer
 	matCBuffer.ambientColor = mat.ambientColor;
@@ -66,28 +65,9 @@ void MeshCore::SetMaterial(std::string name) noexcept
 	matCBuffer.F0 = mat.F0;
 
 	// update binds
-	if (mat.pTexBase != nullptr) {
-		m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(mat.pTexBase);
-	}
-
-	if (mat.pTexNormal != nullptr) {
-		m_Binds[Bind::idTexture1] = std::make_unique<Bind::Texture>(mat.pTexNormal, 1u);
-	}
-
-	if (mat.pTex2 != nullptr) {
-		m_Binds[Bind::idTexture2] = std::make_unique<Bind::Texture>(mat.pTex2, 2u);
-	}
-
-	if (mat.pTex3 != nullptr) {
-		m_Binds[Bind::idTexture3] = std::make_unique<Bind::Texture>(mat.pTex3, 3u);
-	}
-
-	if (mat.pTex4 != nullptr) {
-		m_Binds[Bind::idTexture4] = std::make_unique<Bind::Texture>(mat.pTex4, 4u);
-	}
-
-	if (mat.pTex5 != nullptr) {
-		m_Binds[Bind::idTexture5] = std::make_unique<Bind::Texture>(mat.pTex5, 5u);
+	for (uint8_t i = 0; i < sizeof(mat.idTex) / sizeof(uint16_t); i++)
+	{
+		m_Binds[Bind::idTexture0 + i] = std::make_unique<Bind::Texture>(MatMgr.TextureGet(mat.idTex[i]), i);
 	}
 
 	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + mat.shaderVertex + ".cso");
@@ -111,8 +91,8 @@ void MeshCore::SetMaterial(std::string name) noexcept
 void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
 {
 	// change shaders for the current material
-	(inVS == "") ? inVS = MatMgr.Mat(m_matIndex).shaderVertex : MatMgr.Mat(m_matIndex).shaderVertex = inVS;
-	(inPS == "") ? inPS = MatMgr.Mat(m_matIndex).shaderPixel : MatMgr.Mat(m_matIndex).shaderPixel = inPS;
+	//(inVS == "") ? inVS = MatMgr.Mat(m_MatName).shaderVertex : MatMgr.Mat(m_MatName).shaderVertex = inVS;
+	//(inPS == "") ? inPS = MatMgr.Mat(m_MatName).shaderPixel : MatMgr.Mat(m_MatName).shaderPixel = inPS;
 
 	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + inVS + ".cso");
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();

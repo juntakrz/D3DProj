@@ -12,52 +12,44 @@ class DFMaterial
 
 	struct Material
 	{
+		uint16_t id;
 		std::string name;
 
 		std::string shaderVertex, shaderPixel;
-		ID3D11ShaderResourceView* pTexBase = nullptr;
-		ID3D11ShaderResourceView* pTexNormal = nullptr;
-		ID3D11ShaderResourceView* pTex2 = nullptr;
-		ID3D11ShaderResourceView* pTex3 = nullptr;
-		ID3D11ShaderResourceView* pTex4 = nullptr;
-		ID3D11ShaderResourceView* pTex5 = nullptr;
+		uint16_t idTex[6] = { 0, 0, 0, 0, 0, 0 };
 
 		XMFLOAT4 ambientColor;
 		XMFLOAT3A F0;
-		XMFLOAT4 data;
+		
 		/* Material Data Structure
 		* 
 		x = material intensity
 		y = specular intensity	/ metalness (PBS)
 		z = specular power		/ roughness (PBS)
 		*/
+		XMFLOAT4 data;
+
+		// will MatMgr automatically try to delete textures
+		// from memory if unused by any other material
+		bool manageTextures = false;
 	};
 
-	struct Texture
+	struct DFTexture
 	{
 		std::string name;
 		std::string filePath;
-		DFSurface texture;
-
-		Texture(std::string A, std::string B, DFSurface C) : name(A), filePath(B), texture(std::move(C)) {};
-	};
-
-	struct DXTexture
-	{
-		std::string name;
-		std::string filePath;
-		ID3D11ShaderResourceView* pSRV = nullptr;
+		std::shared_ptr<ID3D11ShaderResourceView*> pSRV;
 	};
 
 	std::vector<std::unique_ptr<Material>> m_Materials;
-	std::vector<std::unique_ptr<Texture>> m_Textures;
-	std::vector<DXTexture> m_DXTextures;
+	std::vector<DFTexture> m_DFTextures;
 
 public:
 
 	struct DFMATERIAL_DESC
 	{
 		std::string name;
+		bool manageTextures = false;
 
 		struct
 		{
@@ -66,7 +58,7 @@ public:
 
 		struct
 		{
-			std::string base = "default.dds", normal = "", tex2 = "", tex3 = "", tex4 = "", tex5 = "";
+			std::string tex0 = "default//default.dds", tex1 = "", tex2 = "", tex3 = "", tex4 = "", tex5 = "";
 		} textures;
 
 		struct
@@ -93,14 +85,19 @@ public:
 	Material& Mat(std::string name) noexcept;
 	Material& Mat(uint16_t index) noexcept;
 	uint16_t MatIndex(std::string name) const noexcept;
+	uint16_t MatCount() const noexcept;
+	void MatDelete(uint16_t index) noexcept;
+	void MatDelete(std::string name) noexcept;
 
-	uint16_t AddTexture(std::string filePath) noexcept;
-	ID3D11ShaderResourceView* GetTexture(uint16_t index) noexcept;
-	uint16_t AddTexturePNG(std::string filePath) noexcept;
-	uint16_t AddTexturePNG(std::string name, std::string filePath) noexcept;
-	DFSurface* GetTexturePNG(std::string name) const noexcept;
-	DFSurface* GetTexturePNG(uint16_t index) const noexcept;
-	uint16_t GetTextureIndexPNG(std::string name) const noexcept;
+	uint16_t TextureAdd(std::string filePath) noexcept;
+	uint16_t TextureAdd(std::string name, std::string filePath) noexcept;
+	ID3D11ShaderResourceView* TextureGet(uint16_t index) const noexcept;
+	ID3D11ShaderResourceView* TextureGet(std::string name) const noexcept;
+	std::string TextureGetName(uint16_t index) const noexcept;
+	uint16_t TextureGetIndex(std::string name) const noexcept;
+	bool TextureDelete(uint16_t index) noexcept;
+	bool TextureDelete(std::string name) noexcept;
 
-	void DEBUG_ShowTextureIndex(uint16_t begin = 0, uint16_t end = 65535) noexcept;
+	void DEBUG_ShowMaterialIndex(uint16_t begin = 0, uint16_t end = 65535) const noexcept;
+	void DEBUG_ShowTextureIndex(uint16_t begin = 0, uint16_t end = 65535) const noexcept;
 };

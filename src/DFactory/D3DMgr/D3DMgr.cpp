@@ -59,6 +59,20 @@ D3DMgr::D3DMgr(HWND hWnd)
 	dsd.DepthEnable = true;
 	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsd.DepthFunc = D3D11_COMPARISON_LESS;
+
+	//stencil stuff, need to read about it
+	dsd.StencilEnable = true;
+	dsd.StencilReadMask = 0xFF;
+	dsd.StencilWriteMask = 0xFF;
+	dsd.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsd.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	dsd.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsd.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	dsd.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsd.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	dsd.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsd.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
 	COMPTR<ID3D11DepthStencilState> pDSState;
 	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &pDSState));
 
@@ -99,9 +113,30 @@ D3DMgr::D3DMgr(HWND hWnd)
 	RDesc.FillMode = D3D11_FILL_SOLID;
 	RDesc.CullMode = D3D11_CULL_BACK;
 	RDesc.FrontCounterClockwise = false;
+	RDesc.DepthBias = 0;
+	RDesc.DepthBiasClamp = 0.0f;
+	RDesc.DepthClipEnable = true;
+	RDesc.MultisampleEnable = true;
+	RDesc.ScissorEnable = false;
+	RDesc.SlopeScaledDepthBias = 0.0f;
 	
 	D3D_THROW_INFO(m_pDevice->CreateRasterizerState(&RDesc, &pRState));
 	m_pContext->RSSetState(pRState.Get());
+
+	//configure alpha blend
+	D3D11_BLEND_DESC blendDesc = {};
+	//blendDesc.AlphaToCoverageEnable = true;
+	blendDesc.RenderTarget[0].BlendEnable = true;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+
+	D3D_THROW_INFO(m_pDevice->CreateBlendState(&blendDesc, &m_pBlendState));
+	m_pContext->OMSetBlendState(m_pBlendState.Get(), NULL, 0xffffffff);
 
 	//configure viewport and rasterizer
 	D3D11_VIEWPORT vp = {};

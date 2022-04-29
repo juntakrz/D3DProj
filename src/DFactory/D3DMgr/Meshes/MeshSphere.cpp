@@ -1,9 +1,7 @@
 #include "MeshSphere.h"
 
-MeshSphere::MeshSphere(std::string material, uint16_t divisions, bool invertFaces)
+MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 {
-	m_matIndex = MatMgr.MatIndex(material);
-	
 	if (!IsStaticBindsInitialized())
 	{
 		//create and bind topology
@@ -26,26 +24,21 @@ MeshSphere::MeshSphere(std::string material, uint16_t divisions, bool invertFace
 	AddIndexBuffer(std::make_unique<Bind::IndexBuffer>(model.indices));
 
 	//load color texture
-	AddBind(std::make_unique<Bind::Texture>(MatMgr.Mat(material).pTexBase), Bind::idTexture0);
+	AddBind(std::make_unique<Bind::Texture>(MatMgr.TextureGet(0)), Bind::idTexture0);
 
-	//load normal texture (if exists)
-	const auto texNormal = MatMgr.Mat(material).pTexNormal;
-	if (texNormal != nullptr) {
-		AddBind(std::make_unique<Bind::Texture>(MatMgr.Mat(material).pTexNormal, 1u), Bind::idTexture1);
-	}
 	AddBind(std::make_unique<Bind::Sampler>(), Bind::idSampler);
 
 	//fill material const buffer
-	AddMaterialBind(m_matIndex);
+	AddMaterialBind(matId);
 
 	//create and bind vertex shader
-	std::string VSPath = "shaders//" + MatMgr.Mat(m_matIndex).shaderVertex + ".cso";
+	std::string VSPath = "shaders//" + MatMgr.Mat(matId).shaderVertex + ".cso";
 	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	AddBind(std::move(pVS), Bind::idVertexShader);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + MatMgr.Mat(m_matIndex).shaderPixel + ".cso";
+	std::string PSPath = "shaders//" + MatMgr.Mat(matId).shaderPixel + ".cso";
 	AddBind(std::make_unique<Bind::PixelShader>(PSPath), Bind::idPixelShader);
 
 	//create and bind InputLayout

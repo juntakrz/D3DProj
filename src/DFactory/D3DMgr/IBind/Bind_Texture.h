@@ -10,7 +10,7 @@ namespace Bind
 
 	public:
 		//Texture(const DFSurface& surface, UINT slot = 0);
-		Texture(ID3D11ShaderResourceView* pSRV, UINT slot = 0);
+		Texture(ID3D11ShaderResourceView* m_pSRV, UINT slot = 0);
 		void Bind() noexcept override;
 
 	protected:

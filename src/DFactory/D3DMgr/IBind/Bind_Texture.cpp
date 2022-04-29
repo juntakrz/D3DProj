@@ -41,14 +41,12 @@ namespace Bind
 	{
 		D3D_DXGIDEBUG(*DFData::pD3DM);
 
-		//m_pSRV = pSRV->Get();
-		//pSRV->CopyTo(m_pSRV.GetAddressOf());
 		m_pSRV = pSRV;
+		//D3D_THROW_INFO(GetContext()->GenerateMips(m_pSRV));
 	}
 
 	void Texture::Bind() noexcept
 	{
-		//GetContext()->PSSetShaderResources(m_slot, 1u, m_pSRV.GetAddressOf());
 		GetContext()->PSSetShaderResources(m_slot, 1u, &m_pSRV);
 	}
 }

@@ -396,8 +396,8 @@
     <FxCompile Include="shaders\PS_Default.hlsl" />
     <FxCompile Include="shaders\VS_BasicTexture.hlsl" />
     <FxCompile Include="shaders\PS_BasicTexture.hlsl" />
-    <FxCompile Include="shaders\PS_Phong.hlsl" />
-    <FxCompile Include="shaders\VS_Phong.hlsl" />
+    <FxCompile Include="shaders\PS_PhongAlpha.hlsl" />
+    <FxCompile Include="shaders\VS_PhongAlpha.hlsl" />
     <FxCompile Include="shaders\PS_Standard_L.hlsl" />
     <FxCompile Include="shaders\VS_Standard_L.hlsl" />
     <FxCompile Include="shaders\PS_Standard.hlsl" />

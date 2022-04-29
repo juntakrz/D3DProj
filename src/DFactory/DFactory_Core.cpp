@@ -32,7 +32,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc.name = "Mat_Default";
 	DFMatDesc.shaders.vertex = "VS_BasicTexture";
 	DFMatDesc.shaders.pixel = "PS_BasicTexture";
-	DFMatDesc.textures.base = "default.dds";
+	DFMatDesc.textures.tex0 = "default//default.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.material.spec_metal = 0.0f;

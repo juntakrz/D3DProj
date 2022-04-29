@@ -13,8 +13,8 @@ struct VSOut
 
 VSOut main( float3 pos : POSITION, float2 tex : TEXCOORD )
 {	
-	VSOut vso;
-    vso.pos = mul(float4(pos, 1.0f), mul(world, viewProj));
-	vso.tex = tex;
-	return vso;
+	VSOut oVS;
+    oVS.pos = mul(float4(pos, 1.0f), mul(world, viewProj));
+	oVS.tex = tex;
+	return oVS;
 }
