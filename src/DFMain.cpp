@@ -12,15 +12,19 @@ DFMain::DFMain(DFactory::DFACTORY_INIT_DESC* pDesc) : DF(DFactory::Init(pDesc))
 void DFMain::DrawFrame()
 {
 	deltaA += 0.0001f;
-	
-	// MdlStars
-	DF.ModelM->Select(2);
-	DF.ModelM->SetPos(DF.Camera()->GetPos().x, DF.Camera()->GetPos().y, DF.Camera()->GetPos().z);
-	
+
 	// MdlMars
 	DF.ModelM->Select(1);
 	DF.ModelM->SetPos(DF.Camera()->GetPos().x + 600.0f, DF.Camera()->GetPos().y - 1600.0f, DF.Camera()->GetPos().z + 4000.0f);
 	//DF.ModelM->SetRotation(-0.4f, deltaA, -0.4f);
+
+	// MdlMarsAtmo
+	DF.ModelM->Select(2);
+	DF.ModelM->SetPos(DF.Camera()->GetPos().x + 600.0f, DF.Camera()->GetPos().y - 1600.0f, DF.Camera()->GetPos().z + 4000.0f);
+	
+	// MdlStars
+	DF.ModelM->Select(3);
+	DF.ModelM->SetPos(DF.Camera()->GetPos().x, DF.Camera()->GetPos().y, DF.Camera()->GetPos().z);
 
 	DF.LightM->PL(0).pMesh->DEBUG_Rotate(0.01f);
 	DF.LightM->PL(1).pMesh->DEBUG_Rotate(-0.01f);
@@ -169,6 +173,18 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
+
+	//Mat_Atmo
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_Atmo";
+	DFMatDesc.shaders.vertex = "VS_PhongAlpha";
+	DFMatDesc.shaders.pixel = "PS_PhongAlpha";
+	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
+	DFMatDesc.material.spec_metal = 4.0f;
+	DFMatDesc.material.pow_roughness = 3.2f;
+	DFMatDesc.material.matIntensity = 1.0f;
+
+	DF.MatM->MatAdd(&DFMatDesc);
 	/*
 	//Mat_Tachi_Fore
 	DFMatDesc = {};
@@ -212,6 +228,12 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(2800.0f, 2800.0f, 2800.0f);
 	DF.ModelM->SetRotation(-0.4f, 0.0f, -0.4f);
 	//DF.Mesh()->SetRotationY(-0.00005f);
+
+	//MdlMarsAtmo
+	DF.ModelM->Create(DF::idSphere, "MdlMarsAtmo", 64);
+	DF.ModelM->SetPos(600.0f, -1600.0f, 4000.0f);
+	DF.ModelM->SetScaling(2850.0f, 2850.0f, 2850.0f);
+	DF.ModelM->SetMaterial("Mat_Atmo");
 	
 	Animate();
 
@@ -231,14 +253,6 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
 	
-	/*
-	//MdlSphere1
-	DF.ModelM->Create(DF::idSphere, "MdlSphere1", 64);
-	DF.ModelM->SetScaling(0.8f, 0.8f, 0.8f);
-	DF.ModelM->SetRotation(0.5f, 0.5f, 0.5f);
-	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
-	DF.ModelM->SetMaterial("Mat_Tachi_Fore");
-	*/
 	Animate();
 	
 	//DF.LMgr->ShowPLMeshes() = true;
