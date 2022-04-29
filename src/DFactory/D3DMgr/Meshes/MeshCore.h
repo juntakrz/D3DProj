@@ -55,7 +55,6 @@ private:
 	const Bind::IndexBuffer* m_pCIndexBuffer = nullptr;
 
 protected:
-	uint16_t m_matIndex = 0;
 
 	void AddBind(std::unique_ptr<Bind::IBind> bindObj, uint8_t id) noexcept;
 	void AddIndexBuffer(std::unique_ptr<Bind::IndexBuffer> ibuf) noexcept;

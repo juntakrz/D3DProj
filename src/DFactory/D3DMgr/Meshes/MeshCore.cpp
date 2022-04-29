@@ -58,7 +58,6 @@ void MeshCore::SetMaterial(std::string name) noexcept
 {
 	// get material object
 	const auto& mat = MatMgr.Mat(name);
-	m_matIndex = MatMgr.MatIndex(name);
 
 	// prepare material PS const buffer
 	matCBuffer.ambientColor = mat.ambientColor;
@@ -92,8 +91,8 @@ void MeshCore::SetMaterial(std::string name) noexcept
 void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
 {
 	// change shaders for the current material
-	(inVS == "") ? inVS = MatMgr.Mat(m_matIndex).shaderVertex : MatMgr.Mat(m_matIndex).shaderVertex = inVS;
-	(inPS == "") ? inPS = MatMgr.Mat(m_matIndex).shaderPixel : MatMgr.Mat(m_matIndex).shaderPixel = inPS;
+	//(inVS == "") ? inVS = MatMgr.Mat(m_MatName).shaderVertex : MatMgr.Mat(m_MatName).shaderVertex = inVS;
+	//(inPS == "") ? inPS = MatMgr.Mat(m_MatName).shaderPixel : MatMgr.Mat(m_MatName).shaderPixel = inPS;
 
 	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + inVS + ".cso");
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();

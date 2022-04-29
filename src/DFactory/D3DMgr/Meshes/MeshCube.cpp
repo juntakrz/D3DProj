@@ -2,7 +2,6 @@
 
 MeshCube::MeshCube(uint16_t matId, uint16_t paramA, uint16_t paramB)
 {
-	m_matIndex = matId;
 
 	if (!IsStaticBindsInitialized())
 	{
@@ -30,16 +29,16 @@ MeshCube::MeshCube(uint16_t matId, uint16_t paramA, uint16_t paramB)
 	AddBind(std::make_unique<Bind::Sampler>(), Bind::idSampler);
 
 	//fill material const buffer
-	AddMaterialBind(m_matIndex);
+	AddMaterialBind(matId);
 
 	//create and bind vertex shader
-	std::string VSPath = "shaders//" + MatMgr.Mat(m_matIndex).shaderVertex + ".cso";
+	std::string VSPath = "shaders//" + MatMgr.Mat(matId).shaderVertex + ".cso";
 	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	AddBind(std::move(pVS), Bind::idVertexShader);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + MatMgr.Mat(m_matIndex).shaderPixel + ".cso";
+	std::string PSPath = "shaders//" + MatMgr.Mat(matId).shaderPixel + ".cso";
 	AddBind(std::make_unique<Bind::PixelShader>(PSPath), Bind::idPixelShader);
 
 	//create and bind InputLayout

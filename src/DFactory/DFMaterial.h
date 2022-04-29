@@ -12,6 +12,7 @@ class DFMaterial
 
 	struct Material
 	{
+		uint16_t id;
 		std::string name;
 
 		std::string shaderVertex, shaderPixel;

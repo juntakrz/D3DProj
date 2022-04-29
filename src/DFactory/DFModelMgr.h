@@ -10,7 +10,7 @@ struct DFMesh
 {
 	uint32_t meshid;
 	std::string meshName;
-	uint16_t meshMat;
+	std::string meshMat;
 	std::unique_ptr<MeshCore> pMesh;
 };
 

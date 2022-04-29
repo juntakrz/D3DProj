@@ -113,9 +113,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			//create new material
 			DFMaterial::DFMATERIAL_DESC DFMatDesc{};
 			DFMatDesc.name = matName;
-
-			//set new material index
-			newMesh.meshMat = pMatMgr->MatCount();
+			newMesh.meshMat = matName;
 
 			if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 			{
@@ -230,6 +228,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 		else
 		{	//use existing material
 			pDFMat = &pMatMgr->Mat(matName);
+			newMesh.meshMat = matName;
 
 			for (uint16_t i = 0; i < sizeof(pDFMat->idTex) / sizeof(uint16_t); i++) {
 				pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(
