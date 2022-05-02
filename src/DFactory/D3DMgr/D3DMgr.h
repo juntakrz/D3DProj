@@ -54,7 +54,7 @@ private:
 
 	DirectX::XMMATRIX m_ProjectionMatrix =
 		DirectX::XMMatrixPerspectiveLH(1.0f, m_VHeight / m_VWidth, 0.001f, 10000.0f);
-		//DirectX::XMMatrixOrthographicLH(1.0f, m_DefaultViewportHeight / m_DefaultViewportWidth, 0.5f, 10000.0f);
+	//DirectX::XMMatrixOrthographicLH(1.0f, m_DefaultViewportHeight / m_DefaultViewportWidth, 0.5f, 10000.0f);
 	class CCamera* m_pCamera;
 
 	void CreateAuxRenderTarget() noexcept;
