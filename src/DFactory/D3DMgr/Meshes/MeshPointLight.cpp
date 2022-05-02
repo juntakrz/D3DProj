@@ -16,7 +16,7 @@ MeshPointLight::MeshPointLight()
 	}
 
 	//create instance
-	auto model = CSphere::Create<Vertex>(4);
+	auto model = CSphere::Create<DF::Vertex>(4);
 
 	//create and bind VertexBuffer with vertices
 	AddBind(std::make_unique<Bind::VertexBuffer>(model.vertices), Bind::idVertexBuffer);
@@ -25,13 +25,13 @@ MeshPointLight::MeshPointLight()
 	AddIndexBuffer(std::make_unique<Bind::IndexBuffer>(model.indices));
 
 	//create and bind vertex shader
-	std::string VSPath = "shaders//VS_Default.cso";
+	std::string VSPath = "shaders//VS_Default.shd";
 	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	AddBind(std::move(pVS), Bind::idVertexShader);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//PS_Default.cso";
+	std::string PSPath = "shaders//PS_Default.shd";
 	AddBind(std::make_unique<Bind::PixelShader>(PSPath), Bind::idPixelShader);
 
 	//create and bind InputLayout
@@ -65,7 +65,7 @@ void MeshPointLight::Draw() noexcept
 	{
 		it->Bind();
 	}
-	(m_showMesh && m_showAllMeshes) ? DFData::pD3DM->DrawIndexed(GetIndexBuffer()->GetCount()) : (void)0;
+	(m_showMesh && m_showAllMeshes) ? DF::pD3DM->DrawIndexed(GetIndexBuffer()->GetCount()) : (void)0;
 }
 
 void MeshPointLight::DEBUG_Rotate(float delta) noexcept

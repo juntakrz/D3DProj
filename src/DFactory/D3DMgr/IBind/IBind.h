@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../D3DMgr.h"
-#include "../../Util/DF_Data.h"
+#include "../../Common/DF_A.h"
 
 //generic interface for Direct3D11 bindable objects
 namespace Bind
@@ -22,6 +22,7 @@ namespace Bind
 
 	public:
 		virtual void Bind() = 0;
+		virtual void Unbind() noexcept {};
 		virtual ~IBind() = default;
 	};
 }

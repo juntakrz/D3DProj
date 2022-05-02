@@ -90,11 +90,11 @@ void DFactory::CProc::ProcessFunctions() noexcept
 			}
 			case '5':
 			{
-				pDF->ModelM->Select(3);
+				pDF->ModelM->Select(4);
 				pDF->ModelM->Delete();
-				pDF->MatM->MatDelete(5);
-				pDF->MatM->MatDelete(5);
-				pDF->MatM->MatDelete(5);
+				pDF->MatM->MatDelete(8);
+				pDF->MatM->MatDelete(9);
+				pDF->MatM->MatDelete(10);
 			}
 			}
 		}

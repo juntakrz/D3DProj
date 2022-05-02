@@ -1,14 +1,14 @@
 #pragma once
 
 #include "../WndMgr/CException.h"
+#include "CDXGIDebug.h"
 #include "D3DMgr_Def.h"
 #include "dxerr/dxerr.h"
 #include "../../imgui/imgui_impl_win32.h"
 #include "../../imgui/imgui_impl_dx11.h"
 #include "../Util/imGuiMgr.h"
-#include "CDXGIDebug.h"
+#include "../Common/DF_Math.h"
 #include "Cameras/CCamera.h"
-#include "../DFSurface.h"
 
 namespace Bind
 {
@@ -17,6 +17,7 @@ namespace Bind
 
 class D3DMgr
 {
+private:
 	friend Bind::IBind;
 	friend class MeshCore;
 
@@ -24,25 +25,49 @@ class D3DMgr
 	COMPTR<ID3D11Device>				m_pDevice;
 	COMPTR<IDXGISwapChain>				m_pSwap;
 	COMPTR<ID3D11DeviceContext>			m_pContext;
-	COMPTR<ID3D11RenderTargetView>		m_pRenderTarget;
-	COMPTR<ID3D11DepthStencilView>		m_pDSV;
+	COMPTR<ID3D11Texture2D>				m_pBackBuffer;
+	COMPTR<ID3D11Texture2D>				m_pAuxRTTex;
+	COMPTR<ID3D11RenderTargetView>		m_pRTVMain;
+	COMPTR<ID3D11DepthStencilView>		m_pDSVMain;
+	COMPTR<ID3D11ShaderResourceView>	m_pSRVMain;
+	COMPTR<ID3D11RenderTargetView>		m_pRTVAux;
+	COMPTR<ID3D11ShaderResourceView>	m_pSRVAux;
+	COMPTR<ID3D11DepthStencilState>		m_pDSStateOn;
+	COMPTR<ID3D11DepthStencilState>		m_pDSStateOff;
 	COMPTR<ID3D11BlendState>			m_pBlendState;
 
+	//dynamically allocated RTV pointers
+	struct RenderTargets
+	{
+		static const uint8_t maxRTVs = 6;
+		//reserved: 0 = back buffer, 1 = primary render to texture resource
+		ID3D11RenderTargetView* m_pRTViews[maxRTVs] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+		ID3D11DepthStencilView* m_pDSViews[maxRTVs] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+		ID3D11ShaderResourceView* m_pSRViews[maxRTVs] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	} RTV;
+
+	HRESULT hr;
+	bool m_imguiEnabled = CWND_IMGUIENABLED;
+	bool m_ZBufferEnabled = true;
+	float m_ClearColor[6][4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float m_VWidth = CWND_DEFAULTWIDTH, m_VHeight = CWND_DEFAULTHEIGHT;
+
+	DirectX::XMMATRIX m_ProjectionMatrix =
+		DirectX::XMMatrixPerspectiveLH(1.0f, m_VHeight / m_VWidth, 0.001f, 10000.0f);
+	//DirectX::XMMatrixOrthographicLH(1.0f, m_DefaultViewportHeight / m_DefaultViewportWidth, 0.5f, 10000.0f);
+	class CCamera* m_pCamera;
+
+	void CreateAuxRenderTarget() noexcept;
+	void AssignInitPtrs() noexcept;
+
+public:
 #ifdef _DEBUG
 	CDXGIDebug dxgiDebug;
 #endif
 
-	HRESULT hr;
-	bool m_imguiEnabled = CWND_IMGUIENABLED;
-	float m_ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	float m_DefaultViewportWidth = CWND_DEFAULTWIDTH, m_DefaultViewportHeight = CWND_DEFAULTHEIGHT;
+	//initial RTV, number of RTVs
+	int m_RTId = 0, m_RTNum = 1;
 
-	DirectX::XMMATRIX m_ProjectionMatrix =
-		DirectX::XMMatrixPerspectiveLH(1.0f, m_DefaultViewportHeight / m_DefaultViewportWidth, 0.5f, 10000.0f);
-		//DirectX::XMMatrixOrthographicLH(1.0f, m_DefaultViewportHeight / m_DefaultViewportWidth, 0.5f, 10000.0f);
-	class CCamera* m_pCamera;
-
-public:
 	class Exception : public CException
 	{
 		using CException::CException;
@@ -86,25 +111,65 @@ public:
 	void DisableImGui() noexcept;
 	bool IsImGuiEnabled() const noexcept;
 
-	void SetDefaultViewportSize(const std::pair<uint16_t, uint16_t> viewportSize);
+	void SetViewportSize(const uint16_t width, const uint16_t height) noexcept;
 
 	void BeginFrame(const float red, const float green, const float blue) noexcept;
-	void BeginFrame() noexcept;
+	void BeginFrame(bool clear = true) noexcept;
 	void EndFrame();
 
-	void ClearBuffer() noexcept;
-	void ClearBuffer(const float red, const float green, const float blue) noexcept;
-	void SetClearBufferColor(const float red, const float green, const float blue) noexcept;
+	//clear buffer only (optionally corresponding depth buffer)
+	void Clear(uint8_t index = 0, bool clearDepthBuffer = true) noexcept;
+	void Clear(const float red, const float green, const float blue, uint8_t index = 0, bool clearDepthBuffer = true) noexcept;
+	void SetClearColor(const float red, const float green, const float blue, uint8_t index = 0) noexcept;
+
+	void EnableDepthBuffer() noexcept;
+	void DisableDepthBuffer() noexcept;
 
 	void RenderWireframe(bool enable = false) noexcept;
 
 	void SetProjection(DirectX::FXMMATRIX& projection) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
 
+	//set and get currently active camera
 	void SetCamera(CCamera* pCamera) noexcept;
 	CCamera* GetCamera() const noexcept;
 
+	//basic wrapper for Direct3D DrawIndexed method
 	void DrawIndexed(const UINT& count) noexcept;
 
-	ID3D11Device* GetDevice() noexcept;
+	//access D3D11 device and context directly
+	ID3D11Device* Device() noexcept;
+	ID3D11DeviceContext* Context() noexcept;
+
+	/* * * * * * D3DMgr_RT.cpp * */
+
+	//render targer view methods									//render target id, quantity
+	void RTBindMainAndAux() noexcept;								//0, 2
+	void RTBindMain() noexcept;										//0, 1
+	void RTBindAux() noexcept;										//1, 1
+	void RTBind(uint8_t index = 255, uint8_t num = 255) noexcept;	//initial, num
+
+	void RTCopyBuffer() noexcept;
+
+	template<typename T, typename... RTVs>
+	void RTSet(T pRTV, RTVs... pRTVs) noexcept
+	{
+		//std::vector
+	}
+
+	//access render targets directly
+	RenderTargets& RTGet() noexcept;
+	ID3D11RenderTargetView* RTGetRTV(uint8_t index) noexcept;
+	ID3D11DepthStencilView* RTGetDSV(uint8_t index) noexcept;
+
+	//external render targets, RTV and DSV are related by the same index
+	void RTAdd(uint8_t index, ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV) noexcept;
+	void RTAddRTV(uint8_t index, ID3D11RenderTargetView* pRTV) noexcept;
+	void RTAddDSV(uint8_t index, ID3D11DepthStencilView* pDSV) noexcept;
+
+	void RTRemove(uint8_t index, bool free = false) noexcept;
+	void RTRemoveRTV(uint8_t index, bool free = false) noexcept;
+	void RTRemoveDSV(uint8_t index, bool free = false) noexcept;
+
+	/* * * * * * * * * * * * * * */
 };

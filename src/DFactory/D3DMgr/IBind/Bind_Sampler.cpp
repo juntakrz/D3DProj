@@ -4,7 +4,7 @@ namespace Bind
 {
 	Sampler::Sampler()
 	{
-		D3D_DXGIDEBUG(*DFData::pD3DM);
+		D3D_DXGIDEBUG(*DF::pD3DM);
 
 		D3D11_SAMPLER_DESC samplerDesc = {};
 		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;

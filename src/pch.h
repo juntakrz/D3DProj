@@ -19,15 +19,6 @@
 #include <math.h>
 #include <DirectXMath.h>
 
-//GDI+
-namespace Gdiplus
-{
-	using std::min;
-	using std::max;
-}
-#pragma comment (lib, "gdiplus.lib")
-#include <gdiplus.h>
-
 //Direct3D
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "D3DCompiler.lib")

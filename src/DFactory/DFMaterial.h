@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../../pch.h"
-#include "DFSurface.h"
-#include "Util/DF_Data.h"
+#include "Common/DF_A.h"
 
 class DFMaterial
 {
@@ -16,7 +15,7 @@ class DFMaterial
 		std::string name;
 
 		std::string shaderVertex, shaderPixel;
-		uint16_t idTex[6] = { 0, 0, 0, 0, 0, 0 };
+		uint32_t idTex[6] = { 0, 0, 0, 0, 0, 0 };
 
 		XMFLOAT4 ambientColor;
 		XMFLOAT3A F0;
@@ -36,9 +35,11 @@ class DFMaterial
 
 	struct DFTexture
 	{
+		uint32_t id;
 		std::string name;
 		std::string filePath;
-		std::shared_ptr<ID3D11ShaderResourceView*> pSRV;
+		std::shared_ptr<ID3D11ShaderResourceView*> pSRV = nullptr;
+		ID3D11RenderTargetView* pRTV = nullptr;		//used by render to textures
 	};
 
 	std::vector<std::unique_ptr<Material>> m_Materials;
@@ -82,6 +83,7 @@ public:
 	}
 
 	uint16_t MatAdd(DFMATERIAL_DESC* pDesc) noexcept;
+
 	Material& Mat(std::string name) noexcept;
 	Material& Mat(uint16_t index) noexcept;
 	uint16_t MatIndex(std::string name) const noexcept;
@@ -89,15 +91,19 @@ public:
 	void MatDelete(uint16_t index) noexcept;
 	void MatDelete(std::string name) noexcept;
 
-	uint16_t TextureAdd(std::string filePath) noexcept;
-	uint16_t TextureAdd(std::string name, std::string filePath) noexcept;
-	ID3D11ShaderResourceView* TextureGet(uint16_t index) const noexcept;
-	ID3D11ShaderResourceView* TextureGet(std::string name) const noexcept;
-	std::string TextureGetName(uint16_t index) const noexcept;
-	uint16_t TextureGetIndex(std::string name) const noexcept;
-	bool TextureDelete(uint16_t index) noexcept;
+	uint32_t TextureAdd(std::string filePath) noexcept;
+	uint32_t TextureAdd(std::string name, std::string filePath) noexcept;
+	uint32_t TextureAddRT(std::string name, UINT width, UINT height) noexcept;
+
+	std::shared_ptr<ID3D11ShaderResourceView*> TextureGet(uint16_t index) const noexcept;
+	std::shared_ptr<ID3D11ShaderResourceView*> TextureGet(std::string name) const noexcept;
+	std::string TextureGetName(uint32_t index) const noexcept;
+	uint32_t TextureGetIndex(std::string name) const noexcept;
+	bool TextureExists(uint32_t index) const noexcept;
+	bool TextureIsRT(uint32_t index) const noexcept;
+	bool TextureDelete(uint32_t index) noexcept;
 	bool TextureDelete(std::string name) noexcept;
 
 	void DEBUG_ShowMaterialIndex(uint16_t begin = 0, uint16_t end = 65535) const noexcept;
-	void DEBUG_ShowTextureIndex(uint16_t begin = 0, uint16_t end = 65535) const noexcept;
+	void DEBUG_ShowTextureIndex(uint32_t begin = 0, uint32_t end = 99999) const noexcept;
 };

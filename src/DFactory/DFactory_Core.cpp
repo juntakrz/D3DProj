@@ -9,11 +9,11 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 		pDescription->WndTitle.c_str());
 
 	// retrieve D3DMgr
-	DFData::pD3DM = &_SInstance.pWndMgr->D3D();
-	_SInstance.pD3DMgr = DFData::pD3DM;
+	DF::pD3DM = &_SInstance.pWndMgr->D3D();
+	_SInstance.pD3DMgr = DF::pD3DM;
 
 	// set Direct3D default viewport size
-	_SInstance.pD3DMgr->SetDefaultViewportSize(_SInstance.pWndMgr->GetWindowSize());
+	_SInstance.pD3DMgr->SetViewportSize(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
 
 	// init light manager
 	_SInstance.LightM = &LightMgr::Get();
@@ -37,6 +37,13 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.material.spec_metal = 0.0f;
 	DFMatDesc.material.pow_roughness = 0.5f;
+	_SInstance.MatM->MatAdd(&DFMatDesc);
+
+	//create and add default RTT material
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_RTTDefault";
+	DFMatDesc.shaders.vertex = "VS_BasicRTT";
+	DFMatDesc.shaders.pixel = "PS_BasicRTT";
 	_SInstance.MatM->MatAdd(&DFMatDesc);
 
 	// initialize DFactory procedure manager
@@ -72,6 +79,8 @@ void DFactory::DrawFrame() noexcept
 	//update camera buffer for use in vertex shader slot 1
 	CameraUpdateVS();
 
+	//DF::pD3DM->RTSetMain();
+
 	for (auto& it : ModelM->m_Models)
 	{
 		// update model matrix and propagate it among meshes through nodes
@@ -86,15 +95,6 @@ void DFactory::DrawFrame() noexcept
 		// draw the model
 		it.pRootNode->Draw();
 
-		//it.meshes[0].pMesh->Draw(*pD3DMgr);
-		/*
-		if (it.meshes.size() > 1 && debug.int64bit > -1 && debug.int64bit < it.meshes.size()) {
-				it.meshes[debug.int64bit].pMesh->Draw(*pD3DMgr);
-		}
-		else
-		{
-			it.pRootNode->Draw(*pD3DMgr);
-		}*/
 	}
 	
 	LightM->Draw();

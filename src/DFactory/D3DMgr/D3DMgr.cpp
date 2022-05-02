@@ -1,29 +1,28 @@
 #include "../../pch.h"
-#include "dxerr/dxerr.h"
 #include "D3DMgr.h"
-#include "../Util/GfxMath.h"
 
 D3DMgr::D3DMgr(HWND hWnd)
 {
-	DXGI_SWAP_CHAIN_DESC scd = {};
-	scd.BufferDesc.Width = 0;			//try resolution of the window
-	scd.BufferDesc.Height = 0;
-	scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	scd.BufferDesc.RefreshRate.Numerator = 0;
-	scd.BufferDesc.RefreshRate.Denominator = 0;
-	scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	scd.SampleDesc.Count = 1;
-	scd.SampleDesc.Quality = 0;
-	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	//using this as main buffer
-	scd.BufferCount = 1;								//amount of additional buffers
-	scd.OutputWindow = hWnd;
-	scd.Windowed = true;
-	scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;			//buffer swapping style
-	scd.Flags = NULL;
+	//create swap chain description
+	DXGI_SWAP_CHAIN_DESC SwapDesc = {};
+	SwapDesc.BufferDesc.Width = 0;			//try resolution of the window
+	SwapDesc.BufferDesc.Height = 0;
+	SwapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	SwapDesc.BufferDesc.RefreshRate.Numerator = 0;
+	SwapDesc.BufferDesc.RefreshRate.Denominator = 0;
+	SwapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	SwapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	SwapDesc.SampleDesc.Count = 1;
+	SwapDesc.SampleDesc.Quality = 0;
+	SwapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+	SwapDesc.BufferCount = 2;								//amount of additional buffers
+	SwapDesc.OutputWindow = hWnd;
+	SwapDesc.Windowed = true;
+	SwapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;	//buffer swapping style
+	SwapDesc.Flags = NULL;
 
 	UINT rlFlags = 0u;
-#ifdef _DEBUG
+#ifdef _DEBUG || _DFDEBUG
 	rlFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
@@ -42,7 +41,7 @@ D3DMgr::D3DMgr(HWND hWnd)
 		d3dFeatureLvl,					//a handle to D3D feature levels
 		(UINT)std::size(d3dFeatureLvl),	//number of elements in the above
 		D3D11_SDK_VERSION,
-		&scd,							//returns swap chain descriptor
+		&SwapDesc,							//returns swap chain descriptor
 		&m_pSwap,						//returns swap chain
 		&m_pDevice,						//returns device
 		&m_d3dFeatureLvl,				//returns current feature level
@@ -50,9 +49,17 @@ D3DMgr::D3DMgr(HWND hWnd)
 	));
 
 	//get access to back buffer in a swap chain
-	COMPTR<ID3D11Resource> pBackBuffer;
-	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
-	D3D_THROW_INFO(m_pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &m_pRenderTarget));
+	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_pBackBuffer));
+
+	//create the default render target view and assign it
+	D3D_THROW_INFO(m_pDevice->CreateRenderTargetView(m_pBackBuffer.Get(), nullptr, &m_pRTVMain));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
+	SRVDesc.Format = SwapDesc.BufferDesc.Format;
+	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	SRVDesc.Texture2D.MipLevels = 1;
+	SRVDesc.Texture2D.MostDetailedMip = 0;
+	D3D_THROW_INFO(m_pDevice->CreateShaderResourceView(m_pBackBuffer.Get(), &SRVDesc, &m_pSRVMain));
 
 	//Z-buffer
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
@@ -73,11 +80,14 @@ D3DMgr::D3DMgr(HWND hWnd)
 	dsd.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	dsd.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	COMPTR<ID3D11DepthStencilState> pDSState;
-	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &pDSState));
+	//create both on and off depth states
+	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &m_pDSStateOn));
 
-	//bind depth state
-	D3D_THROW_INFO(m_pContext->OMSetDepthStencilState(pDSState.Get(), 1u));
+	dsd.StencilEnable = false;
+	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &m_pDSStateOff));
+
+	//bind enabled depth state
+	D3D_THROW_INFO(m_pContext->OMSetDepthStencilState(m_pDSStateOn.Get(), 1u));
 
 	//create depth stencil texture
 	COMPTR<ID3D11Texture2D> pDepthStencil;
@@ -85,8 +95,8 @@ D3DMgr::D3DMgr(HWND hWnd)
 	D3D11_TEXTURE2D_DESC stencilDesc = {};
 	stencilDesc.Usage = D3D11_USAGE_DEFAULT;
 	stencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	stencilDesc.Width = m_DefaultViewportWidth;
-	stencilDesc.Height = m_DefaultViewportHeight;
+	stencilDesc.Width = m_VWidth;
+	stencilDesc.Height = m_VHeight;
 	stencilDesc.MipLevels = 1u;
 	stencilDesc.ArraySize = 1u;
 	stencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -101,10 +111,10 @@ D3DMgr::D3DMgr(HWND hWnd)
 	dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsvd.Texture2D.MipSlice = 0u;
 	
-	D3D_THROW_INFO(m_pDevice->CreateDepthStencilView(pDepthStencil.Get(), &dsvd, &m_pDSV));
+	D3D_THROW_INFO(m_pDevice->CreateDepthStencilView(pDepthStencil.Get(), &dsvd, &m_pDSVMain));
 
 	//bind render target and depth stencil view to OM (output merger)
-	m_pContext->OMSetRenderTargets(1u, m_pRenderTarget.GetAddressOf(), m_pDSV.Get());
+	m_pContext->OMSetRenderTargets(1u, m_pRTVMain.GetAddressOf(), m_pDSVMain.Get());
 
 	//rasterizer test
 	COMPTR<ID3D11RasterizerState> pRState;
@@ -115,17 +125,16 @@ D3DMgr::D3DMgr(HWND hWnd)
 	RDesc.FrontCounterClockwise = false;
 	RDesc.DepthBias = 0;
 	RDesc.DepthBiasClamp = 0.0f;
-	RDesc.DepthClipEnable = true;
-	RDesc.MultisampleEnable = true;
+	RDesc.DepthClipEnable = false;
+	RDesc.MultisampleEnable = false;
 	RDesc.ScissorEnable = false;
 	RDesc.SlopeScaledDepthBias = 0.0f;
 	
 	D3D_THROW_INFO(m_pDevice->CreateRasterizerState(&RDesc, &pRState));
 	m_pContext->RSSetState(pRState.Get());
 
-	//configure alpha blend
+	//configure alpha blending
 	D3D11_BLEND_DESC blendDesc = {};
-	//blendDesc.AlphaToCoverageEnable = true;
 	blendDesc.RenderTarget[0].BlendEnable = true;
 	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
@@ -140,13 +149,19 @@ D3DMgr::D3DMgr(HWND hWnd)
 
 	//configure viewport and rasterizer
 	D3D11_VIEWPORT vp = {};
-	vp.Width = m_DefaultViewportWidth;
-	vp.Height = m_DefaultViewportHeight;
+	vp.Width = m_VWidth;
+	vp.Height = m_VHeight;
 	vp.MinDepth = 0.f;
 	vp.MaxDepth = 1.f;
 	vp.TopLeftX = 0.f;
 	vp.TopLeftY = 0.f;
 	m_pContext->RSSetViewports(1u, &vp);	//amount of viewports, pointer to array of viewports
+
+	//create aux render target
+	CreateAuxRenderTarget();
+
+	//assign initial pointers
+	AssignInitPtrs();
 
 	//initialize imGui here
 	imGuiMgr::Get();
@@ -173,10 +188,10 @@ bool D3DMgr::IsImGuiEnabled() const noexcept
 	return m_imguiEnabled;
 }
 
-void D3DMgr::SetDefaultViewportSize(const std::pair<uint16_t, uint16_t> viewportSize)
+void D3DMgr::SetViewportSize(const uint16_t width, const uint16_t height) noexcept
 {
-	m_DefaultViewportWidth = (float)viewportSize.first;
-	m_DefaultViewportHeight = (float)viewportSize.second;
+	m_VWidth = (float)width;
+	m_VHeight = (float)height;
 }
 
 void D3DMgr::BeginFrame(const float red, const float green, const float blue) noexcept
@@ -189,12 +204,14 @@ void D3DMgr::BeginFrame(const float red, const float green, const float blue) no
 	}
 
 	const float color[]{ red, green, blue, 1.0f };
-	m_pContext->ClearRenderTargetView(m_pRenderTarget.Get(), color);
-	m_pContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
+	m_pContext->ClearRenderTargetView(m_pRTVMain.Get(), color);
+	m_pContext->ClearDepthStencilView(m_pDSVMain.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
-void D3DMgr::BeginFrame() noexcept
+void D3DMgr::BeginFrame(bool clear) noexcept
 {
+	RTBind();
+
 	if (m_imguiEnabled)
 	{
 		ImGui_ImplDX11_NewFrame();
@@ -202,12 +219,21 @@ void D3DMgr::BeginFrame() noexcept
 		ImGui::NewFrame();
 	}
 
-	m_pContext->ClearRenderTargetView(m_pRenderTarget.Get(), m_ClearColor);
-	m_pContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
+	//set to false if clearing buffers manually
+	if (clear)
+	{
+		for (uint8_t i = m_RTId; i < m_RTId + m_RTNum; i++)
+		{
+			m_pContext->ClearRenderTargetView(RTV.m_pRTViews[i], m_ClearColor[i]);
+			m_pContext->ClearDepthStencilView(RTV.m_pDSViews[i], D3D11_CLEAR_DEPTH, 1.0f, 0u);
+		}
+	}
 }
 
 void D3DMgr::EndFrame()
 {
+	RTCopyBuffer();
+
 	if (IsImGuiEnabled())
 	{
 		ImGui::Render();
@@ -217,6 +243,7 @@ void D3DMgr::EndFrame()
 #ifdef _DEBUG
 	dxgiDebug.Set();
 #endif
+
 	if (FAILED(hr = m_pSwap->Present(1u, NULL)))
 	{
 		if (hr == DXGI_ERROR_DEVICE_REMOVED)
@@ -230,24 +257,48 @@ void D3DMgr::EndFrame()
 	}
 }
 
-void D3DMgr::ClearBuffer() noexcept
+void D3DMgr::Clear(uint8_t index, bool clearDepthBuffer) noexcept
 {
-	m_pContext->ClearRenderTargetView(m_pRenderTarget.Get(), m_ClearColor);
-	m_pContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
+	m_pContext->ClearRenderTargetView(RTV.m_pRTViews[index], m_ClearColor[index]);
+	if (clearDepthBuffer)
+	{
+		m_pContext->ClearDepthStencilView(RTV.m_pDSViews[index], D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	}
 }
 
-void D3DMgr::ClearBuffer(const float red, const float green, const float blue) noexcept
+void D3DMgr::Clear(const float red, const float green, const float blue, uint8_t index, bool clearDepthBuffer) noexcept
 {
-	const float color[] { red, green, blue, 1.f };
-	m_pContext->ClearRenderTargetView(m_pRenderTarget.Get(), color);
-	m_pContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
+	const float color[4] = { red, green, blue, 1.0f };
+
+	m_pContext->ClearRenderTargetView(RTV.m_pRTViews[index], color);
+	if (clearDepthBuffer)
+	{
+		m_pContext->ClearDepthStencilView(RTV.m_pDSViews[index], D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	}
+
 }
 
-void D3DMgr::SetClearBufferColor(const float red, const float green, const float blue) noexcept
+void D3DMgr::SetClearColor(const float red, const float green, const float blue, uint8_t index) noexcept
 {
-	m_ClearColor[0] = red;
-	m_ClearColor[1] = green;
-	m_ClearColor[2] = blue;
+	if (index < RTV.maxRTVs - 1)
+	{
+		m_ClearColor[index][0] = red;
+		m_ClearColor[index][1] = green;
+		m_ClearColor[index][2] = blue;
+		m_ClearColor[index][3] = 1.0f;
+	}
+}
+
+void D3DMgr::EnableDepthBuffer() noexcept
+{
+	m_pContext->OMSetDepthStencilState(m_pDSStateOn.Get(), 1u);
+	m_ZBufferEnabled = true;
+}
+
+void D3DMgr::DisableDepthBuffer() noexcept
+{
+	m_pContext->OMSetDepthStencilState(m_pDSStateOff.Get(), 1u);
+	m_ZBufferEnabled = false;
 }
 
 void D3DMgr::RenderWireframe(bool enable) noexcept
@@ -300,7 +351,12 @@ void D3DMgr::DrawIndexed(const UINT& count) noexcept
 	D3D_THROW_INFO(m_pContext->DrawIndexed(count, 0u, 0u));
 }
 
-ID3D11Device* D3DMgr::GetDevice() noexcept
+ID3D11Device* D3DMgr::Device() noexcept
 {
 	return m_pDevice.Get();
+}
+
+ID3D11DeviceContext* D3DMgr::Context() noexcept
+{
+	return m_pContext.Get();
 }

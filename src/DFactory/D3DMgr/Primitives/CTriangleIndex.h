@@ -54,8 +54,8 @@ public:
 			DirectX::XMStoreFloat3(&xmSide_2_0, vecSide_2_0);
 
 			// texture vectors
-			const DirectX::XMFLOAT2 xmU = { vertex1.tex.u - vertex0.tex.u, vertex2.tex.u - vertex0.tex.u };
-			const DirectX::XMFLOAT2 xmV = { vertex1.tex.v - vertex0.tex.v, vertex2.tex.v - vertex0.tex.v };
+			const DirectX::XMFLOAT2 xmU = { vertex1.tex.x - vertex0.tex.x, vertex2.tex.x - vertex0.tex.x };
+			const DirectX::XMFLOAT2 xmV = { vertex1.tex.y - vertex0.tex.y, vertex2.tex.y - vertex0.tex.y };
 
 			// denominator of the tangent/binormal equation: 1.0 / cross(vecX, vecY)
 			const float den = 1.0f / (xmU.x * xmV.y - xmU.y * xmV.x);

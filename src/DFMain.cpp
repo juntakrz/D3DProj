@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "DFMain.h"
 
-GDIPlusMgr gdipm;
-
 //PRIVATE
 
 DFMain::DFMain(DFactory::DFACTORY_INIT_DESC* pDesc) : DF(DFactory::Init(pDesc))
@@ -185,22 +183,6 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.matIntensity = 1.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
-	/*
-	//Mat_Tachi_Fore
-	DFMatDesc = {};
-	DFMatDesc.name = "Mat_Tachi_Fore";
-	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS";
-	DFMatDesc.textures.tex0 = "PBR//tachilp1//Tachi_Fore_Color.dds";
-	DFMatDesc.textures.tex1 = "PBR//tachilp1//Tachi_Fore_Normal.dds";
-	DFMatDesc.textures.tex2 = "PBR//tachilp1//Tachi_Fore_Metallic.dds";
-	DFMatDesc.textures.tex3 = "PBR//tachilp1//Tachi_Fore_Roughness.dds";
-	DFMatDesc.textures.tex4 = "PBR//tachilp1//Tachi_Fore_AO.dds";
-	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.12f, 1.0f };
-	DFMatDesc.material.spec_metal = 1.0f;
-	DFMatDesc.material.pow_roughness = 1.0f;
-	*/
-	DF.MatM->MatAdd(&DFMatDesc);
 
 	//Mat_Metal
 	DFMatDesc = {};
@@ -228,7 +210,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(2800.0f, 2800.0f, 2800.0f);
 	DF.ModelM->SetRotation(-0.4f, 0.0f, -0.4f);
 	//DF.Mesh()->SetRotationY(-0.00005f);
-
+	
 	//MdlMarsAtmo
 	DF.ModelM->Create(DF::idSphere, "MdlMarsAtmo", 64);
 	DF.ModelM->SetPos(600.0f, -1600.0f, 4000.0f);
@@ -252,27 +234,31 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
-	
-	Animate();
+
+	//MdlPlane1 (rtt test)
+	DF.ModelM->Create(DF::idPlane, "MdlPlane1");
+	DF.ModelM->SetMaterialRT("Mat_RTTDefault", 0u);
+	DF.ModelM->SetPos(0.0f, 0.5f, 12.0f);
+	DF.ModelM->SetScaling(3.2f, 1.8f, 0.0f);
 	
 	//DF.LMgr->ShowPLMeshes() = true;
 	
 	DF.LightM->PLAdd("Light1", 0.17f, 0.515f, 8.55f);
 	//DF.LightM->PL().pMesh->SetRotationZ(0.05f);
 	DF.LightM->PL().intensity = 0.14f;
-	DF.LightM->PL().color = { 1.0f, 0.0f, 0.0f, 1.0f };
+	DF.LightM->PL().color = { 1.0f, 0.08f, 0.08f, 1.0f };
 
 	Animate();
 
-	DF.LightM->PLAdd("Light2", -0.6f, 0.355f, 8.35f);
+	DF.LightM->PLAdd("Light2", -0.6f, 0.345f, 8.36f);
 	//DF.LightM->PL().pMesh->SetRotationZ(-0.05f);
 	DF.LightM->PL().intensity = 0.14f;
-	DF.LightM->PL().color = { 1.0f, 0.0f, 0.0f, 1.0f };
+	DF.LightM->PL().color = { 1.0f, 0.08f, 0.08f, 1.0f };
 
 	Animate();
 
 	DF.LightM->PLAdd("Light3", 0.7f, -1.2f, 6.2f);
-	DF.LightM->PL().intensity = 1.0f;
+	DF.LightM->PL().intensity = 0.2f;
 	DF.LightM->PL().color = { 0.0f, 0.2f, 1.0f, 1.0f };
 
 	Animate();
