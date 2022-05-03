@@ -4,6 +4,7 @@
 
 namespace DF
 {
+	extern void* Engine;
 	extern D3DMgr* pD3DM;
 	ID3D11Device* Device() noexcept;
 	ID3D11DeviceContext* Context() noexcept;

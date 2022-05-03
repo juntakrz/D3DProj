@@ -3,6 +3,7 @@
 namespace DF
 {
 	D3DMgr* pD3DM = nullptr;
+	void* Engine = nullptr;
 
 	ID3D11Device* Device() noexcept
 	{

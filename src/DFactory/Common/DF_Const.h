@@ -4,11 +4,16 @@ namespace Bind
 {
 	enum BindID
 	{
-		idIndexBuffer, idVertexBuffer, idSampler, idInputLayout, idTransform,
-		idVertexShader, idPixelShader,
+		idVertexBuffer, idIndexBuffer, idTopology,		// core binds
+		idVertexShader, idPixelShader, idSampler,
 		idTexture0, idTexture1, idTexture2, idTexture3, idTexture4, idTexture5,
 		idConstVertexBuf0, idConstPixelBuf0,
-		idTopology
+		idInputLayout, idStencil, idTransform
+	};
+
+	enum StencilMode
+	{
+		stencilOff, stencilWrite, stencilMask
 	};
 }
 
@@ -17,6 +22,20 @@ namespace DF
 	enum ObjectID
 	{
 		idPlane = 0, idCube, idSphere, idSkySphere, idImport
+	};
+
+	enum FXID
+	{
+		// use bitwise operators for these
+		fxNone =		0,			// 0
+		fxStandard =	1 << 0,		// 1
+		fxOutline =		1 << 1,		// 2
+		fxBlur =		1 << 2,		// 4
+		FX4 =			1 << 3,		// 8
+		FX5 =			1 << 4,		// 16
+		FX6 =			1 << 5,		// 32
+		FX7 =			1 << 6,		// 64
+		FX8 =			1 << 7		// 128
 	};
 
 	struct Vertex

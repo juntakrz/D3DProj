@@ -151,6 +151,17 @@ void DFModelMgr::Delete() noexcept
 	m_Models.shrink_to_fit();
 }
 
+void DFModelMgr::UpdateRenderer() noexcept
+{
+	pRenderMgr->ResetRenderPasses();
+
+	for (const auto& it : m_Models)
+	{
+		// process meshes and fill the render queue
+		it.pRootNode->CreateRenderJob(pRenderMgr);
+	}
+}
+
 void DFModelMgr::SetMaterial(std::string material, uint32_t meshID) noexcept
 {
 	uint16_t matIndex = pMatMgr->MatIndex(material);
@@ -204,6 +215,60 @@ void DFModelMgr::SetShaders(std::string VS, std::string PS, uint32_t meshID) noe
 	else
 	{
 		m_Models[m_curModel].meshes[meshID].pMesh->SetShaders(VS, PS);
+	}
+}
+
+void DFModelMgr::SetEffect(uint8_t index, bool enabled, uint32_t meshID)
+{
+	switch (index)
+	{
+	case DF::fxOutline:
+	{
+		// if ID is 0 - set effect for all meshes
+		if (meshID == 0)
+		{
+			for (auto& it : m_Models[m_curModel].meshes)
+			{
+				it.pMesh->SetEffects();
+			}
+		}
+		else
+		{
+			m_Models[m_curModel].meshes[meshID].pMesh->SetEffects();
+		}
+		break;
+	}
+	/*
+	case DF::fxRenderTarget:
+	{
+		if (meshID == 0)
+		{
+			for (auto& it : m_Models[m_curModel].meshes)
+			{
+				it.pMesh->isRenderTarget = enabled;
+			}
+		}
+		else
+		{
+			m_Models[m_curModel].meshes[meshID].pMesh->isRenderTarget = enabled;
+		}
+		break;
+	}*/
+	default:
+	{
+		if (meshID == 0)
+		{
+			for (auto& it : m_Models[m_curModel].meshes)
+			{
+				it.pMesh->isRenderTarget = false;
+			}
+		}
+		else
+		{
+			m_Models[m_curModel].meshes[meshID].pMesh->isRenderTarget = false;
+		}
+		break;
+	}
 	}
 }
 

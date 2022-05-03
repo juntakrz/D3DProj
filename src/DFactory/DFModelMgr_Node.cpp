@@ -29,15 +29,16 @@ void DFModelNode::XMUpdate(FXMMATRIX transform) noexcept
 	}
 }
 
-void DFModelNode::Draw() const noexcept
+void DFModelNode::CreateRenderJob(RenderQ* renderMgr) const noexcept
 {
 	for (const auto& mesh : m_pMeshes)
 	{
-		mesh->Draw();
+		// ask Render Manager to generate a render job using ptr to mesh and its techniques
+		renderMgr->GenerateJob(mesh, mesh->GetTechniqueIds());
 	}
 
 	for (const auto& pNode : m_pChildNodes)
 	{
-		pNode->Draw();
+		pNode->CreateRenderJob(renderMgr);
 	}
 }

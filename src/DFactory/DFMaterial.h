@@ -2,6 +2,7 @@
 
 #include "../../pch.h"
 #include "Common/DF_A.h"
+#include "Common/DF_Const.h"
 
 class DFMaterial
 {
@@ -27,6 +28,9 @@ class DFMaterial
 		z = specular power		/ roughness (PBS)
 		*/
 		XMFLOAT4 data;
+
+		// add effects using bitwise ops
+		uint32_t effects;
 
 		// will MatMgr automatically try to delete textures
 		// from memory if unused by any other material
@@ -71,6 +75,8 @@ public:
 			float pow_roughness = 1.0f;
 			float extra = 0.0f;
 		} material;
+
+		uint32_t effects = DF::fxStandard;
 	};
 
 	DFMaterial() {};

@@ -4,6 +4,9 @@ DFactory DFactory::_SInstance;
 
 DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 {
+	// pointer to engine manager (this)
+	DF::Engine = &_SInstance;
+	
 	// initialize WinAPI manager and create window
 	_SInstance.pWndMgr = std::make_unique<WndMgr>(pDescription->Wnd.sizeX, pDescription->Wnd.sizeY, pDescription->Wnd.posX, pDescription->Wnd.posY,
 		pDescription->WndTitle.c_str());
@@ -12,8 +15,14 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DF::pD3DM = &_SInstance.pWndMgr->D3D();
 	_SInstance.pD3DMgr = DF::pD3DM;
 
+	// create post processing surface
+	DF::pD3DM->PPSurface.Create();
+
 	// set Direct3D default viewport size
 	_SInstance.pD3DMgr->SetViewportSize(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
+
+	// init rendering manager
+	_SInstance.RenderM = new RenderQ;
 
 	// init light manager
 	_SInstance.LightM = &LightMgr::Get();
@@ -22,6 +31,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.ModelM = &DFModelMgr::Get();
 	_SInstance.ModelM->pD3DMgr = &_SInstance.pWndMgr->D3D();
 	_SInstance.ModelM->pMatMgr = _SInstance.MatM;
+	_SInstance.ModelM->pRenderMgr = _SInstance.RenderM;
 
 	// create default objects
 	_SInstance.AddCamera();
@@ -43,7 +53,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_RTTDefault";
 	DFMatDesc.shaders.vertex = "VS_BasicRTT";
-	DFMatDesc.shaders.pixel = "PS_BasicRTT";
+	DFMatDesc.shaders.pixel = "PS_FSPP_Blur32";
 	_SInstance.MatM->MatAdd(&DFMatDesc);
 
 	// initialize DFactory procedure manager
@@ -69,6 +79,9 @@ void DFactory::BeginFrame() noexcept
 void DFactory::EndFrame() noexcept
 {
 	pD3DMgr->EndFrame();
+
+	// increase frames rendered count by one
+	AddFrame();
 }
 
 void DFactory::DrawFrame() noexcept
@@ -85,19 +98,25 @@ void DFactory::DrawFrame() noexcept
 	{
 		// update model matrix and propagate it among meshes through nodes
 		it.pRootNode->XMUpdate(it.GetModelXMTransform());
-
+		/*
 		// determine which light sources will affect a certain mesh
 		for (auto& mesh : it.meshes)
 		{
 			LightM->Bind(Camera()->m_XMView, mesh.pMesh.get());
 		}
-
-		// draw the model
-		it.pRootNode->Draw();
-
+		*/
 	}
 	
 	LightM->Draw();
+
+
+
+	RenderM->Render();
+}
+
+void DFactory::UpdateRenderer() noexcept
+{
+	ModelM->UpdateRenderer();
 }
 
 void DFactory::SetSimulationSpeed(const float simSpeedFactor) noexcept
@@ -108,6 +127,16 @@ void DFactory::SetSimulationSpeed(const float simSpeedFactor) noexcept
 const float& DFactory::GetSimulationSpeed() const noexcept
 {
 	return vars.simSpeedFactor;
+}
+
+void DFactory::AddFrame() noexcept
+{
+	m_frames++;
+}
+
+const uint64_t& DFactory::GetFrame() const noexcept
+{
+	return m_frames;
 }
 
 const XMMATRIX* DFactory::GetProjection() const noexcept

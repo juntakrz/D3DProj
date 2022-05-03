@@ -14,4 +14,8 @@ namespace Bind
 	{
 		GetContext()->PSSetShader(m_pPS.Get(), nullptr, NULL);
 	}
+	void PixelShader::Unbind() noexcept
+	{
+		GetContext()->PSSetShader(nullptr, nullptr, NULL);
+	}
 }

@@ -6,6 +6,8 @@
 
 using namespace DirectX;
 
+class RenderQ;
+
 struct DFMesh
 {
 	uint32_t meshid;
@@ -29,7 +31,7 @@ private:
 public:
 	DFModelNode(std::vector<MeshCore*> pMeshes, const XMMATRIX& transform) noexcept;
 	void XMUpdate(FXMMATRIX transform) noexcept;
-	void Draw() const noexcept;
+	void CreateRenderJob(RenderQ* renderMgr) const noexcept;
 };
 
 class DFModelMgr
@@ -61,6 +63,7 @@ private:
 
 	D3DMgr* pD3DMgr;
 	DFMaterial* pMatMgr;
+	RenderQ* pRenderMgr;
 
 	std::vector<DFModel> m_Models;
 
@@ -91,9 +94,12 @@ public:
 	void Delete(std::string name) noexcept;
 	void Delete(uint32_t modelID) noexcept;
 
+	void UpdateRenderer() noexcept;
+
 	void SetMaterial(std::string material = "Mat_Default", uint32_t meshID = 0) noexcept;
 	void SetMaterialRT(std::string material = "Mat_RTTDefault", uint32_t meshID = 0) noexcept;
 	void SetShaders(std::string VS = "", std::string PS = "", uint32_t meshID = 0) noexcept;
+	void SetEffect(uint8_t index, bool enabled = true, uint32_t meshID = 0);
 
 	void DEBUG_ShowModelList() const noexcept;
 

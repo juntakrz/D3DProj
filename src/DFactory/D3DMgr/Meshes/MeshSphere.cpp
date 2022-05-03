@@ -2,55 +2,52 @@
 
 MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 {
-	if (!IsStaticBindsInitialized())
-	{
-		//create and bind topology
-		AddStaticBind(std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-	}
-	else
-	{
-		//get index buffer for all the following insantces of this object
-		SetIndexBufferFromStaticBinds();
-	}
-
-	//create instance
+	// create instance
 	auto model = CSphere::Create<DF::Vertex>(divisions, invertFaces);
 	model.SetTangentBinormalNormal();
 
-	//create and bind VertexBuffer with vertices
-	AddBind(std::make_unique<Bind::VertexBuffer>(model.vertices), Bind::idVertexBuffer);
+	//
+	// CORE BUFFERS
+	//
 
-	//create and bind IndexBuffer with indices
-	AddIndexBuffer(std::make_unique<Bind::IndexBuffer>(model.indices));
+	// create VertexBuffer with vertices
+	m_Binds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(model.vertices);
 
-	//load color texture
-	AddBind(std::make_unique<Bind::Texture>(MatMgr.TextureGet(0)), Bind::idTexture0);
+	// create IndexBuffer with indices
+	m_Binds[Bind::idIndexBuffer] = std::make_unique<Bind::IndexBuffer>(model.indices);
 
-	AddBind(std::make_unique<Bind::Sampler>(), Bind::idSampler);
+	// create topology
+	m_Binds[Bind::idTopology] = std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//fill material const buffer
+	// assign core pointers
+	m_pIndexBuffer = reinterpret_cast<Bind::IndexBuffer*>(m_Binds[Bind::idIndexBuffer].get());
+
+	/*	//////////	*/
+
+	// load color texture
+	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(MatMgr.TextureGet(0));
+
+	m_Binds[Bind::idSampler] = std::make_unique<Bind::Sampler>();
+
+	// fill material const buffer
 	AddMaterialBind(matId);
 
-	//create and bind vertex shader
+	// create vertex shader
 	std::string VSPath = "shaders//" + MatMgr.Mat(matId).shaderVertex + ".shd";
 	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
-	AddBind(std::move(pVS), Bind::idVertexShader);
+	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
 	std::string PSPath = "shaders//" + MatMgr.Mat(matId).shaderPixel + ".shd";
-	AddBind(std::make_unique<Bind::PixelShader>(PSPath), Bind::idPixelShader);
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
 
 	//create and bind InputLayout
-	AddBind(std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode), Bind::idInputLayout);
+	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
+
+	//create and bind default stencil state
+	//AddBind(std::make_unique<Bind::Stencil>(Bind::stencilOff), Bind::idStencil);
 
 	//create and bind transform constant buffer
-	AddBind(std::make_unique<Bind::TransformConstBuffer>(*this), Bind::idTransform);
-}
-
-DirectX::XMMATRIX MeshSphere::GetTransformXM() const noexcept
-{
-	DirectX::XMStoreFloat3A(&xmPos, DirectX::FXMVECTOR(xmMain.r[3]));
-
-	return xmMain;
+	m_Binds[Bind::idTransform] = std::make_unique<Bind::TransformConstBuffer>(*this);
 }

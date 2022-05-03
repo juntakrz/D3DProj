@@ -86,7 +86,6 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	}
 
 	std::vector<std::unique_ptr<Bind::IBind>> pBinds;
-	pBinds.reserve(24);
 	for (uint8_t i = 0; i < 24; i++)
 	{
 		pBinds.emplace_back();
@@ -214,6 +213,8 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 			//try to delete textures if unused by anything else
 			DFMatDesc.manageTextures = true;
+			
+			DFMatDesc.effects = DF::fxStandard;
 
 			pMatMgr->MatAdd(&DFMatDesc);
 			pDFMat = &pMatMgr->Mat(newMesh.meshMat);
@@ -245,6 +246,9 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	//create and bind pixel shader
 	std::string PSPath = "shaders//" + pDFMat->shaderPixel + ".shd";
 	pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
+
+	//create and bind default stencil state
+	pBinds[Bind::idStencil] = std::make_unique<Bind::Stencil>(Bind::stencilOff);
 
 	pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 

@@ -57,6 +57,7 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 	newMat.data.w = pDesc->material.extra;
 	newMat.F0 = pDesc->material.F0;
 	newMat.manageTextures = pDesc->manageTextures;
+	newMat.effects = pDesc->effects;
 
 	m_Materials.emplace_back(std::make_unique<DFMaterial::Material>(std::move(newMat)));
 	return index;

@@ -157,9 +157,11 @@
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
+      <ObjectFileOutput>$(ProjectDir)/shaders/%(Filename).shd</ObjectFileOutput>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DFactory\D3DMgr\CSurface2D.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RT.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr_PL.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshImport.cpp" />
@@ -168,6 +170,9 @@
     <ClCompile Include="src\DFactory\DFModelMgr_Import.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Node.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Transform.cpp" />
+    <ClCompile Include="src\DFactory\RenderQ\RPass.cpp" />
+    <ClCompile Include="src\DFactory\RenderQ\RTechnique.cpp" />
+    <ClCompile Include="src\DFactory\RenderQ\RenderQ.cpp" />
     <ClCompile Include="src\DFactory\Util\DDSTextureLoader11.cpp" />
     <ClCompile Include="src\DFactory\Common\DF_A.cpp" />
     <ClCompile Include="src\DFMain.cpp">
@@ -264,6 +269,12 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\CApp.h" />
+    <ClInclude Include="src\DFactory\D3DMgr\CSurface2D.h" />
+    <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h" />
+    <ClInclude Include="src\DFactory\RenderQ\RPass.h" />
+    <ClInclude Include="src\DFactory\RenderQ\RenderQ.h" />
+    <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h" />
+    <ClInclude Include="src\DFactory\RenderQ\RTechnique.h" />
     <ClInclude Include="src\DFactory\Util\DDSTextureLoader11.h" />
     <ClInclude Include="src\DFactory\Common\DF_A.h" />
     <ClInclude Include="src\DFactory\Common\DF_Const.h" />
@@ -342,6 +353,18 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/%(Filename).shd</ObjectFileOutput>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="shaders\PS_FSPP_Blur8.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\PS_FSPP_Blur32.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="shaders\PS_PBS_NoHDR.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -355,6 +378,11 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/%(Filename).shd</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\PS_FSPP.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\PS_Standard.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -408,6 +436,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/%(Filename).shd</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\VS_FSPP.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\VS_Standard.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
