@@ -123,7 +123,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Create(DF::idPlane, "MdlLoadScr");
 	DF.ModelM->SetMaterial("Mat_LoadScr");
 	DF.ModelM->SetScaling(16.0f, 9.0f, 0.0f);
-	DF.ModelM->SetPos(0.0f, 0.0f, 16.02f);
+	DF.ModelM->SetPos(0.0f, 0.0f, 16.5f);
 
 	DF.UpdateRenderer();
 	
@@ -136,8 +136,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Mars";
 	DFMatDesc.shaders.vertex = "VS_PBS";
 	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
-	DFMatDesc.textures.tex0 = "mars_4k_color.dds";
-	DFMatDesc.textures.tex1 = "mars_4k_normal.dds";
+	DFMatDesc.textures.tex0 = "PBR//mars//mars_4k_albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR//mars//mars_4k_normal.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.06f, 0.0f, 0.0f };
 	DFMatDesc.material.matIntensity = 2.9f;	//2.9
 	DFMatDesc.material.spec_metal = 0.0f;
@@ -145,7 +145,35 @@ void DFMain::LoadScreen() noexcept
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
-	Animate();
+	//Mat_MarsPBS
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_MarsPBS";
+	DFMatDesc.shaders.vertex = "VS_PBS";
+	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
+	DFMatDesc.textures.tex0 = "PBR//mars//mars_4k_albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR//mars//mars_4k_normal.dds";
+	DFMatDesc.textures.tex2 = "PBR//mars//mars_4k_metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR//mars//mars_4k_roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR//mars//mars_4k_ao.dds";
+	DFMatDesc.material.ambientColor = { 0.06f, 0.03f, 0.0f, 1.0f };
+	DFMatDesc.material.spec_metal = 0.08f;
+	DFMatDesc.material.pow_roughness = 0.8f;
+	DFMatDesc.material.F0 = { 0.25f, 0.23f, 0.00f };
+	DFMatDesc.material.matIntensity = 2.0f;
+
+	DF.MatM->MatAdd(&DFMatDesc);
+
+	//Mat_Atmo
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_Atmo";
+	DFMatDesc.shaders.vertex = "VS_PhongAlpha";
+	DFMatDesc.shaders.pixel = "PS_PhongAlpha";
+	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
+	DFMatDesc.material.spec_metal = 1.0f;
+	DFMatDesc.material.pow_roughness = 1.0f;
+	DFMatDesc.material.matIntensity = 0.9f;
+
+	DF.MatM->MatAdd(&DFMatDesc);
 	
 	//Mat_Stars
 	DFMatDesc = {};
@@ -172,7 +200,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.0f, 0.0f, 0.0f };
-	DFMatDesc.effects = DF::fxStandard;// | DF::fxOutline;
+	DFMatDesc.effects = DF::fxStandard;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -190,6 +218,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
+	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -210,40 +239,47 @@ void DFMain::LoadScreen() noexcept
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
-	//Mat_Atmo
+	//Mat_Test
 	DFMatDesc = {};
-	DFMatDesc.name = "Mat_Atmo";
-	DFMatDesc.shaders.vertex = "VS_PhongAlpha";
-	DFMatDesc.shaders.pixel = "PS_PhongAlpha";
-	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
-	DFMatDesc.material.spec_metal = 4.0f;
-	DFMatDesc.material.pow_roughness = 3.2f;
-	DFMatDesc.material.matIntensity = 1.0f;
-
-	DF.MatM->MatAdd(&DFMatDesc);
-
-	//Mat_Metal
-	DFMatDesc = {};
-	DFMatDesc.name = "Mat_Metal";
-	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
-	//DFMatDesc.shaders.vertex = "VS_Standard";
-	//DFMatDesc.shaders.pixel = "PS_Standard";
-	DFMatDesc.textures.tex0 = "metal1.dds";
-	DFMatDesc.textures.tex1 = "metal1_normal.dds";
+	DFMatDesc.name = "Mat_Test";
+	DFMatDesc.shaders.vertex = "VS_BasicTexture";
+	DFMatDesc.shaders.pixel = "PS_BasicTexture";
+	DFMatDesc.textures.tex0 = "striped.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
 	DFMatDesc.material.spec_metal = 0.2f;		//1.5
 	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
 	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
 	DFMatDesc.material.extra = 0.0f;
+	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
+
+	DF.MatM->MatAdd(&DFMatDesc);
+
+	//Mat_TestNoMip
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_TestNoMip";
+	DFMatDesc.shaders.vertex = "VS_BasicTexture";
+	DFMatDesc.shaders.pixel = "PS_BasicTexture";
+	DFMatDesc.textures.tex0 = "striped_nomip.dds";
+	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
+	DFMatDesc.material.spec_metal = 0.2f;		//1.5
+	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
+	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
+	DFMatDesc.material.extra = 0.0f;
+	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
 	Animate();
+
+	//MdlStars
+	DF.ModelM->Create(DF::idSkySphere, "MdlStars");
+	DF.ModelM->SetMaterial("Mat_Stars");
+	DF.ModelM->SetScaling(3700.0f, 3700.0f, 3700.0f);
+	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	
 	//MdlMars
 	DF.ModelM->Create(DF::idSphere, "MdlMars", 64);
-	DF.ModelM->SetMaterial("Mat_Mars");
+	DF.ModelM->SetMaterial("Mat_MarsPBS");
 	DF.ModelM->SetPos(600.0f, -1600.0f, 4000.0f);
 	DF.ModelM->SetScaling(2800.0f, 2800.0f, 2800.0f);
 	DF.ModelM->SetRotation(-0.4f, 1.4f, -0.4f);
@@ -253,19 +289,9 @@ void DFMain::LoadScreen() noexcept
 	//MdlMarsAtmo
 	DF.ModelM->Create(DF::idSphere, "MdlMarsAtmo", 64);
 	DF.ModelM->SetPos(600.0f, -1600.0f, 4000.0f);
-	DF.ModelM->SetEffect(DF::fxOutline, true, 0);
-	DF.ModelM->SetScaling(2850.0f, 2850.0f, 2850.0f);
+	//DF.ModelM->SetEffect(DF::fxOutline, true, 0); // not implemented yet
+	DF.ModelM->SetScaling(2820.0f, 2820.0f, 2820.0f);
 	DF.ModelM->SetMaterial("Mat_Atmo");
-	
-	Animate();
-	
-	//MdlStars
-	DF.ModelM->Create(DF::idSkySphere, "MdlStars");
-	DF.ModelM->SetMaterial("Mat_Stars");
-	DF.ModelM->SetScaling(3700.0f, 3700.0f, 3700.0f);
-	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
-	
-	//DF.Mesh()->SetRotationY(0.00002f);
 	
 	Animate();
 	
@@ -275,15 +301,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
-	
-	//MdlSphere0
-	DF.ModelM->Create(DF::idSphere, "MdlSphere0");
-	DF.ModelM->SetMaterial("Mat_PBSSteel");
-	//DF.ModelM->SetEffect(DF::fxOutline, true, 0);
-	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
-	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
-	DF.ModelM->SetPos(-0.7f, 0.0f, 2.0f);
-	
+	//*/
 	
 	//MdlSphere1
 	DF.ModelM->Create(DF::idSphere, "MdlSphere1");
@@ -292,12 +310,32 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 2.0f);
 
+	//MdlSphere0
+	DF.ModelM->Create(DF::idSphere, "MdlSphere0");
+	DF.ModelM->SetMaterial("Mat_PBSSteel");
+	//DF.ModelM->SetEffect(DF::fxOutline, true, 0);
+	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
+	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
+	DF.ModelM->SetPos(-0.7f, 0.0f, 2.0f);
+	
 	//MdlSphere2
 	DF.ModelM->Create(DF::idSphere, "MdlSphere2");
 	DF.ModelM->SetMaterial("Mat_PBSMetal");
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(-1.4f, 0.0f, 2.0f);
+
+	//MdlTestPlane
+	DF.ModelM->Create(DF::idPlane, "MdlPlaneTest");
+	DF.ModelM->SetMaterial("Mat_Test");
+	DF.ModelM->SetPos(-0.6f, 0.5f, 2.0f);
+	DF.ModelM->SetScaling(0.1f, 0.1f, 0.1f);
+
+	//MdlTestPlaneNoMip
+	DF.ModelM->Create(DF::idPlane, "MdlPlaneTestNoMip");
+	DF.ModelM->SetMaterial("Mat_TestNoMip");
+	DF.ModelM->SetPos(-0.8f, 0.5f, 2.0f);
+	DF.ModelM->SetScaling(0.1f, 0.1f, 0.1f);
 	
 	/*
 	//MdlPlane1 (rtt test)

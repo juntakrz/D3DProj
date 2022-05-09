@@ -45,9 +45,6 @@ MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 	//create and bind InputLayout
 	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 
-	//create and bind default stencil state
-	//AddBind(std::make_unique<Bind::Stencil>(Bind::stencilOff), Bind::idStencil);
-
 	//create and bind transform constant buffer
 	m_Binds[Bind::idTransform] = std::make_unique<Bind::TransformConstBuffer>(*this);
 }

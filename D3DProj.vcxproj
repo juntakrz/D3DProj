@@ -161,8 +161,10 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\DFactory\D3DMgr\CSurface2D.cpp" />
+    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RS.cpp" />
+    <ClCompile Include="src\DFactory\D3DMgr\RenderSurface.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RT.cpp" />
+    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Stencil.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr_PL.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshImport.cpp" />
     <ClCompile Include="src\DFactory\DFMaterial_Texture.cpp" />
@@ -227,7 +229,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Except.cpp" />
-    <ClCompile Include="src\DFactory\D3DMgr\CDXGIDebug.cpp">
+    <ClCompile Include="src\DFactory\Util\CDXGIDebug.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -269,7 +271,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\CApp.h" />
-    <ClInclude Include="src\DFactory\D3DMgr\CSurface2D.h" />
+    <ClInclude Include="src\DFactory\D3DMgr\RenderSurface.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h" />
     <ClInclude Include="src\DFactory\RenderQ\RPass.h" />
     <ClInclude Include="src\DFactory\RenderQ\RenderQ.h" />
@@ -302,7 +304,7 @@
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\Mesh_Includes.h" />
     <ClInclude Include="src\DFactory\Common\DF_Math.h" />
     <ClInclude Include="src\DFactory\D3DMgr\D3DMgr.h" />
-    <ClInclude Include="src\DFactory\D3DMgr\CDXGIDebug.h" />
+    <ClInclude Include="src\DFactory\Util\CDXGIDebug.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\IBind.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_ConstBuffer.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_IndexBuffer.h" />
@@ -360,6 +362,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\PS_FSPP_Blur32.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\PS_Outline_s2.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
@@ -439,6 +447,18 @@
     </FxCompile>
     <FxCompile Include="shaders\VS_FSPP.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\VS_Outline_s1.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\VS_Outline_s2.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\VS_Standard.hlsl">

@@ -15,11 +15,11 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DF::pD3DM = &_SInstance.pWndMgr->D3D();
 	_SInstance.pD3DMgr = DF::pD3DM;
 
-	// create post processing surface
-	DF::pD3DM->PPSurface.Create();
-
 	// set Direct3D default viewport size
 	_SInstance.pD3DMgr->SetViewportSize(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
+
+	// create 'main' render surface
+	_SInstance.pD3DMgr->CreateRenderSurface("main", 1.0f);
 
 	// init rendering manager
 	_SInstance.RenderM = new RenderQ;
@@ -92,24 +92,13 @@ void DFactory::DrawFrame() noexcept
 	//update camera buffer for use in vertex shader slot 1
 	CameraUpdateVS();
 
-	//DF::pD3DM->RTSetMain();
-
 	for (auto& it : ModelM->m_Models)
 	{
 		// update model matrix and propagate it among meshes through nodes
 		it.pRootNode->XMUpdate(it.GetModelXMTransform());
-		/*
-		// determine which light sources will affect a certain mesh
-		for (auto& mesh : it.meshes)
-		{
-			LightM->Bind(Camera()->m_XMView, mesh.pMesh.get());
-		}
-		*/
 	}
 	
 	LightM->Draw();
-
-
 
 	RenderM->Render();
 }

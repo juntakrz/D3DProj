@@ -51,6 +51,9 @@ float4 main(PSInput iPS) : SV_TARGET
     float1 roughness = texRoughness.Sample(smplr, iPS.tex).r * M_Roughness;
     float1 ao = texAO.Sample(smplr, iPS.tex).r;
     
+    // bump intensity - lower is higher
+    float1 bumpInt = 0.65f;
+    
     float3 L, radiance, color;
     
     float3 Lo = { 0.0f, 0.0f, 0.0f };
@@ -61,7 +64,7 @@ float4 main(PSInput iPS) : SV_TARGET
     //set normal map range from (0, +1) to (-1, +1)
     normalTex = (normalTex * 2.0f) - 1.0f;
 
-    float3 N = normalize(normalTex.x * iPS.tangent + normalTex.y * iPS.binormal + normalTex.z * iPS.W_Normal);
+    float3 N = normalize(normalTex.x * iPS.tangent + normalTex.y * iPS.binormal + normalTex.z * bumpInt * iPS.W_Normal);
     float3 V = normalize(iPS.camPos - iPS.worldPos); //view vector
     
     for (uint i = 0; i < numPLights.x + 1; i++)

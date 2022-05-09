@@ -29,9 +29,6 @@ MeshPointLight::MeshPointLight()
 	std::string PSPath = "shaders//PS_Default.shd";
 	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
 
-	//create and bind default stencil state
-	m_Binds[Bind::idStencil] = std::make_unique<Bind::Stencil>(Bind::stencilOff);
-
 	//create and bind InputLayout
 	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 	{
@@ -55,7 +52,7 @@ void MeshPointLight::DisableLightMesh() noexcept
 
 void MeshPointLight::Draw() noexcept
 {
-	for (const auto& it : *GetBinds())
+	for (const auto& it : *Binds())
 	{
 		it ? it->Bind() : void();
 	}

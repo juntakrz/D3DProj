@@ -13,7 +13,7 @@ namespace Bind
 
 		void Bind() noexcept override
 		{
-			GetContext()->VSSetShader(nullptr, 0u, 0u);
+			GetContext()->VSSetShader(nullptr, nullptr, NULL);
 		}
 
 	};
@@ -25,7 +25,7 @@ namespace Bind
 
 		void Bind() noexcept override
 		{
-			GetContext()->PSSetShader(nullptr, 0u, 0u);
+			GetContext()->PSSetShader(nullptr, nullptr, NULL);
 		}
 	};
 
