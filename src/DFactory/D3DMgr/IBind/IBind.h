@@ -19,6 +19,7 @@ namespace Bind
 		}
 #endif
 		;
+		D3D_DXGIDEBUG(*DF::pD3DM);
 
 	public:
 		virtual void Bind() = 0;

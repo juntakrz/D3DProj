@@ -180,6 +180,18 @@
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\CSurface2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\RenderQ\RPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\RenderQ\RTechnique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\RenderQ\RenderQ.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -356,6 +368,24 @@
     <ClInclude Include="src\DFactory\Common\DF_A.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\CSurface2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\RenderQ\RenderQ.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\RenderQ\RTechnique.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\RenderQ\RPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\c-logo-icon.ico">
@@ -395,5 +425,9 @@
     <FxCompile Include="shaders\PS_PBS_NoHDR.hlsl" />
     <FxCompile Include="shaders\VS_BasicRTT.hlsl" />
     <FxCompile Include="shaders\PS_BasicRTT.hlsl" />
+    <FxCompile Include="shaders\PS_FSPP.hlsl" />
+    <FxCompile Include="shaders\VS_FSPP.hlsl" />
+    <FxCompile Include="shaders\PS_FSPP_Blur32.hlsl" />
+    <FxCompile Include="shaders\PS_FSPP_Blur8.hlsl" />
   </ItemGroup>
 </Project>

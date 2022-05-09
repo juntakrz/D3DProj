@@ -129,7 +129,7 @@ D3DMgr& WndMgr::D3D()
 {
 	if (!pD3DMgr)
 	{
-		MessageBoxW(nullptr, L"Couldn't initialize Direct3D API", L"ERROR", MB_ICONERROR | MB_OK);
+		MessageBoxA(nullptr, "Couldn't initialize Direct3D API", "ERROR", MB_ICONERROR | MB_OK);
 	}
 	return *pD3DMgr;
 }

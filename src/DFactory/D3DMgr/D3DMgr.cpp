@@ -49,17 +49,10 @@ D3DMgr::D3DMgr(HWND hWnd)
 	));
 
 	//get access to back buffer in a swap chain
-	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_pBackBuffer));
+	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_pBackBuf_Tex));
 
 	//create the default render target view and assign it
-	D3D_THROW_INFO(m_pDevice->CreateRenderTargetView(m_pBackBuffer.Get(), nullptr, &m_pRTVMain));
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
-	SRVDesc.Format = SwapDesc.BufferDesc.Format;
-	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	SRVDesc.Texture2D.MipLevels = 1;
-	SRVDesc.Texture2D.MostDetailedMip = 0;
-	D3D_THROW_INFO(m_pDevice->CreateShaderResourceView(m_pBackBuffer.Get(), &SRVDesc, &m_pSRVMain));
+	D3D_THROW_INFO(m_pDevice->CreateRenderTargetView(m_pBackBuf_Tex.Get(), nullptr, &m_pBackBuf_RT));
 
 	//Z-buffer
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
@@ -68,7 +61,7 @@ D3DMgr::D3DMgr(HWND hWnd)
 	dsd.DepthFunc = D3D11_COMPARISON_LESS;
 
 	//stencil stuff, need to read about it
-	dsd.StencilEnable = true;
+	dsd.StencilEnable = false;
 	dsd.StencilReadMask = 0xFF;
 	dsd.StencilWriteMask = 0xFF;
 	dsd.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
@@ -83,15 +76,13 @@ D3DMgr::D3DMgr(HWND hWnd)
 	//create both on and off depth states
 	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &m_pDSStateOn));
 
-	dsd.StencilEnable = false;
+	dsd.DepthEnable = false;
 	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &m_pDSStateOff));
 
 	//bind enabled depth state
-	D3D_THROW_INFO(m_pContext->OMSetDepthStencilState(m_pDSStateOn.Get(), 1u));
+	//D3D_THROW_INFO(m_pContext->OMSetDepthStencilState(m_pDSStateOn.Get(), 1u));
 
 	//create depth stencil texture
-	COMPTR<ID3D11Texture2D> pDepthStencil;
-
 	D3D11_TEXTURE2D_DESC stencilDesc = {};
 	stencilDesc.Usage = D3D11_USAGE_DEFAULT;
 	stencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -99,22 +90,22 @@ D3DMgr::D3DMgr(HWND hWnd)
 	stencilDesc.Height = m_VHeight;
 	stencilDesc.MipLevels = 1u;
 	stencilDesc.ArraySize = 1u;
-	stencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	stencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	stencilDesc.SampleDesc.Count = 1u;
 	stencilDesc.SampleDesc.Quality = 0u;
 
-	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &pDepthStencil));
+	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &m_pBackBuf_DSTex));
 
 	//create depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {};
-	dsvd.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsvd.Texture2D.MipSlice = 0u;
 	
-	D3D_THROW_INFO(m_pDevice->CreateDepthStencilView(pDepthStencil.Get(), &dsvd, &m_pDSVMain));
+	D3D_THROW_INFO(m_pDevice->CreateDepthStencilView(m_pBackBuf_DSTex.Get(), &dsvd, &m_pBackBuf_DS));
 
 	//bind render target and depth stencil view to OM (output merger)
-	m_pContext->OMSetRenderTargets(1u, m_pRTVMain.GetAddressOf(), m_pDSVMain.Get());
+	m_pContext->OMSetRenderTargets(1u, m_pBackBuf_RT.GetAddressOf(), m_pBackBuf_DS.Get());
 
 	//rasterizer test
 	COMPTR<ID3D11RasterizerState> pRState;
@@ -157,11 +148,11 @@ D3DMgr::D3DMgr(HWND hWnd)
 	vp.TopLeftY = 0.f;
 	m_pContext->RSSetViewports(1u, &vp);	//amount of viewports, pointer to array of viewports
 
-	//create aux render target
-	CreateAuxRenderTarget();
+	//create render buffer and assign pointers
+	RTInitBuffers(m_IsHDR);
 
-	//assign initial pointers
-	AssignInitPtrs();
+	//create copy buffer
+	CreateRenderSR(m_IsHDR);
 
 	//initialize imGui here
 	imGuiMgr::Get();
@@ -204,14 +195,14 @@ void D3DMgr::BeginFrame(const float red, const float green, const float blue) no
 	}
 
 	const float color[]{ red, green, blue, 1.0f };
-	m_pContext->ClearRenderTargetView(m_pRTVMain.Get(), color);
-	m_pContext->ClearDepthStencilView(m_pDSVMain.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	m_pContext->ClearRenderTargetView(m_pBackBuf_RT.Get(), color);
+	m_pContext->ClearDepthStencilView(m_pBackBuf_DS.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
 void D3DMgr::BeginFrame(bool clear) noexcept
 {
-	RTBind();
-
+	RTBind(1, 1);
+	
 	if (m_imguiEnabled)
 	{
 		ImGui_ImplDX11_NewFrame();
@@ -224,16 +215,21 @@ void D3DMgr::BeginFrame(bool clear) noexcept
 	{
 		for (uint8_t i = m_RTId; i < m_RTId + m_RTNum; i++)
 		{
-			m_pContext->ClearRenderTargetView(RTV.m_pRTViews[i], m_ClearColor[i]);
-			m_pContext->ClearDepthStencilView(RTV.m_pDSViews[i], D3D11_CLEAR_DEPTH, 1.0f, 0u);
+			m_pContext->ClearRenderTargetView(RT[i].pRTV, m_ClearColor[i]);
+			m_pContext->ClearDepthStencilView(RT[i].pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 		}
 	}
 }
 
 void D3DMgr::EndFrame()
 {
+	RTBind(0, 1);
+	Clear();
 	RTCopyBuffer();
-
+	PPSurface.Bind(RT[1].pSRV);
+	PPSurface.Draw();
+	PPSurface.Unbind();
+	
 	if (IsImGuiEnabled())
 	{
 		ImGui::Render();
@@ -259,10 +255,10 @@ void D3DMgr::EndFrame()
 
 void D3DMgr::Clear(uint8_t index, bool clearDepthBuffer) noexcept
 {
-	m_pContext->ClearRenderTargetView(RTV.m_pRTViews[index], m_ClearColor[index]);
+	m_pContext->ClearRenderTargetView(RT[index].pRTV, m_ClearColor[index]);
 	if (clearDepthBuffer)
 	{
-		m_pContext->ClearDepthStencilView(RTV.m_pDSViews[index], D3D11_CLEAR_DEPTH, 1.0f, 0u);
+		m_pContext->ClearDepthStencilView(RT[index].pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	}
 }
 
@@ -270,17 +266,17 @@ void D3DMgr::Clear(const float red, const float green, const float blue, uint8_t
 {
 	const float color[4] = { red, green, blue, 1.0f };
 
-	m_pContext->ClearRenderTargetView(RTV.m_pRTViews[index], color);
+	m_pContext->ClearRenderTargetView(RT[index].pRTV, color);
 	if (clearDepthBuffer)
 	{
-		m_pContext->ClearDepthStencilView(RTV.m_pDSViews[index], D3D11_CLEAR_DEPTH, 1.0f, 0u);
+		m_pContext->ClearDepthStencilView(RT[index].pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	}
 
 }
 
 void D3DMgr::SetClearColor(const float red, const float green, const float blue, uint8_t index) noexcept
 {
-	if (index < RTV.maxRTVs - 1)
+	if (index < maxRT - 1)
 	{
 		m_ClearColor[index][0] = red;
 		m_ClearColor[index][1] = green;

@@ -2,32 +2,14 @@
 
 MeshImport::MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds)
 {
-	if (!IsStaticBindsInitialized())
-	{
-		//create and bind topology
-		AddStaticBind(std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-	}
-	else
-	{
-		//get index buffer for all the following insantces of this object
-		SetIndexBufferFromStaticBinds();
-	}
+	m_Binds = std::move(pBinds);
 
-	auto indexBuf = static_cast<Bind::IndexBuffer*>(pBinds[Bind::idIndexBuffer].get());
-	AddIndexBuffer(std::unique_ptr<Bind::IndexBuffer>{indexBuf});
-	pBinds[Bind::idIndexBuffer].release();
+	m_pIndexBuffer = reinterpret_cast<Bind::IndexBuffer*>(m_Binds[Bind::idIndexBuffer].get());
 
-	for (uint8_t id = 1; id < pBinds.size(); id++)
-	{
-		pBinds[id] != nullptr ? AddBind(std::move(pBinds[id]), id) : void();
-	}
+	m_Binds[Bind::idTopology] = std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	AddBind(std::make_unique<Bind::TransformConstBuffer>(*this), Bind::idTransform);
-}
+	// create transform buffer
+	m_Binds[Bind::idTransform] = std::make_unique<Bind::TransformConstBuffer>(*this);
 
-XMMATRIX MeshImport::GetTransformXM() const noexcept
-{
-	DirectX::XMStoreFloat3A(&xmPos, DirectX::FXMVECTOR(xmMain.r[3]));
-
-	return xmMain;
+	m_TechniqueIds = DF::fxStandard;
 }

@@ -14,24 +14,7 @@ protected:
 		return m_StaticBinds;
 	}
 
-	static bool IsStaticBindsInitialized() noexcept
-	{
-		return !m_StaticBinds.empty();
-	}
-
-	static void AddStaticBind(std::unique_ptr<Bind::IBind> pBindObj) noexcept
-	{
-		ASSERT(typeid(*pBindObj) != typeid(Bind::IndexBuffer));
-		m_StaticBinds.push_back(std::move(pBindObj));
-	}
-	
-	void AddStaticIndexBuffer(std::unique_ptr<Bind::IndexBuffer> pIndexBuffer) noexcept
-	{
-		ASSERT(m_pCIndexBuffer == nullptr);
-		m_pCIndexBuffer = pIndexBuffer.get();
-		m_StaticBinds.push_back(std::move(pIndexBuffer));
-	}
-
+	/*
 	void SetIndexBufferFromStaticBinds() noexcept
 	{
 		ASSERT(m_pCIndexBuffer == nullptr);		//check if D3DMgr_IndexBuffer is already bound
@@ -46,7 +29,7 @@ protected:
 		}
 		ASSERT(m_pCIndexBuffer == nullptr);		//check if index buffer was ever bound
 
-	}
+	}*/
 
 };
 

@@ -2,10 +2,15 @@
 
 #include "../D3DMgr.h"
 #include "../../Common/DF_Math.h"
-#include "../IBind/IBind.h"
+//#include "../IBind/IBind.h"
 #include "../IBind/Bind_Includes.h"
 #include "../../Common/DF_Const.h"
 #include "../../DFMaterial.h"
+
+namespace Bind
+{
+	class VertexBuffer;
+}
 
 class MeshCore
 {
@@ -26,7 +31,7 @@ protected:
 		DirectX::XMFLOAT4 data;
 	} matCBuffer;
 
-	//DirectX variables
+	// DirectX variables
 	mutable DirectX::XMMATRIX xmMain;
 	mutable DirectX::XMFLOAT3A xmPos;	//for storing transformed 3D position
 
@@ -37,20 +42,24 @@ protected:
 		DirectX::XMFLOAT3A translation = { 0.0f, 0.0f, 0.0f };
 	} transform;
 
-private:
-	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;
-	const Bind::IndexBuffer* m_pCIndexBuffer = nullptr;
+	// BUFFERS
+
+	// core index buffer
+	Bind::IndexBuffer* m_pIndexBuffer = nullptr;
+
+	// standard no FX binds
+	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;	// standard render pass mesh binds
 
 public:
+	//public mesh variables
 	bool isRenderTarget = false;
+	std::string m_Name = "";				// mesh name (currently unused)
+	uint16_t m_MaterialIndex = 0;			// material index used by this mesh with a standard technique
+	uint32_t m_TechniqueIds;				// technique ids in bit format, applied to this mesh
 
 protected:
-	void AddBind(std::unique_ptr<Bind::IBind> bindObj, uint8_t id) noexcept;
-	void AddIndexBuffer(std::unique_ptr<Bind::IndexBuffer> ibuf) noexcept;
-	void AddMaterialBind(uint16_t matIndex) noexcept;
-
-	std::vector<std::unique_ptr<Bind::IBind>>* GetBinds() noexcept;
-	const Bind::IndexBuffer* GetIndexBuffer() const noexcept;
+	void AddMaterialBind(uint16_t matIndex) noexcept;	
+	void SetMaterial(uint16_t matIndex) noexcept;
 
 #ifdef _DEBUG
 	static CDXGIDebug& GetDXGIDebug(D3DMgr& d3dMgr) noexcept
@@ -75,9 +84,18 @@ public:
 	MeshCore(const MeshCore&) = delete;
 	~MeshCore() = default;
 
-	void Draw();
+	// get technique id
+	uint32_t GetTechniqueIds() const noexcept;
 
-	virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
+	// binds and draw calls
+	void BindCore() const noexcept;									// bind core mesh buffers
+	void BindStandard() const noexcept;								// bind other mesh buffers
+	std::vector<std::unique_ptr<Bind::IBind>>* GetBinds() noexcept;	// get standard mesh binds
+	const Bind::IndexBuffer* GetIndexBuffer() const noexcept;	
+	void DrawIndexed() noexcept;								// mesh draw call
+
+	//virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
+	virtual DirectX::XMMATRIX GetTransformXM() const noexcept;
 	void XMUpdate(FXMMATRIX transform) noexcept;
 
 	DirectX::XMMATRIX* GetMatrix() noexcept;
@@ -89,6 +107,7 @@ public:
 	void SetMaterial(std::string name) noexcept;
 	void SetMaterialRT(std::string name) noexcept;
 	void SetShaders(std::string& inVS, std::string& inPS) noexcept;
+	void SetEffects() noexcept;
 
 	//set origin position
 	void SetPos(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;

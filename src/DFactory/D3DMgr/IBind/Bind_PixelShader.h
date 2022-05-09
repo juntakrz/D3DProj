@@ -10,6 +10,7 @@ namespace Bind
 	public:
 		PixelShader(const std::string& filePath) noexcept;
 		void Bind() noexcept override;
+		void Unbind() noexcept override;
 
 	protected:
 		COMPTR<ID3DBlob> m_pBlob;

@@ -4,45 +4,43 @@ bool MeshPointLight::m_showAllMeshes = false;
 
 MeshPointLight::MeshPointLight()
 {
-	if (!IsStaticBindsInitialized())
-	{
-		//create and bind topology
-		AddStaticBind(std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-	}
-	else
-	{
-		//get index buffer for all the following insantces of this object
-		SetIndexBufferFromStaticBinds();
-	}
-
 	//create instance
 	auto model = CSphere::Create<DF::Vertex>(4);
 
-	//create and bind VertexBuffer with vertices
-	AddBind(std::make_unique<Bind::VertexBuffer>(model.vertices), Bind::idVertexBuffer);
+	// create VertexBuffer with vertices
+	m_Binds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(model.vertices);
 
-	//create and bind IndexBuffer with indices
-	AddIndexBuffer(std::make_unique<Bind::IndexBuffer>(model.indices));
+	// create IndexBuffer with indices
+	m_Binds[Bind::idIndexBuffer] = std::make_unique<Bind::IndexBuffer>(model.indices);
+
+	// create topology
+	m_Binds[Bind::idTopology] = std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// assign core pointers
+	m_pIndexBuffer = reinterpret_cast<Bind::IndexBuffer*>(m_Binds[Bind::idIndexBuffer].get());
 
 	//create and bind vertex shader
 	std::string VSPath = "shaders//VS_Default.shd";
 	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
-	AddBind(std::move(pVS), Bind::idVertexShader);
+	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
 	std::string PSPath = "shaders//PS_Default.shd";
-	AddBind(std::make_unique<Bind::PixelShader>(PSPath), Bind::idPixelShader);
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
+
+	//create and bind default stencil state
+	m_Binds[Bind::idStencil] = std::make_unique<Bind::Stencil>(Bind::stencilOff);
 
 	//create and bind InputLayout
 	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	AddBind(std::make_unique<Bind::InputLayout>(ied, pVSByteCode), Bind::idInputLayout);
+	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(ied, pVSByteCode);
 
 	//create and bind transform constant buffer
-	AddBind(std::make_unique<Bind::TransformConstBuffer>(*this), Bind::idTransform);
+	m_Binds[Bind::idTransform] = std::make_unique<Bind::TransformConstBuffer>(*this);
 }
 
 void MeshPointLight::EnableLightMesh() noexcept

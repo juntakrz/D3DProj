@@ -7,6 +7,7 @@
 #include "Common/DF_A.h"
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
+#include "RenderQ/RenderQ.h"
 
 class DFactory
 {
@@ -84,6 +85,7 @@ public:
 	//managers
 	std::unique_ptr<WndMgr> pWndMgr;
 	D3DMgr* pD3DMgr = nullptr;
+	RenderQ* RenderM = nullptr;
 	DFModelMgr* ModelM = nullptr;
 	LightMgr* LightM = nullptr;
 	DFMaterial* MatM = &DFMaterial::Get();
@@ -101,6 +103,9 @@ private:
 
 	static constexpr float m_projRatio = CWND_DEFAULTWIDTH / CWND_DEFAULTHEIGHT;
 	XMMATRIX m_XMProj = XMMatrixPerspectiveFovLH(1.0f, (float)CWND_DEFAULTWIDTH / (float)CWND_DEFAULTHEIGHT, 0.1f, 5000.0f);
+
+	// frame counter
+	uint64_t m_frames = 0u;
 
 public:
 
@@ -121,8 +126,14 @@ public:
 	void EndFrame() noexcept;
 	void DrawFrame() noexcept;
 
+	void UpdateRenderer() noexcept;		// resets the render queue
+
 	void SetSimulationSpeed(const float simSpeedFactor) noexcept;
 	const float& GetSimulationSpeed() const noexcept;
+
+	// frame counter
+	void AddFrame() noexcept;
+	const uint64_t& GetFrame() const noexcept;
 
 	const XMMATRIX* GetProjection() const noexcept;
 	void SetProjection(float FOV, float ratio, float nearZ, float farZ) noexcept;

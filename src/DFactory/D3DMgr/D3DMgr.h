@@ -9,6 +9,7 @@
 #include "../Util/imGuiMgr.h"
 #include "../Common/DF_Math.h"
 #include "Cameras/CCamera.h"
+#include "CSurface2D.h"
 
 namespace Bind
 {
@@ -21,35 +22,43 @@ private:
 	friend Bind::IBind;
 	friend class MeshCore;
 
+	// core
 	D3D_FEATURE_LEVEL					m_d3dFeatureLvl;
-	COMPTR<ID3D11Device>				m_pDevice;
 	COMPTR<IDXGISwapChain>				m_pSwap;
+	COMPTR<ID3D11Device>				m_pDevice;
 	COMPTR<ID3D11DeviceContext>			m_pContext;
-	COMPTR<ID3D11Texture2D>				m_pBackBuffer;
-	COMPTR<ID3D11Texture2D>				m_pAuxRTTex;
-	COMPTR<ID3D11RenderTargetView>		m_pRTVMain;
-	COMPTR<ID3D11DepthStencilView>		m_pDSVMain;
-	COMPTR<ID3D11ShaderResourceView>	m_pSRVMain;
-	COMPTR<ID3D11RenderTargetView>		m_pRTVAux;
-	COMPTR<ID3D11ShaderResourceView>	m_pSRVAux;
+
+	// back buffer
+	COMPTR<ID3D11Texture2D>				m_pBackBuf_Tex;
+	COMPTR<ID3D11Texture2D>				m_pBackBuf_DSTex;
+	COMPTR<ID3D11RenderTargetView>		m_pBackBuf_RT;			
+	COMPTR<ID3D11DepthStencilView>		m_pBackBuf_DS;
+
+	// render copy shader resource
+	COMPTR<ID3D11Texture2D>				m_pBufCopy_Tex;
+	COMPTR<ID3D11ShaderResourceView>	m_pBufCopy_SR;
+
+	// states
 	COMPTR<ID3D11DepthStencilState>		m_pDSStateOn;
 	COMPTR<ID3D11DepthStencilState>		m_pDSStateOff;
 	COMPTR<ID3D11BlendState>			m_pBlendState;
 
 	//dynamically allocated RTV pointers
+	static const uint8_t maxRT = 6;
 	struct RenderTargets
 	{
-		static const uint8_t maxRTVs = 6;
-		//reserved: 0 = back buffer, 1 = primary render to texture resource
-		ID3D11RenderTargetView* m_pRTViews[maxRTVs] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-		ID3D11DepthStencilView* m_pDSViews[maxRTVs] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-		ID3D11ShaderResourceView* m_pSRViews[maxRTVs] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-	} RTV;
+		//reserved: 0 = back buffer, 1 = primary render to texture resource, 2 - 5 for use in effects
+		ID3D11Texture2D* pTex = nullptr;
+		ID3D11RenderTargetView* pRTV = nullptr;
+		ID3D11DepthStencilView* pDSV = nullptr;
+		ID3D11ShaderResourceView* pSRV = nullptr;
+	} RT[maxRT];
 
 	HRESULT hr;
 	bool m_imguiEnabled = CWND_IMGUIENABLED;
 	bool m_ZBufferEnabled = true;
-	float m_ClearColor[6][4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	bool m_IsHDR = false;
+	float m_ClearColor[6][4] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 	float m_VWidth = CWND_DEFAULTWIDTH, m_VHeight = CWND_DEFAULTHEIGHT;
 
 	DirectX::XMMATRIX m_ProjectionMatrix =
@@ -57,13 +66,14 @@ private:
 	//DirectX::XMMatrixOrthographicLH(1.0f, m_DefaultViewportHeight / m_DefaultViewportWidth, 0.5f, 10000.0f);
 	class CCamera* m_pCamera;
 
-	void CreateAuxRenderTarget() noexcept;
-	void AssignInitPtrs() noexcept;
+	void CreateRenderSR(bool isHDR) noexcept;		//create render buffer copy resource
+	void RTInitBuffers(bool isHDR) noexcept;
 
 public:
 #ifdef _DEBUG
 	CDXGIDebug dxgiDebug;
 #endif
+	class CSurface2D PPSurface;
 
 	//initial RTV, number of RTVs
 	int m_RTId = 0, m_RTNum = 1;
@@ -143,13 +153,17 @@ public:
 
 	/* * * * * * D3DMgr_RT.cpp * */
 
+	//creates render target resources at slot > 0 and < maxRT
+	void RTCreateBuffer(uint8_t index, bool isHDR) noexcept;
+	void RTCreateDS(uint8_t index, DXGI_FORMAT* format = nullptr) noexcept;
+
 	//render targer view methods									//render target id, quantity
 	void RTBindMainAndAux() noexcept;								//0, 2
 	void RTBindMain() noexcept;										//0, 1
 	void RTBindAux() noexcept;										//1, 1
-	void RTBind(uint8_t index = 255, uint8_t num = 255) noexcept;	//initial, num
+	void RTBind(uint8_t index = 0, uint8_t num = 1) noexcept;		//initial, num
 
-	void RTCopyBuffer() noexcept;
+	void RTCopyBuffer(uint8_t index = 1) noexcept;
 
 	template<typename T, typename... RTVs>
 	void RTSet(T pRTV, RTVs... pRTVs) noexcept
@@ -163,13 +177,8 @@ public:
 	ID3D11DepthStencilView* RTGetDSV(uint8_t index) noexcept;
 
 	//external render targets, RTV and DSV are related by the same index
-	void RTAdd(uint8_t index, ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV) noexcept;
-	void RTAddRTV(uint8_t index, ID3D11RenderTargetView* pRTV) noexcept;
-	void RTAddDSV(uint8_t index, ID3D11DepthStencilView* pDSV) noexcept;
-
-	void RTRemove(uint8_t index, bool free = false) noexcept;
-	void RTRemoveRTV(uint8_t index, bool free = false) noexcept;
-	void RTRemoveDSV(uint8_t index, bool free = false) noexcept;
+	void RTSet(uint8_t index, ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV) noexcept;
+	void RTRemove(uint8_t index, bool release = false) noexcept;
 
 	/* * * * * * * * * * * * * * */
 };

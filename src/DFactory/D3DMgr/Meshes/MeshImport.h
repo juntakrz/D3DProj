@@ -9,5 +9,4 @@ private:
 
 public:
 	MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds);
-	XMMATRIX GetTransformXM() const noexcept override;
 };
