@@ -15,7 +15,6 @@ public:
 	void Render() noexcept;						// frame processing scenario
 
 	void PassCreate(std::string name) noexcept;	// create pass
-	void TechniqueCreate(uint32_t id) noexcept;	// create technique
 	RPass& Pass(std::string name) noexcept;		// get pass
 
 	void ResetRenderPasses() noexcept;			// clears all render jobs
@@ -24,5 +23,4 @@ public:
 private:
 	// store passes and techniques
 	std::vector<RPass> m_Passes;
-	std::vector<std::unique_ptr<RTechnique>> m_Techniques;
 };

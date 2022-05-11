@@ -45,6 +45,13 @@ uint8_t D3DMgr::CreateRenderBuffer(int16_t width, int16_t height, bool isHDR) no
 	renderTargets.back().width = width;
 	renderTargets.back().height = height;
 
+	// prepare viewport description
+	renderTargets.back().vp.Width = width;
+	renderTargets.back().vp.Height = height;
+	renderTargets.back().vp.MinDepth = 0.0f;
+	renderTargets.back().vp.MaxDepth = 1.0f;
+	renderTargets.back().vp.TopLeftX = 0.0f;
+
 	// return render target index
 	return renderTargets.size() - 1;
 }
@@ -123,6 +130,12 @@ void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 {
 	// create render and depth buffers (at slot index 1)
 	CreateDepthBuffer(CreateRenderBuffer(m_VWidth, m_VHeight, isHDR));
+
+	// slot 2
+	CreateRenderBuffer(m_VWidth, m_VHeight, isHDR);
+
+	// slot 3 (smaller buffer resolution for post process effects)
+	CreateDepthBuffer(CreateRenderBuffer(m_VWidth / 2, m_VHeight / 2, isHDR));
 }
 
 void D3DMgr::RTBind(uint8_t rtIndex, uint8_t dsIndex, uint8_t num) noexcept
@@ -135,6 +148,9 @@ void D3DMgr::RTBind(uint8_t rtIndex, uint8_t dsIndex, uint8_t num) noexcept
 	D3D_THROW_INFO(m_pContext->OMSetRenderTargets(
 		num, renderTargets[rtIndex].pRTV.GetAddressOf(), depthTargets[dsIndex].pDSV.Get())
 	);
+
+	D3D_THROW_INFO(m_pContext->RSSetViewports(1u, &renderTargets[rtIndex].vp));
+
 	m_RTId = rtIndex;
 	m_DSId = dsIndex;
 	m_RTNum = num;

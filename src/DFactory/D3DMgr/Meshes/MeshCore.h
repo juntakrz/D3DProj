@@ -46,8 +46,8 @@ protected:
 	// core index buffer
 	Bind::IndexBuffer* m_pIndexBuffer = nullptr;
 
-	// standard no FX binds
-	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;	// standard render pass mesh binds
+	// local mesh binds
+	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;
 
 public:
 	//public mesh variables
@@ -88,7 +88,7 @@ public:
 
 	// binds and draw calls
 	void BindCore() const noexcept;									// bind core mesh buffers
-	void BindStandard() const noexcept;								// bind other mesh buffers
+	void BindLocal() const noexcept;								// bind other mesh buffers
 	std::vector<std::unique_ptr<Bind::IBind>>* Binds() noexcept;	// get standard mesh binds
 	const Bind::IndexBuffer* GetIndexBuffer() const noexcept;	
 	void DrawIndexed() noexcept;								// mesh draw call

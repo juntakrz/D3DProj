@@ -27,6 +27,21 @@ private:
 		stOff, stWrite, stMask
 	};
 
+	enum RenderBuffer
+	{
+		RB_Back		= 0,
+		RB_Render	= 1,
+		RB_Blur		= 2,
+		RB_Resample = 3
+	};
+
+	enum DepthStencilBuffer
+	{
+		DSB_Back		= 0,
+		DSB_Render		= 1,
+		DSB_Resample	= 2
+	};
+
 	// core
 	D3D_FEATURE_LEVEL					m_d3dFeatureLvl;
 	COMPTR<IDXGISwapChain>				m_pSwap;
@@ -49,6 +64,7 @@ private:
 		COMPTR<ID3D11Texture2D>				pTex;
 		COMPTR<ID3D11RenderTargetView>		pRTV;
 		COMPTR<ID3D11ShaderResourceView>	pSRV;
+		D3D11_VIEWPORT vp;
 		std::string name = "ERROR";
 		uint16_t width = 0;
 		uint16_t height = 0;
@@ -142,7 +158,7 @@ public:
 
 	void SetViewportSize(const uint16_t width, const uint16_t height) noexcept;
 
-	void BeginFrame(bool clear = true) noexcept;
+	void BeginFrame() noexcept;
 	void EndFrame();
 
 	//clear buffer only (optionally corresponding depth buffer)

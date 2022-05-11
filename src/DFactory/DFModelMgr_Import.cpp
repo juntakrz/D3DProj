@@ -211,7 +211,10 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			DFMatDesc.shaders.vertex = "VS_BasicTexture";
 			DFMatDesc.shaders.pixel = "PS_BasicTexture";
 
-			//try to delete textures if unused by anything else
+			// default normal mapping intensity
+			DFMatDesc.material.bumpIntensity = 1.5f;
+
+			// try to delete textures if unused by anything else
 			DFMatDesc.manageTextures = true;
 			
 			DFMatDesc.effects = DF::fxStandard;
@@ -220,7 +223,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			pDFMat = &pMatMgr->Mat(newMesh.meshMat);
 		}
 		else
-		{	//use existing material
+		{	// use existing material
 			pDFMat = &pMatMgr->Mat(matName);
 			newMesh.meshMat = matName;
 
@@ -251,13 +254,15 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	struct PSConstBuffer
 	{
-		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.25f, 1.0f };
+		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.4f, 1.0f };
 		XMFLOAT3A F0 = { 0.1f, 0.1f, 0.1f };
 		float matIntensity = 1.0f;
 		float spec_metal = 1.12f;
 		float pow_rough = 0.8f;
-		float extra = 0.0f;
+		float bumpIntensity = 1.0f;
 	} material;
+
+	material.bumpIntensity = pDFMat->data.w;
 
 	pBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<PSConstBuffer>>(material, 0u);
 

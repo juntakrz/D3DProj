@@ -409,6 +409,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="shaders\include\HPS_PBS.hlsli" />
+    <None Include="shaders\include\HVS_Transform.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc">
@@ -420,8 +421,8 @@
     <FxCompile Include="shaders\PS_Default.hlsl" />
     <FxCompile Include="shaders\VS_BasicTexture.hlsl" />
     <FxCompile Include="shaders\PS_BasicTexture.hlsl" />
-    <FxCompile Include="shaders\PS_PhongAlpha.hlsl" />
-    <FxCompile Include="shaders\VS_PhongAlpha.hlsl" />
+    <FxCompile Include="shaders\PS_Atmosphere.hlsl" />
+    <FxCompile Include="shaders\VS_Atmosphere.hlsl" />
     <FxCompile Include="shaders\PS_Standard_L.hlsl" />
     <FxCompile Include="shaders\VS_Standard_L.hlsl" />
     <FxCompile Include="shaders\PS_Standard.hlsl" />
@@ -437,6 +438,5 @@
     <FxCompile Include="shaders\PS_FSPP_Blur8.hlsl" />
     <FxCompile Include="shaders\PS_Outline_s2.hlsl" />
     <FxCompile Include="shaders\VS_Outline_s2.hlsl" />
-    <FxCompile Include="shaders\VS_Outline_s1.hlsl" />
   </ItemGroup>
 </Project>

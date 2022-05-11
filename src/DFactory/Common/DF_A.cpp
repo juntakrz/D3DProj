@@ -2,16 +2,16 @@
 
 namespace DF
 {
-	D3DMgr* pD3DM = nullptr;
+	D3DMgr* DFM = nullptr;
 	void* Engine = nullptr;
 
 	ID3D11Device* Device() noexcept
 	{
-		return pD3DM->Device();
+		return DFM->Device();
 	}
 
 	ID3D11DeviceContext* Context() noexcept
 	{
-		return pD3DM->Context();
+		return DFM->Context();
 	}
 }

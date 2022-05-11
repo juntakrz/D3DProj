@@ -5,6 +5,7 @@ cbuffer M_Material : register(b0)
     float1 M_MatIntensity;
     float1 M_Metalness;
     float1 M_Roughness;
+    float1 M_BumpIntensity;
 };
 
 cbuffer L_DirLight : register(b1)
@@ -64,7 +65,7 @@ float4 main(PSInput iPS) : SV_TARGET
     //set normal map range from (0, +1) to (-1, +1)
     normalTex = (normalTex * 2.0f) - 1.0f;
 
-    float3 N = normalize(normalTex.x * iPS.tangent + normalTex.y * iPS.binormal + normalTex.z * bumpInt * iPS.W_Normal);
+    float3 N = normalize(normalTex.x * iPS.tangent + normalTex.y * iPS.binormal + normalTex.z * M_BumpIntensity * iPS.W_Normal);
     float3 V = normalize(iPS.camPos - iPS.worldPos); //view vector
     
     for (uint i = 0; i < numPLights.x + 1; i++)

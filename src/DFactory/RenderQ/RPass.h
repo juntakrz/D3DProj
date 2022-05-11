@@ -6,7 +6,6 @@
 struct RPassJob
 {
 	MeshCore* pMesh;
-	RTechniqueStep* pTStep;		// contains binds, if no binds - use mesh standard pass binds
 };
 
 class RPass

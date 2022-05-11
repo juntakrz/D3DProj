@@ -1,7 +1,7 @@
 Texture2D tex2D;
 SamplerState smplr;
 
-static const int r = 3;
+static const int r = 4;
 static const float divisor = (2 * r + 1) * (2 * r + 1);
 
 float4 main(float2 tex : TEXCOORD) : SV_TARGET
@@ -13,8 +13,6 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
     uint2 renderRes;
     tex2D.GetDimensions(renderRes.x, renderRes.y);
     const float2 pixelStep = { 1.0 / renderRes.x, 1.0 / renderRes.y };
-    
-    float1 mult = 0.0;
     
     // accumulated color
     float4 accColor = { 0.0, 0.0, 0.0, 0.0 };
@@ -30,6 +28,6 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
             accColor += tex2D.Sample(smplr, texCoord);
         }
     }
-    
-    return float4(accColor.rgb / divisor, 1.0);
+
+    return accColor / divisor;
 }

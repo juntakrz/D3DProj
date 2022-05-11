@@ -13,7 +13,7 @@ namespace Bind
 		ConstBuffer(UINT slot = 0)
 			: m_slot(slot)
 		{
-			D3D_DXGIDEBUG(*DF::pD3DM);
+			D3D_DXGIDEBUG(*DF::DFM);
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.Usage = D3D11_USAGE_DYNAMIC;
@@ -28,7 +28,7 @@ namespace Bind
 		ConstBuffer(const C& cbuf, UINT slot = 0)
 			: m_slot(slot)
 		{
-			D3D_DXGIDEBUG(*DF::pD3DM);
+			D3D_DXGIDEBUG(*DF::DFM);
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.Usage = D3D11_USAGE_DYNAMIC;
@@ -45,7 +45,7 @@ namespace Bind
 		};
 		void Update(const C& cbuf)
 		{
-			D3D_DXGIDEBUG(*DF::pD3DM);
+			D3D_DXGIDEBUG(*DF::DFM);
 
 			D3D11_MAPPED_SUBRESOURCE msr = {};
 			D3D_THROW(GetContext()->Map(m_pConstBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr));
@@ -55,7 +55,7 @@ namespace Bind
 		
 		void Update(const std::vector<C>* cbuf, int size)
 		{
-			D3D_DXGIDEBUG(*DF::pD3DM);
+			D3D_DXGIDEBUG(*DF::DFM);
 
 			std::vector<C> tbuf(cbuf->size());
 			memcpy(tbuf.data(), cbuf->data(), sizeof(C) * cbuf->size());

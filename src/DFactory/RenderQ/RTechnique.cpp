@@ -1,20 +1,17 @@
 #include "RTechnique.h"
 
-// RPASSSTEP
+// RTECHNIQUEDB
 
-void RTechniqueStep::StepBind() noexcept
+void RTechniqueDB::InitDefaultTechniques() noexcept
 {
-	for (const auto& it : m_FXBinds)
+	// do not initialize again
+	if (m_InitializedDefaults)
 	{
-		it ? it->Bind() : void();
+		return;
 	}
-}
 
-// RTECHNIQUE
-
-RTechnique::RTechnique(uint32_t id) noexcept : m_id(id)
-{
 	std::string VS, PS;
+	uint8_t currentPass = 0;
 
 	// initialize bind vector and its standard 24 slots
 	std::vector<std::unique_ptr<Bind::IBind>> pBinds;
@@ -28,75 +25,73 @@ RTechnique::RTechnique(uint32_t id) noexcept : m_id(id)
 		}
 	};
 
-	switch (m_id)
+	// CONCEPT: 'Pass X' 'Intended pass use description'
+
+	// PASS 0
+	// use rendering using mesh own binds
 	{
-	case(DF::fxOutline) :
+		m_Techniques.emplace_back(RTechnique());
+		m_Techniques.back().m_Id = 1 << currentPass;
+		m_Techniques.back().m_UseMeshBinds = true;
+
+		currentPass++;
+	}
+	// PASS 1
+	// use rendering using mesh own binds for 'blur' render buffer
 	{
-		//
-		// STEP FOR PASS 1
-		//
+		m_Techniques.emplace_back(RTechnique());
+		m_Techniques.back().m_Id = 1 << currentPass;
+		m_Techniques.back().m_UseMeshBinds = true;
 
-		// should get these from technique related material in the future
-		{
-			fInitBinds();
-			VS = "VS_Default";
-			//PS = "PS_Default";
-			
-			auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
-			ID3DBlob* pVSByteCode = pVS->GetByteCode();
-			pBinds[Bind::idVertexShader] = std::move(pVS);
-			pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
-			//pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + PS + ".shd");*/
-			pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
-
-			//m_FXBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
-
-			// create step 0
-			m_Steps.push_back(RTechniqueStep{ std::move(pBinds), 1u });
-		}
-
-		//
-		// STEP FOR PASS 2
-		//
-
-		{
-			fInitBinds();
-			VS = "VS_Outline_s2";
-			PS = "PS_Outline_s2";
-
-			auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
-			ID3DBlob* pVSByteCode = pVS->GetByteCode();
-			pBinds[Bind::idVertexShader] = std::move(pVS);
-			pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + PS + ".shd");
-
-			//m_FXBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
-
-			pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
-
-			// create step 0
-			m_Steps.push_back(RTechniqueStep{ std::move(pBinds), 2u });
-		}
-
-		break;
+		currentPass++;
 	}
-	default:
+	// PASS 2
+	// write mask without actually drawing to render buffer
 	{
-		{
-			// since it's a Standard pass - create step with null bound vector
-			//fInitBinds();
-			//m_Steps.push_back(RTechniqueStep{std::move(pBinds), 0u});
-		}
-		break;
+		fInitBinds();
+		VS = "VS_Default";
+
+		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
+		ID3DBlob* pVSByteCode = pVS->GetByteCode();
+		pBinds[Bind::idVertexShader] = std::move(pVS);
+		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
+		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
+
+		//m_FXBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
+		m_Techniques.emplace_back(RTechnique());
+		m_Techniques.back().m_Id = 1 << currentPass;
+		m_Techniques.back().m_UseMeshBinds = false;
+		m_Techniques.back().m_Binds = std::move(pBinds);
+
+		currentPass++;
 	}
+	// PASS 3
+	// masking pass
+	{
+		fInitBinds();
+		VS = "VS_Outline_s2";
+		PS = "PS_Outline_s2";
+
+		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
+		ID3DBlob* pVSByteCode = pVS->GetByteCode();
+		pBinds[Bind::idVertexShader] = std::move(pVS);
+		pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + PS + ".shd");
+		//m_FXBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
+
+		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
+
+		m_Techniques.emplace_back(RTechnique());
+		m_Techniques.back().m_Id = 1 << currentPass;
+		m_Techniques.back().m_UseMeshBinds = false;
+		m_Techniques.back().m_Binds = std::move(pBinds);
+
+		currentPass++;
 	}
+	// mark default techniques as being initialized
+	m_InitializedDefaults = true;
 }
 
-const uint32_t& RTechnique::GetId() const noexcept
+size_t RTechniqueDB::Size() const noexcept
 {
-	return m_id;
-}
-
-std::vector<RTechniqueStep>* RTechnique::Steps() noexcept
-{
-	return &m_Steps;
+	return m_Techniques.size();
 }

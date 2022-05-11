@@ -166,12 +166,13 @@ void DFMain::LoadScreen() noexcept
 	//Mat_Atmo
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Atmo";
-	DFMatDesc.shaders.vertex = "VS_PhongAlpha";
-	DFMatDesc.shaders.pixel = "PS_PhongAlpha";
+	DFMatDesc.shaders.vertex = "VS_Atmosphere";
+	DFMatDesc.shaders.pixel = "PS_Atmosphere";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.matIntensity = 0.9f;
+	DFMatDesc.effects = DF::fxBlur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -200,7 +201,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.0f, 0.0f, 0.0f };
-	DFMatDesc.effects = DF::fxStandard;
+	DFMatDesc.material.bumpIntensity = 2.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -219,6 +220,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
+	DFMatDesc.material.bumpIntensity = 2.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -236,6 +238,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
+	DFMatDesc.material.bumpIntensity = 2.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -249,7 +252,6 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 0.2f;		//1.5
 	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
 	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
-	DFMatDesc.material.extra = 0.0f;
 	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
 
 	DF.MatM->MatAdd(&DFMatDesc);
@@ -264,7 +266,6 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 0.2f;		//1.5
 	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
 	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
-	DFMatDesc.material.extra = 0.0f;
 	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
 
 	DF.MatM->MatAdd(&DFMatDesc);
@@ -290,7 +291,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Create(DF::idSphere, "MdlMarsAtmo", 64);
 	DF.ModelM->SetPos(600.0f, -1600.0f, 4000.0f);
 	//DF.ModelM->SetEffect(DF::fxOutline, true, 0); // not implemented yet
-	DF.ModelM->SetScaling(2820.0f, 2820.0f, 2820.0f);
+	DF.ModelM->SetScaling(2860.0f, 2860.0f, 2860.0f);
 	DF.ModelM->SetMaterial("Mat_Atmo");
 	
 	Animate();
@@ -309,7 +310,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 2.0f);
-
+	
 	//MdlSphere0
 	DF.ModelM->Create(DF::idSphere, "MdlSphere0");
 	DF.ModelM->SetMaterial("Mat_PBSSteel");
@@ -336,7 +337,6 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetMaterial("Mat_TestNoMip");
 	DF.ModelM->SetPos(-0.8f, 0.5f, 2.0f);
 	DF.ModelM->SetScaling(0.1f, 0.1f, 0.1f);
-	
 	/*
 	//MdlPlane1 (rtt test)
 	DF.ModelM->Create(DF::idPlane, "MdlPlane1");

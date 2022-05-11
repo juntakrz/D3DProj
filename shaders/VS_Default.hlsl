@@ -1,9 +1,4 @@
-cbuffer CBuf
-{
-    matrix world;
-	matrix view;
-    matrix viewProj;
-};
+#include "include/HVS_Transform.hlsli"
 
 float4 main( float3 pos : POSITION ) : SV_Position
 {
