@@ -1,14 +1,15 @@
 #include "../../pch.h"
-#include "CSurface2D.h"
+#include "RenderSurface.h"
 #include "D3DMgr_Def.h"
 
-void CSurface2D::Create() noexcept
+RenderSurface::RenderSurface(float scale) noexcept
+	: scale(scale)
 {
 	// create mesh
-	vertices.push_back({ -1.0,  1.0, 0.0, 0.0  });	// top left
-	vertices.push_back({  1.0,  1.0, 1.0, 0.0  });	// top right
-	vertices.push_back({ -1.0, -1.0, 0.0, 1.0  });	// bottom right
-	vertices.push_back({  1.0, -1.0, 1.0, 1.0  });	// bottom left
+	vertices.push_back({ -scale,  scale, 0.0f, 0.0f  });	// top left
+	vertices.push_back({  scale,  scale, 1.0f, 0.0f  });	// top right
+	vertices.push_back({ -scale, -scale, 0.0f, 1.0f  });	// bottom right
+	vertices.push_back({  scale, -scale, 1.0f, 1.0f  });	// bottom left
 
 	// create vertex buffer
 	D3D11_BUFFER_DESC vBufDesc{};
@@ -50,7 +51,7 @@ void CSurface2D::Create() noexcept
 	);
 }
 
-void CSurface2D::Bind(ID3D11ShaderResourceView* pSRV) noexcept
+void RenderSurface::Bind(ID3D11ShaderResourceView* pSRV) noexcept
 {
 	// store ptr to texture
 	m_pSRV = pSRV;
@@ -66,12 +67,12 @@ void CSurface2D::Bind(ID3D11ShaderResourceView* pSRV) noexcept
 	DF::Context()->PSSetShaderResources(0u, 1u, &pSRV);
 }
 
-void CSurface2D::Unbind() noexcept
+void RenderSurface::Unbind() noexcept
 {
 	DF::Context()->PSSetShaderResources(0u, 1u, &nullSRV);
 }
 
-void CSurface2D::Draw() noexcept
+void RenderSurface::Draw() noexcept
 {
 	//DF::Context()->DrawIndexed(6u, 0u, 0u);
 	DF::Context()->Draw(4u, 0u);

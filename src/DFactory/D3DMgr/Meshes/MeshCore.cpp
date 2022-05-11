@@ -20,7 +20,7 @@ void MeshCore::BindCore() const noexcept
 
 void MeshCore::BindStandard() const noexcept
 {
-	for (uint8_t i = 3; i < 15; i++)
+	for (uint8_t i = 3; i < Bind::MAXBINDS; i++)
 	{
 		m_Binds[i] ? m_Binds[i]->Bind() : void();
 	}
@@ -28,7 +28,7 @@ void MeshCore::BindStandard() const noexcept
 	m_Binds[Bind::idTransform] ? m_Binds[Bind::idTransform]->Bind() : void();
 }
 
-std::vector<std::unique_ptr<Bind::IBind>>* MeshCore::GetBinds() noexcept
+std::vector<std::unique_ptr<Bind::IBind>>* MeshCore::Binds() noexcept
 {
 	return &m_Binds;
 }

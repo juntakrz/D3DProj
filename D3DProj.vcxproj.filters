@@ -57,7 +57,7 @@
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Except.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\D3DMgr\CDXGIDebug.cpp">
+    <ClCompile Include="src\DFactory\Util\CDXGIDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFMain.cpp">
@@ -180,7 +180,7 @@
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\D3DMgr\CSurface2D.cpp">
+    <ClCompile Include="src\DFactory\D3DMgr\RenderSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFactory\RenderQ\RPass.cpp">
@@ -190,6 +190,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFactory\RenderQ\RenderQ.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Stencil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -227,7 +233,7 @@
     <ClInclude Include="src\DFactory\D3DMgr\dxerr\dxerr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\D3DMgr\CDXGIDebug.h">
+    <ClInclude Include="src\DFactory\Util\CDXGIDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -368,7 +374,7 @@
     <ClInclude Include="src\DFactory\Common\DF_A.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\D3DMgr\CSurface2D.h">
+    <ClInclude Include="src\DFactory\D3DMgr\RenderSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h">
@@ -429,5 +435,8 @@
     <FxCompile Include="shaders\VS_FSPP.hlsl" />
     <FxCompile Include="shaders\PS_FSPP_Blur32.hlsl" />
     <FxCompile Include="shaders\PS_FSPP_Blur8.hlsl" />
+    <FxCompile Include="shaders\PS_Outline_s2.hlsl" />
+    <FxCompile Include="shaders\VS_Outline_s2.hlsl" />
+    <FxCompile Include="shaders\VS_Outline_s1.hlsl" />
   </ItemGroup>
 </Project>

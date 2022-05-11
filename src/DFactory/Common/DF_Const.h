@@ -2,13 +2,15 @@
 
 namespace Bind
 {
+	constexpr uint8_t MAXBINDS = 20;
+
 	enum BindID
 	{
 		idVertexBuffer, idIndexBuffer, idTopology,		// core binds
 		idVertexShader, idPixelShader, idSampler,
 		idTexture0, idTexture1, idTexture2, idTexture3, idTexture4, idTexture5,
 		idConstVertexBuf0, idConstPixelBuf0,
-		idInputLayout, idStencil, idTransform
+		idInputLayout, idTransform
 	};
 
 	enum StencilMode

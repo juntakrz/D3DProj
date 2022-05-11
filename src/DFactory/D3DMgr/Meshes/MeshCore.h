@@ -2,7 +2,6 @@
 
 #include "../D3DMgr.h"
 #include "../../Common/DF_Math.h"
-//#include "../IBind/IBind.h"
 #include "../IBind/Bind_Includes.h"
 #include "../../Common/DF_Const.h"
 #include "../../DFMaterial.h"
@@ -76,7 +75,7 @@ public:
 		DirectX::XMStoreFloat3A(&xmPos, DirectX::FXMVECTOR(xmMain.r[3]));
 
 		// initialize bind pointers vector
-		for (uint8_t i = 0; i < 24; i++)
+		for (uint8_t i = 0; i < Bind::MAXBINDS; i++)
 		{
 			m_Binds.push_back(nullptr);
 		}
@@ -90,7 +89,7 @@ public:
 	// binds and draw calls
 	void BindCore() const noexcept;									// bind core mesh buffers
 	void BindStandard() const noexcept;								// bind other mesh buffers
-	std::vector<std::unique_ptr<Bind::IBind>>* GetBinds() noexcept;	// get standard mesh binds
+	std::vector<std::unique_ptr<Bind::IBind>>* Binds() noexcept;	// get standard mesh binds
 	const Bind::IndexBuffer* GetIndexBuffer() const noexcept;	
 	void DrawIndexed() noexcept;								// mesh draw call
 

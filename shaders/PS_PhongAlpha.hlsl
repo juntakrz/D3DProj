@@ -33,14 +33,14 @@ float4 main(PSInput iPS) : SV_TARGET
     float4 colorTex = { 1.0f, 1.0f, 1.0f, 1.0f };
     
     //global variables
-    float4 specular = { 0.0f, 0.0f, 0.0f, 0.0f };
+    float4 specular = { 0.0f, 0.0f, 0.0f, 1.0f };
     float4 globalDiffuse = { 0.0f, 0.0f, 0.0f, 1.0f };
     
     //calculate directional light intensity
     float1 L_DirIntensity = saturate(dot(iPS.W_Normal, normalize(L_DirPos))) * L_DirInt;
     
     //add directional light
-    globalDiffuse = L_DirDiffuse * (L_DirIntensity * L_DirIntensity) * M_MatIntensity;
+    globalDiffuse = L_DirDiffuse * L_DirIntensity * M_MatIntensity;
     
     //calculate directional specular
     if (M_SpecIntensity > 0.0f)
@@ -51,4 +51,5 @@ float4 main(PSInput iPS) : SV_TARGET
     //final color
     //return float4((globalDiffuse.rgb + M_Ambient.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a);
     return float4((globalDiffuse.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a);
+
 }

@@ -3,12 +3,13 @@
 RenderQ::RenderQ() noexcept
 {
 	// create preset passes
-	PassCreate("fxStandard0");		// 0 = fxStandard
-	PassCreate("fxOutline1");		// 1 = fxOutline / Write
-	PassCreate("fxOutline2");		// 2 = fxOutline / Mask
+	PassCreate("fxStandard0");			// 0 = fxStandard
+	PassCreate("fxOutline1");			// 1 = fxOutline / Write
+	PassCreate("fxOutline2");			// 2 = fxOutline / Mask
 
 	// create techniques from presets
-	TechniqueCreate(DF::fxOutline);	// 1 << 1 = fxOutline
+	TechniqueCreate(DF::fxStandard);	// 1 << 0 = fxStandard
+	TechniqueCreate(DF::fxOutline);		// 1 << 1 = fxOutline
 
 	// initialize static pointers to engine methods in Pass class
 	RPass::Init();
@@ -16,10 +17,19 @@ RenderQ::RenderQ() noexcept
 
 void RenderQ::Render() noexcept
 {
-	for (const auto& it : m_Passes)
-	{
-		it.PassDraw();
-	}
+	// render scenario
+
+	DF::pD3DM->SetDepthStencilState(0);	// stOff
+	m_Passes[0].PassDraw();				// fxStandard
+
+	DF::pD3DM->SetDepthStencilState(1); // stWrite
+	m_Passes[1].PassDraw();				// fxOutline stencil writing step
+
+	DF::pD3DM->SetDepthStencilState(2);	// stMask
+	m_Passes[2].PassDraw();				// fxOutline stencil masking step
+
+	// returning stencil state to normal for final output
+	DF::pD3DM->SetDepthStencilState(0);	// stOff
 }
 
 void RenderQ::PassCreate(std::string name) noexcept
@@ -82,13 +92,19 @@ void RenderQ::ResetRenderPasses() noexcept
 
 void RenderQ::GenerateJob(MeshCore* pMesh, uint32_t techniqueIds) noexcept
 {
-	if (!techniqueIds)	// if 0 - ignore ane don't render
+	if (!techniqueIds)	// if 0 - ignore and don't render
 	{
 		return;
 	}
 
 	// if technique is 1 ('standard') binds will be taken from the mesh itself
 	(techniqueIds & 1) ? m_Passes[0].PassJobAdd(RPassJob{ pMesh, nullptr }) : void();
+
+	// if only Standard technique is used - no need to waste cycles iterating through all
+	if (techniqueIds < 2)
+	{
+		return;
+	}
 
 	// iterate through technique IDs of a mech and generate job
 	// techniques should be placed in a vector in the same order as they are in bit flags

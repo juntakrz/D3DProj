@@ -86,7 +86,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	}
 
 	std::vector<std::unique_ptr<Bind::IBind>> pBinds;
-	for (uint8_t i = 0; i < 24; i++)
+	for (uint8_t i = 0; i < Bind::MAXBINDS; i++)
 	{
 		pBinds.emplace_back();
 	}
@@ -246,9 +246,6 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	//create and bind pixel shader
 	std::string PSPath = "shaders//" + pDFMat->shaderPixel + ".shd";
 	pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
-
-	//create and bind default stencil state
-	pBinds[Bind::idStencil] = std::make_unique<Bind::Stencil>(Bind::stencilOff);
 
 	pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 

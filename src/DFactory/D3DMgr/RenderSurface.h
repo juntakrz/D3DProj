@@ -12,7 +12,7 @@ namespace DF
 }
 
 // 2D surface used for post processing
-class CSurface2D
+class RenderSurface
 {
 	// surface mesh data
 	std::vector<XMFLOAT4> vertices;	// 0 = x, 1 = y, 2 = u, 3 = v
@@ -33,17 +33,17 @@ class CSurface2D
 	const UINT m_VBufferStride = sizeof(XMFLOAT4);
 	const UINT m_IBufferStride = sizeof(UINT);
 	const UINT offset = 0u;
+	const float scale = 1.0f;
 
 	std::string m_PSFilePath = "PS_FSPP";
 	//std::string m_PSFilePath = "PS_FSPP_Blur32";
 	std::string m_VSFilePath = "VS_FSPP";
 
 public:
-	CSurface2D() {};
-	CSurface2D(const CSurface2D&) = default;
-	~CSurface2D() = default;
+	RenderSurface(float scale = 1.0f) noexcept;
+	RenderSurface(const RenderSurface&) = default;
+	~RenderSurface() = default;
 
-	void Create() noexcept;
 	void Bind(ID3D11ShaderResourceView* pSRV) noexcept;
 	void Unbind() noexcept;
 	void Draw() noexcept;

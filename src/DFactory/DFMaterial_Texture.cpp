@@ -44,16 +44,28 @@ uint32_t DFMaterial::TextureAdd(std::string name, std::string filePath) noexcept
 	filePath = constPath + filePath;
 	std::wstring wFilePath(filePath.begin(), filePath.end());
 
-	ID3D11ShaderResourceView* pSRV = nullptr;
+	dft.pSRV = std::make_shared<ID3D11ShaderResourceView*>(nullptr);
 
-	HRESULT hr = DirectX::CreateDDSTextureFromFile(DF::pD3DM->Device(), wFilePath.c_str(), nullptr, &pSRV);
-	/*HRESULT hr = DirectX::CreateDDSTextureFromFileEx(
+	//HRESULT hr = DirectX::CreateDDSTextureFromFile(DF::pD3DM->Device(), wFilePath.c_str(),nullptr, dft.pSRV.get());
+	HRESULT hr = DirectX::CreateDDSTextureFromFileEx(
 		DF::pD3DM->Device(), nullptr, wFilePath.c_str(), 0uLL,
-		D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET,
-		0u, D3D11_RESOURCE_MISC_GENERATE_MIPS, false, nullptr, &dxt.pSRV
-		);*/
+		D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE,
+		0u, 0u, false, nullptr, dft.pSRV.get()
+		);
 
-	dft.pSRV = std::make_shared<ID3D11ShaderResourceView*>(pSRV);
+	// diagnosis code, used to peek inside imported DDS resource
+	/*
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	ID3D11ShaderResourceView* srv = *dft.pSRV.get();
+	srv->GetDesc(&srvDesc);
+
+	ID3D11Resource* res;
+	srv->GetResource(&res);
+
+	ID3D11Texture2D* tex = reinterpret_cast<ID3D11Texture2D*>(res);
+	D3D11_TEXTURE2D_DESC texDesc{};
+	tex->GetDesc(&texDesc);
+	*/
 
 #ifdef _DEBUG || _DFDEBUG
 	if (hr != S_OK)

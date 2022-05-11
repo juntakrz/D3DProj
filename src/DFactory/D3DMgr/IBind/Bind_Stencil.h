@@ -16,12 +16,14 @@ namespace Bind
 		Stencil(uint8_t mode)
 		{
 			//default stencil description setting
-			D3D11_DEPTH_STENCIL_DESC DSDesc = CD3D11_DEPTH_STENCIL_DESC( CD3D11_DEFAULT{} );
+			D3D11_DEPTH_STENCIL_DESC DSDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
 
 			switch (mode)
 			{
 			case (uint8_t)Mode::Write :
 			{
+				DSDesc.DepthEnable = false;
+				DSDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 				DSDesc.StencilEnable = true;
 				DSDesc.StencilWriteMask = 0xFF;
 				DSDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
@@ -31,6 +33,7 @@ namespace Bind
 			case (uint8_t)Mode::Mask :
 			{
 				DSDesc.DepthEnable = false;
+				DSDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 				DSDesc.StencilEnable = true;
 				DSDesc.StencilReadMask = 0xFF;
 				DSDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;

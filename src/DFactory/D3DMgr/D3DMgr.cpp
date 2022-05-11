@@ -5,8 +5,8 @@ D3DMgr::D3DMgr(HWND hWnd)
 {
 	//create swap chain description
 	DXGI_SWAP_CHAIN_DESC SwapDesc = {};
-	SwapDesc.BufferDesc.Width = 0;			//try resolution of the window
-	SwapDesc.BufferDesc.Height = 0;
+	SwapDesc.BufferDesc.Width = m_VWidth;
+	SwapDesc.BufferDesc.Height = m_VHeight;
 	SwapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	SwapDesc.BufferDesc.RefreshRate.Numerator = 0;
 	SwapDesc.BufferDesc.RefreshRate.Denominator = 0;
@@ -48,41 +48,27 @@ D3DMgr::D3DMgr(HWND hWnd)
 		&m_pContext
 	));
 
-	//get access to back buffer in a swap chain
-	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_pBackBuf_Tex));
+	// initialize render target and depth buffer vectors
+	renderTargets.push_back(RenderTarget{ nullptr, nullptr, nullptr });
+	depthTargets.push_back(DSTarget{ nullptr, nullptr });
 
-	//create the default render target view and assign it
-	D3D_THROW_INFO(m_pDevice->CreateRenderTargetView(m_pBackBuf_Tex.Get(), nullptr, &m_pBackBuf_RT));
+	// store resource resolutions for reference
+	renderTargets.back().name = "rtBackBuffer";
+	renderTargets.back().width = m_VWidth;
+	renderTargets.back().height = m_VHeight;
+	depthTargets.back().name = "dsBackBuffer";
+	depthTargets.back().width = m_VWidth;
+	depthTargets.back().height = m_VHeight;
 
-	//Z-buffer
-	D3D11_DEPTH_STENCIL_DESC dsd = {};
-	dsd.DepthEnable = true;
-	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsd.DepthFunc = D3D11_COMPARISON_LESS;
+	// get swap chain buffer and put it into the render target vector
+	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &renderTargets.back().pTex));
 
-	//stencil stuff, need to read about it
-	dsd.StencilEnable = false;
-	dsd.StencilReadMask = 0xFF;
-	dsd.StencilWriteMask = 0xFF;
-	dsd.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsd.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	dsd.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dsd.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	dsd.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsd.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	dsd.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dsd.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	// create the default render target view and assign it
+	D3D_THROW_INFO(m_pDevice->CreateRenderTargetView(
+		renderTargets.back().pTex.Get(), nullptr, &renderTargets.back().pRTV)
+	);
 
-	//create both on and off depth states
-	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &m_pDSStateOn));
-
-	dsd.DepthEnable = false;
-	D3D_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsd, &m_pDSStateOff));
-
-	//bind enabled depth state
-	//D3D_THROW_INFO(m_pContext->OMSetDepthStencilState(m_pDSStateOn.Get(), 1u));
-
-	//create depth stencil texture
+	// create depth stencil texture
 	D3D11_TEXTURE2D_DESC stencilDesc = {};
 	stencilDesc.Usage = D3D11_USAGE_DEFAULT;
 	stencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -94,22 +80,27 @@ D3DMgr::D3DMgr(HWND hWnd)
 	stencilDesc.SampleDesc.Count = 1u;
 	stencilDesc.SampleDesc.Quality = 0u;
 
-	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &m_pBackBuf_DSTex));
+	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &depthTargets.back().pDSTex));
 
-	//create depth stencil view
+	// create depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {};
 	dsvd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsvd.Texture2D.MipSlice = 0u;
 	
-	D3D_THROW_INFO(m_pDevice->CreateDepthStencilView(m_pBackBuf_DSTex.Get(), &dsvd, &m_pBackBuf_DS));
+	D3D_THROW_INFO(m_pDevice->CreateDepthStencilView(
+		depthTargets.back().pDSTex.Get(), &dsvd, &depthTargets.back().pDSV)
+	);
 
-	//bind render target and depth stencil view to OM (output merger)
-	m_pContext->OMSetRenderTargets(1u, m_pBackBuf_RT.GetAddressOf(), m_pBackBuf_DS.Get());
+	// bind initial render target and depth stencil view to OM (output merger)
+	m_pContext->OMSetRenderTargets(1u, renderTargets.back().pRTV.GetAddressOf(), depthTargets.back().pDSV.Get());
+	m_RTId = 0;		// reference values
+	m_DSId = 0;
+	m_RTNum = 1;
 
 	//rasterizer test
 	COMPTR<ID3D11RasterizerState> pRState;
-
+	
 	D3D11_RASTERIZER_DESC RDesc = {};
 	RDesc.FillMode = D3D11_FILL_SOLID;
 	RDesc.CullMode = D3D11_CULL_BACK;
@@ -123,7 +114,7 @@ D3DMgr::D3DMgr(HWND hWnd)
 	
 	D3D_THROW_INFO(m_pDevice->CreateRasterizerState(&RDesc, &pRState));
 	m_pContext->RSSetState(pRState.Get());
-
+	
 	//configure alpha blending
 	D3D11_BLEND_DESC blendDesc = {};
 	blendDesc.RenderTarget[0].BlendEnable = true;
@@ -131,13 +122,13 @@ D3DMgr::D3DMgr(HWND hWnd)
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE; //zero
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
 
 	D3D_THROW_INFO(m_pDevice->CreateBlendState(&blendDesc, &m_pBlendState));
 	m_pContext->OMSetBlendState(m_pBlendState.Get(), NULL, 0xffffffff);
-
+	
 	//configure viewport and rasterizer
 	D3D11_VIEWPORT vp = {};
 	vp.Width = m_VWidth;
@@ -148,13 +139,21 @@ D3DMgr::D3DMgr(HWND hWnd)
 	vp.TopLeftY = 0.f;
 	m_pContext->RSSetViewports(1u, &vp);	//amount of viewports, pointer to array of viewports
 
-	//create render buffer and assign pointers
+	// Initializations
+
+	// init 'clear' colors
+	InitClearColors();
+
+	// create stencil states
+	CreateStencilStates();
+
+	// create render buffer and assign pointers
 	RTInitBuffers(m_IsHDR);
 
-	//create copy buffer
+	// create copy buffer
 	CreateRenderSR(m_IsHDR);
 
-	//initialize imGui here
+	// initialize imGui here
 	imGuiMgr::Get();
 	ImGui_ImplDX11_Init(m_pDevice.Get(), m_pContext.Get());
 }
@@ -162,6 +161,17 @@ D3DMgr::D3DMgr(HWND hWnd)
 D3DMgr::~D3DMgr()
 {
 	ImGui_ImplDX11_Shutdown();
+}
+
+void D3DMgr::InitClearColors() noexcept
+{
+	for (uint8_t i = 0; i < 6; i++)
+	{
+		m_ClearColor[i][0] = 0.0f;
+		m_ClearColor[i][1] = 0.0f;
+		m_ClearColor[i][2] = 0.0f;
+		m_ClearColor[i][3] = 1.0f;
+	}
 }
 
 void D3DMgr::EnableImGui() noexcept
@@ -185,23 +195,10 @@ void D3DMgr::SetViewportSize(const uint16_t width, const uint16_t height) noexce
 	m_VHeight = (float)height;
 }
 
-void D3DMgr::BeginFrame(const float red, const float green, const float blue) noexcept
-{
-	if (m_imguiEnabled)
-	{
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-	}
-
-	const float color[]{ red, green, blue, 1.0f };
-	m_pContext->ClearRenderTargetView(m_pBackBuf_RT.Get(), color);
-	m_pContext->ClearDepthStencilView(m_pBackBuf_DS.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-}
-
 void D3DMgr::BeginFrame(bool clear) noexcept
 {
-	RTBind(1, 1);
+	// bind secondary render target and depth buffer to render to
+	RTBind(1u, 1u);
 	
 	if (m_imguiEnabled)
 	{
@@ -213,22 +210,27 @@ void D3DMgr::BeginFrame(bool clear) noexcept
 	//set to false if clearing buffers manually
 	if (clear)
 	{
-		for (uint8_t i = m_RTId; i < m_RTId + m_RTNum; i++)
+		for (uint8_t i = m_RTId, j = m_DSId; i < m_RTId + m_RTNum; i++, j++)
 		{
-			m_pContext->ClearRenderTargetView(RT[i].pRTV, m_ClearColor[i]);
-			m_pContext->ClearDepthStencilView(RT[i].pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+			m_pContext->ClearRenderTargetView(renderTargets[i].pRTV.Get(), m_ClearColor[i]);
+			m_pContext->ClearDepthStencilView(depthTargets[j].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 		}
 	}
 }
 
 void D3DMgr::EndFrame()
 {
-	RTBind(0, 1);
+	// bind main back buffer and its depth buffer
+	RTBind(0u, 0u);
 	Clear();
-	RTCopyBuffer();
-	PPSurface.Bind(RT[1].pSRV);
-	PPSurface.Draw();
-	PPSurface.Unbind();
+
+	// copy SRV from buffer 1 to buffer 0 (back buffer)
+	//RTCopyBuffer(1u, 0u);
+
+	// draw the 2D surface using render buffer 1
+	SurfaceTargets(0)->Bind(renderTargets[1u].pSRV.Get());
+	SurfaceTargets(0)->Draw();
+	SurfaceTargets(0)->Unbind();
 	
 	if (IsImGuiEnabled())
 	{
@@ -253,23 +255,27 @@ void D3DMgr::EndFrame()
 	}
 }
 
-void D3DMgr::Clear(uint8_t index, bool clearDepthBuffer) noexcept
+void D3DMgr::Clear(uint8_t rtIndex, bool clearDepthBuffer, int8_t dsIndex) noexcept
 {
-	m_pContext->ClearRenderTargetView(RT[index].pRTV, m_ClearColor[index]);
+	m_pContext->ClearRenderTargetView(renderTargets[rtIndex].pRTV.Get(), m_ClearColor[rtIndex]);
 	if (clearDepthBuffer)
 	{
-		m_pContext->ClearDepthStencilView(RT[index].pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+		// if depth stencil buffer index is -1 - clear the same index as render target
+		(dsIndex < 0) ? dsIndex = rtIndex : 0;
+		m_pContext->ClearDepthStencilView(depthTargets[dsIndex].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	}
 }
 
-void D3DMgr::Clear(const float red, const float green, const float blue, uint8_t index, bool clearDepthBuffer) noexcept
+void D3DMgr::Clear(const float red, const float green, const float blue, uint8_t rtIndex, bool clearDepthBuffer, int8_t dsIndex) noexcept
 {
 	const float color[4] = { red, green, blue, 1.0f };
 
-	m_pContext->ClearRenderTargetView(RT[index].pRTV, color);
+	m_pContext->ClearRenderTargetView(renderTargets[rtIndex].pRTV.Get(), color);
 	if (clearDepthBuffer)
 	{
-		m_pContext->ClearDepthStencilView(RT[index].pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+		// if depth stencil buffer index is -1 - clear the same index as render target
+		(dsIndex < 0) ? dsIndex = rtIndex : 0;
+		m_pContext->ClearDepthStencilView(depthTargets[dsIndex].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	}
 
 }
@@ -283,18 +289,6 @@ void D3DMgr::SetClearColor(const float red, const float green, const float blue,
 		m_ClearColor[index][2] = blue;
 		m_ClearColor[index][3] = 1.0f;
 	}
-}
-
-void D3DMgr::EnableDepthBuffer() noexcept
-{
-	m_pContext->OMSetDepthStencilState(m_pDSStateOn.Get(), 1u);
-	m_ZBufferEnabled = true;
-}
-
-void D3DMgr::DisableDepthBuffer() noexcept
-{
-	m_pContext->OMSetDepthStencilState(m_pDSStateOff.Get(), 1u);
-	m_ZBufferEnabled = false;
 }
 
 void D3DMgr::RenderWireframe(bool enable) noexcept
