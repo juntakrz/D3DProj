@@ -1,7 +1,7 @@
 Texture2D tex2D;
 SamplerState smplr;
 
-static const int r = 4;
+static const int r = 4;     // kernel
 static const float divisor = (2 * r + 1) * (2 * r + 1);
 
 float4 main(float2 tex : TEXCOORD) : SV_TARGET
@@ -10,9 +10,12 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
     float2 texCoord = tex;
     
     // get texture pixel step
-    uint2 renderRes;
+    /*uint2 renderRes;
     tex2D.GetDimensions(renderRes.x, renderRes.y);
-    const float2 pixelStep = { 1.0 / renderRes.x, 1.0 / renderRes.y };
+    const float2 pixelStep = { 1.0 / renderRes.x, 1.0 / renderRes.y };*/
+    
+    // performance saving approximation
+    static const float2 pixelStep = { 0.0007, 0.0012 };
     
     // accumulated color
     float4 accColor = { 0.0, 0.0, 0.0, 0.0 };

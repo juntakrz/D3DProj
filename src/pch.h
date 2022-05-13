@@ -16,6 +16,7 @@
 #include <bitset>
 #include <optional>
 #include <memory>
+#include <unordered_map>
 #include <math.h>
 #include <DirectXMath.h>
 

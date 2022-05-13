@@ -1,8 +1,9 @@
-#include "../D3DMgr/IBind/Bind_Includes.h"
+//#include "../D3DMgr/IBind/Bind_Includes.h"
 
 class RTechnique
 {
 	friend class RTechniqueDB;
+	friend class RPass;
 
 public:
 	RTechnique() = default;
@@ -29,9 +30,13 @@ public:
 	};
 
 private:
-	uint32_t m_Id = 0;			// bitwise id
-	bool m_UseMeshBinds = false;
-	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;
+	uint32_t m_Id = 0;										// bitwise id
+	bool m_UseMeshBinds = false;							// technique relies on mesh binds
+	//std::string m_CamId = "";								// camera that this technique will use for rendering, empty for no change
+	CCamera* m_pCamera = nullptr;
+	int8_t m_RB = -1, m_DSB = -1;							// render and depth buffers to switch to before rendering, -1 to not switch
+	int8_t m_depthState = -1;								// depth state for the current pass, -1 for no change
+	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;		// technique binds
 };
 
 class RTechniqueDB

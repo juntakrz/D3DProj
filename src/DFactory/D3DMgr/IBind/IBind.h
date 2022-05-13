@@ -19,7 +19,7 @@ namespace Bind
 		}
 #endif
 		;
-		D3D_DXGIDEBUG(*DF::DFM);
+		D3D_DXGIDEBUG(*DF::D3DM);
 
 	public:
 		virtual void Bind() = 0;

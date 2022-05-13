@@ -19,7 +19,7 @@ class RPass
 	};
 
 public:
-	RPass(size_t id, std::string name) noexcept : m_Id(id), m_Name(name) {};
+	RPass(size_t id, std::string name) noexcept : m_Id(id), m_Name(name), m_pTechDB(&RTechniqueDB::Get()) {};
 	RPass(const RPass&) = default;
 	~RPass() = default;
 
@@ -33,4 +33,7 @@ private:
 	size_t m_Id;						// pass Id, which should be the same for technique steps
 	std::string m_Name;					// pass name to identify it
 	std::vector<RPassJob> m_Jobs;		// pass will apply corresponding technique step to mesh
+	
+	RTechniqueDB* m_pTechDB = nullptr;			// technique database
+	mutable RTechnique* m_pTech = nullptr;		// only used inside PassDraw for faster calls
 };

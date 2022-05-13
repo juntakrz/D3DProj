@@ -11,12 +11,21 @@ void RPass::PassJobAdd(RPassJob&& job) noexcept
 
 void RPass::PassDraw() const noexcept
 {
-	// check if current technique requires mesh binds and if yes - bind it only once per pass
-	const bool& requiresMeshBinds = RTechniqueDB::Get().m_Techniques[m_Id].RequiresMeshBinds();
-	(requiresMeshBinds) ? void() : RTechniqueDB::Get().m_Techniques[m_Id].BindTechnique();
+	// get pass technique
+	m_pTech = &m_pTechDB->m_Techniques[m_Id];
 
-	//if (m_Id == 2 && m_Jobs.size())
-	//	std::string x;
+	// check if current technique requires mesh binds and if yes - bind it only once per pass
+	const bool& requiresMeshBinds = m_pTech->RequiresMeshBinds();
+	(requiresMeshBinds) ? void() : m_pTech->BindTechnique();
+
+	// switch to pass camera, if available
+	(m_pTech->m_pCamera) ? DF::D3DM->SetCamera(m_pTech->m_pCamera) : void();
+
+	// switch to pass render / depth stencil buffers or leave previous ones as is, if undefined
+	(m_pTech->m_RB > -1 && m_pTech->m_DSB > -1) ? DF::D3DM->RTBind(m_pTech->m_RB, m_pTech->m_DSB) : void();
+
+	// change depth stencil state if defined
+	(m_pTech->m_depthState > -1) ? DF::D3DM->SetDepthStencilState(m_pTech->m_depthState) : void();
 
 	for (auto& it : m_Jobs)
 	{

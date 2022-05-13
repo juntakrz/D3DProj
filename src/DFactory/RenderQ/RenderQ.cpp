@@ -17,21 +17,46 @@ RenderQ::RenderQ() noexcept
 
 void RenderQ::Render() noexcept
 {
-	// render scenario // need to rewrite this
+	// RENDER SCENARIO (need to rewrite this)
+	
+	//
+	// PASS PROCESSOR
+	//
 
-	DF::DFM->SetDepthStencilState(0);	// stOff
 	m_Passes[0].PassDraw();				// fxStandard
-
-	DF::DFM->RTBind(2u, 1u);			// bind 'blur buffer' for rendering but write depth to 'render' depth buffer
 	m_Passes[1].PassDraw();				// fxBlur drawing to blur buffer and render stencil pass
-
-	DF::DFM->SetDepthStencilState(1);	// stWrite
 	m_Passes[2].PassDraw();				// fxOutline stencil writing step
-
-	DF::DFM->SetDepthStencilState(2);	// stMask
 	m_Passes[3].PassDraw();				// fxOutline stencil masking step
 
-	DF::DFM->SetDepthStencilState(0);	// stOff
+	// disable stencil
+	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Stencil::Off);
+
+	//
+	// SURFACE PROCESSER
+	//
+
+	// bind 'downsample' buffer and depth buffer with equal resolution
+	DF::D3DM->RTBind(DF::RBuffers::Resample, DF::DSBuffers::Resample);
+
+	// render to downscaled surface that has blur shaders using fxBlur buffer
+	DF::D3DM->RenderBufferToSurface(1u, DF::RBuffers::Blur);
+
+	// copy "render" depth buffer to its compatible clone if visualizing depth
+	(DF::D3DM->GetShowDepth()) ? DF::D3DM->RTCopyBuffer(1u, 4u, true) : void();
+
+	// bind 'render' buffer and corresponding depth buffer
+	DF::D3DM->RTBind(DF::RBuffers::Render, DF::DSBuffers::Render);
+
+	DF::D3DM->RenderBufferToSurface(1u, DF::RBuffers::Resample);
+
+	// bind main back buffer and its depth buffer
+	DF::D3DM->RTBind(DF::RBuffers::Back, DF::DSBuffers::Back);
+
+	// draw the primary surface using data from render buffer 1 or draw depth data
+	(DF::D3DM->GetShowDepth())
+		? DF::D3DM->RenderDepthToSurface(0u, (DF::DSBuffers)4u)
+		: DF::D3DM->RenderBufferToSurface(0u, DF::RBuffers::Render);
+
 }
 
 void RenderQ::PassCreate(std::string name) noexcept

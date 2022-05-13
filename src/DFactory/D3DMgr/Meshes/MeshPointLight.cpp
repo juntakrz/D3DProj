@@ -60,7 +60,7 @@ void MeshPointLight::Draw() noexcept
 	{
 		it->Bind();
 	}
-	(m_showMesh && m_showAllMeshes) ? DF::DFM->DrawIndexed(GetIndexBuffer()->GetCount()) : (void)0;
+	(m_showMesh && m_showAllMeshes) ? DF::D3DM->DrawIndexed(GetIndexBuffer()->GetCount()) : (void)0;
 }
 
 void MeshPointLight::DEBUG_Rotate(float delta) noexcept

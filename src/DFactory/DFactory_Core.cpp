@@ -12,8 +12,8 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 		pDescription->WndTitle.c_str());
 
 	// retrieve D3DMgr
-	DF::DFM = &_SInstance.pWndMgr->D3D();
-	_SInstance.pD3DMgr = DF::DFM;
+	DF::D3DM = &_SInstance.pWndMgr->D3D();
+	_SInstance.pD3DMgr = DF::D3DM;
 
 	// set Direct3D default viewport size
 	_SInstance.pD3DMgr->SetViewportSize(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
@@ -21,10 +21,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	// create 'main' and 'aux' render surfaces
 	_SInstance.pD3DMgr->CreateRenderSurface("main", 1.0f);
 	_SInstance.pD3DMgr->CreateRenderSurface("aux", 1.0f);
-	_SInstance.pD3DMgr->SurfaceTargets(1)->SetShaders("VS_FSPP", "PS_FSPP_Blur8");
-
-	// init rendering manager
-	_SInstance.RenderM = new RenderQ;
+	_SInstance.pD3DMgr->RenderSurfaces(1)->SetShaders("surface//VS_Surface", "surface//PS_Surface_Blur8");
 
 	// init light manager
 	_SInstance.LightM = &LightMgr::Get();
@@ -33,11 +30,15 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.ModelM = &DFModelMgr::Get();
 	_SInstance.ModelM->pD3DMgr = &_SInstance.pWndMgr->D3D();
 	_SInstance.ModelM->pMatMgr = _SInstance.MatM;
-	_SInstance.ModelM->pRenderMgr = _SInstance.RenderM;
 
-	// create default objects
-	_SInstance.AddCamera();
+	// create default camera, activate and bind it
+	_SInstance.CameraAdd("camMain");
+	_SInstance.CameraActivate("camMain", true);
 	_SInstance.CameraBindVS();
+
+	// init rendering manager
+	_SInstance.RenderM = new RenderQ;
+	_SInstance.ModelM->pRenderMgr = _SInstance.RenderM;
 
 	//create and add default material
 	DFMaterial::DFMATERIAL_DESC DFMatDesc{};
@@ -71,8 +72,8 @@ void DFactory::BeginFrame() noexcept
 	proc.ProcessFunctions();
 
 	//calculate View and ViewProj matrices only once per frame
-	Camera()->SetView();
-	m_XMViewProj = XMMatrixTranspose(XMMatrixMultiply(Camera()->m_XMView, m_XMProj));
+	pD3DMgr->Camera()->SetView();
+	m_XMViewProj = XMMatrixTranspose(XMMatrixMultiply(pD3DMgr->Camera()->m_XMView, m_XMProj));
 
 	//hand off to Direct3D manager
 	pD3DMgr->BeginFrame();
@@ -83,25 +84,27 @@ void DFactory::EndFrame() noexcept
 	pD3DMgr->EndFrame();
 
 	// increase frames rendered count by one
-	AddFrame();
+	FrameCountIncrease();
 }
 
 void DFactory::DrawFrame() noexcept
 {
-	//send active camera matrix to current D3DMgr object
-	pD3DMgr->SetCamera(m_Cameras[vars.activeCamera].pCam.get());
-
-	//update camera buffer for use in vertex shader slot 1
+	// update camera buffer for use in vertex shader slot 1
 	CameraUpdateVS();
 
+	// update directional light view
+	LightM->DLSetViewMatrix();
+
+	// update model matrix and propagate it among meshes through nodes
 	for (auto& it : ModelM->m_Models)
 	{
-		// update model matrix and propagate it among meshes through nodes
 		it.pRootNode->XMUpdate(it.GetModelXMTransform());
 	}
 	
+	// process lights
 	LightM->Draw();
 
+	// render frame
 	RenderM->Render();
 }
 
@@ -120,12 +123,12 @@ const float& DFactory::GetSimulationSpeed() const noexcept
 	return vars.simSpeedFactor;
 }
 
-void DFactory::AddFrame() noexcept
+void DFactory::FrameCountIncrease() noexcept
 {
 	m_frames++;
 }
 
-const uint64_t& DFactory::GetFrame() const noexcept
+const uint64_t& DFactory::GetFrameCount() const noexcept
 {
 	return m_frames;
 }

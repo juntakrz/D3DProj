@@ -1,6 +1,6 @@
 #include "include/HVS_Transform.hlsli"
 
-cbuffer CameraBuffer
+cbuffer CameraBuffer : register(b1)
 {
     float3 camPos;
 };

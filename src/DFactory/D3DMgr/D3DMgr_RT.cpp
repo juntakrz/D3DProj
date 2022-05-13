@@ -56,7 +56,7 @@ uint8_t D3DMgr::CreateRenderBuffer(int16_t width, int16_t height, bool isHDR) no
 	return renderTargets.size() - 1;
 }
 
-int8_t D3DMgr::CreateDepthBuffer(uint8_t rtIndex) noexcept
+int8_t D3DMgr::CreateDepthBuffer(uint8_t rtIndex, bool isShaderResource, DF::DS_Usage usage) noexcept
 {
 	// if render target is out of bounds - return error
 	if (rtIndex > renderTargets.size() - 1)
@@ -70,23 +70,24 @@ int8_t D3DMgr::CreateDepthBuffer(uint8_t rtIndex) noexcept
 	uint16_t width = RenderTargets()->at(rtIndex).width;
 	uint16_t height = RenderTargets()->at(rtIndex).height;
 
-	//create depth stencil texture
+	// create depth stencil texture
 	D3D11_TEXTURE2D_DESC stencilDesc = {};
 	stencilDesc.Usage = D3D11_USAGE_DEFAULT;
-	stencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	stencilDesc.Width = width;
 	stencilDesc.Height = height;
 	stencilDesc.MipLevels = 1u;
 	stencilDesc.ArraySize = 1u;
-	stencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	stencilDesc.SampleDesc.Count = 1u;
 	stencilDesc.SampleDesc.Quality = 0u;
+	stencilDesc.Format = DF::GetDepthFormatTypeless(usage);
+	stencilDesc.BindFlags = (isShaderResource)
+		? D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE : D3D11_BIND_DEPTH_STENCIL;
 
 	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &depthTargets.back().pDSTex));
 
-	//create depth stencil view
+	// create depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {};
-	dsvd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvd.Format = DF::GetDepthFormatTyped(usage);
 	dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsvd.Texture2D.MipSlice = 0u;
 
@@ -94,6 +95,17 @@ int8_t D3DMgr::CreateDepthBuffer(uint8_t rtIndex) noexcept
 
 	depthTargets.back().width = width;
 	depthTargets.back().height = height;
+
+	if (isShaderResource)
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
+		SRVDesc.Format = DF::GetDepthFormatColor(usage);
+		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		SRVDesc.Texture2D.MipLevels = 1;
+		SRVDesc.Texture2D.MostDetailedMip = 0;
+
+		Device()->CreateShaderResourceView(depthTargets.back().pDSTex.Get(), &SRVDesc, &depthTargets.back().pDS_SRV);
+	}
 
 	return depthTargets.size() - 1;
 }
@@ -128,17 +140,26 @@ void D3DMgr::CreateRenderSR(bool HDR) noexcept
 
 void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 {
-	// create render and depth buffers (at slot index 1)
-	CreateDepthBuffer(CreateRenderBuffer(m_VWidth, m_VHeight, isHDR));
+	// create render and depth buffers									(RB1 / DSB1)
+	CreateDepthBuffer(CreateRenderBuffer(m_VWidth, m_VHeight, isHDR), true);
 
-	// slot 2
+	// create aux render buffer for separate pass						(RB2)
 	CreateRenderBuffer(m_VWidth, m_VHeight, isHDR);
 
-	// slot 3 (smaller buffer resolution for post process effects)
+	// create downsampled render and depth buffer for post processing	(RB3 / DSB2)
 	CreateDepthBuffer(CreateRenderBuffer(m_VWidth / 2, m_VHeight / 2, isHDR));
+
+	// create render buffer for storing directional light view depth	(RB4)
+	//CreateRenderBuffer(m_VWidth, m_VHeight, isHDR);
+
+	// create depth buffer for directional light view based on RB1		(DSB3)
+	CreateDepthBuffer((uint8_t)DF::RBuffers::Render, true, DF::DS_Usage::DepthShadow);
+
+	// create compatible buffer for DSB1 for depth visualizer			(DSB4)
+	CreateCompatibleBuffer(1u, true, false);
 }
 
-void D3DMgr::RTBind(uint8_t rtIndex, uint8_t dsIndex, uint8_t num) noexcept
+void D3DMgr::RTBind(const uint8_t& rtIndex, const uint8_t& dsIndex, const uint8_t& num) noexcept
 {
 	(rtIndex > renderTargets.size() - 1) ?
 		MessageBoxA(nullptr, "Render target index is out of bounds.", "RTBind Error", MB_OK | MB_ICONERROR) : 0;
@@ -156,24 +177,122 @@ void D3DMgr::RTBind(uint8_t rtIndex, uint8_t dsIndex, uint8_t num) noexcept
 	m_RTNum = num;
 }
 
-void D3DMgr::RTCopyBuffer(uint8_t indexFrom, uint8_t indexTo) noexcept
+uint8_t D3DMgr::CreateCompatibleBuffer(uint8_t index, bool isDepthBuffer, bool createRenderView) noexcept
 {
-	// if index is out of bounds - copy nothing
-	if (indexFrom < 1 || indexFrom > renderTargets.size() - 1 || indexTo > renderTargets.size() - 1)
+	D3D11_TEXTURE2D_DESC texDesc;
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+
+	switch (isDepthBuffer)
 	{
+	case true:
+	{
+		if (index < 0 || index > depthTargets.size() - 1)
+		{
 #ifdef _DEBUG || _DFDEBUG
-		OutputDebugStringA("RTCopyBuffer Error: Index is out of bounds.\n");
+			OutputDebugStringA("ERROR: Creating compatible depth target failed: index is out of bounds.\n");
 #endif
+			return -1;
+		}
+
+		depthTargets[index].pDSTex->GetDesc(&texDesc);
+		depthTargets[index].pDS_SRV->GetDesc(&srvDesc);
+		(createRenderView) ? depthTargets[index].pDSV->GetDesc(&dsvDesc) : void();
+
+		depthTargets.emplace_back();
+
+		Device()->CreateTexture2D(&texDesc, nullptr, &depthTargets.back().pDSTex);
+		Device()->CreateShaderResourceView(depthTargets.back().pDSTex.Get(), &srvDesc, &depthTargets.back().pDS_SRV);
+		(createRenderView)
+			? Device()->CreateDepthStencilView(depthTargets.back().pDSTex.Get(), &dsvDesc, &depthTargets.back().pDSV) : 0u;
+
+		return depthTargets.size() - 1;
+	}
+	case false:
+	{
+		if (index < 0 || index > renderTargets.size() - 1)
+		{
+#ifdef _DEBUG || _DFDEBUG
+			OutputDebugStringA("ERROR: Creating compatible render target failed: index is out of bounds.\n");
+#endif
+			return -1;
+		}
+
+		renderTargets[index].pTex->GetDesc(&texDesc);
+		renderTargets[index].pSRV->GetDesc(&srvDesc);
+		(createRenderView) ? renderTargets[index].pRTV->GetDesc(&rtvDesc) : void();
+
+		renderTargets.emplace_back();
+
+		Device()->CreateTexture2D(&texDesc, nullptr, &renderTargets.back().pTex);
+		Device()->CreateShaderResourceView(renderTargets.back().pTex.Get(), &srvDesc, &renderTargets.back().pSRV);
+		(createRenderView)
+			? Device()->CreateRenderTargetView(renderTargets.back().pTex.Get(), &rtvDesc, &renderTargets.back().pRTV) : 0u;
+
+		return renderTargets.size() - 1;
+	}
+	}
+}
+
+void D3DMgr::RTBind(const DF::RBuffers& rtIndex, const DF::DSBuffers& dsIndex, const uint8_t& num) noexcept
+{
+	RTBind((uint8_t)rtIndex, (uint8_t)dsIndex, num);
+}
+
+void D3DMgr::RTCopyBuffer(uint8_t indexFrom, uint8_t indexTo, bool isDepthBuffer) noexcept
+{
+	switch (isDepthBuffer)
+	{
+	case true:
+	{
+		// if index is out of bounds - copy nothing
+		if (indexFrom < 1 || indexFrom > depthTargets.size() - 1 || indexTo > depthTargets.size() - 1)
+		{
+#ifdef _DEBUG || _DFDEBUG
+			OutputDebugStringA("RTCopyBuffer Error: Index is out of bounds.\n");
+#endif
+			return;
+		}
+		//unbind render target if bound
+		(m_DSId == indexFrom || m_DSId == indexTo) ? Context()->OMSetRenderTargets(0u, nullptr, nullptr) : void();
+
+		//copy shader resource / texture
+		Context()->CopyResource(depthTargets[indexTo].pDSTex.Get(), depthTargets[indexFrom].pDSTex.Get());
+
+		//rebind render target if it was unbound before
+		(m_DSId == indexFrom || m_DSId == indexTo)
+			? Context()->OMSetRenderTargets(
+				m_RTNum, renderTargets[m_RTId].pRTV.GetAddressOf(), depthTargets[m_DSId].pDSV.Get()
+			) : void();
+
 		return;
 	}
-	//unbind render targets
-	//Context()->OMSetRenderTargets(0u, nullptr, nullptr);
+	case false:
+	{
+		// if index is out of bounds - copy nothing
+		if (indexFrom < 1 || indexFrom > renderTargets.size() - 1 || indexTo > renderTargets.size() - 1)
+		{
+#ifdef _DEBUG || _DFDEBUG
+			OutputDebugStringA("RTCopyBuffer Error: Index is out of bounds.\n");
+#endif
+			return;
+		}
+		//unbind render target if bound
+		(m_RTId == indexFrom || m_RTId == indexTo) ? Context()->OMSetRenderTargets(0u, nullptr, nullptr) : void();
 
-	//copy shader resource / texture
-	Context()->CopyResource(renderTargets[indexTo].pTex.Get(), renderTargets[indexFrom].pTex.Get());
+		//copy shader resource / texture
+		Context()->CopyResource(renderTargets[indexTo].pTex.Get(), renderTargets[indexFrom].pTex.Get());
 
-	//bind render targets
-	//Context()->OMSetRenderTargets(m_RTNum, &RTV.m_pRTViews[m_RTId], RTV.m_pDSViews[m_RTId]);
+		//rebind render target if it was unbound before
+		(m_RTId == indexFrom || m_RTId == indexTo)
+			? Context()->OMSetRenderTargets(
+				m_RTNum, renderTargets[m_RTId].pRTV.GetAddressOf(), depthTargets[m_DSId].pDSV.Get()
+			) : void();
+
+		return;
+	}
+	}
 }
 
 std::vector<D3DMgr::RenderTarget>* D3DMgr::RenderTargets() noexcept
