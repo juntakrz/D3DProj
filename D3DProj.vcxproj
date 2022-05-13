@@ -339,6 +339,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\include\HPS_PBS.hlsli" />
+    <None Include="shaders\include\HVS_Transform.hlsli" />
     <None Include="src\DFactory\D3DMgr\dxerr\DXGetErrorDescription.inl" />
     <None Include="src\DFactory\D3DMgr\dxerr\DXGetErrorString.inl" />
     <None Include="src\DFactory\D3DMgr\dxerr\DXTrace.inl" />
@@ -422,7 +423,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/%(Filename).shd</ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="shaders\PS_PhongAlpha.hlsl">
+    <FxCompile Include="shaders\PS_Atmosphere.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
@@ -447,12 +448,6 @@
     </FxCompile>
     <FxCompile Include="shaders\VS_FSPP.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="shaders\VS_Outline_s1.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\VS_Outline_s2.hlsl">
@@ -483,7 +478,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/%(Filename).shd</ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="shaders\VS_PhongAlpha.hlsl">
+    <FxCompile Include="shaders\VS_Atmosphere.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>

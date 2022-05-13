@@ -28,16 +28,12 @@ namespace DF
 
 	enum FXID
 	{
-		// use bitwise operators for these
-		fxNone =		0,			// 0
-		fxStandard =	1 << 0,		// 1
-		fxOutline =		1 << 1,		// 2
-		fxBlur =		1 << 2,		// 4
-		FX4 =			1 << 3,		// 8
-		FX5 =			1 << 4,		// 16
-		FX6 =			1 << 5,		// 32
-		FX7 =			1 << 6,		// 64
-		FX8 =			1 << 7		// 128
+		// mark bits that will run this mesh through corresponding passes
+		fxNone =		0,						// exclude from rendering
+		fxStandard =	1 << 0,					// pass 0
+		fxBlur =		1 << 1,					// pass 1
+		fxMask =		1 << 2,					// pass 2
+		fxOutline =		(1 << 2) + (1 << 3)		// pass 2 and 3
 	};
 
 	struct Vertex

@@ -31,5 +31,5 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
         }
     }
     
-    return float4(accColor.rgb / (r + 1), 1.0);
+    return accColor / (r + 1);
 }

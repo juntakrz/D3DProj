@@ -6,7 +6,7 @@ namespace Bind
 	IndexBuffer::IndexBuffer(const std::vector<uint32_t>& indices) : m_count((UINT)indices.size())
 	{
 
-		D3D_DXGIDEBUG(*DF::pD3DM);
+		D3D_DXGIDEBUG(*DF::DFM);
 
 		//descriptors
 		D3D11_BUFFER_DESC bd = {};

@@ -18,7 +18,7 @@ namespace Bind
 	void TransformConstBuffer::Bind() noexcept
 	{
 		transforms.world = DirectX::XMMatrixTranspose(parent.GetTransformXM());
-		transforms.view = DirectX::XMMatrixTranspose(DF::pD3DM->GetCamera()->m_XMView);
+		transforms.view = DirectX::XMMatrixTranspose(DF::DFM->GetCamera()->m_XMView);
 		transforms.viewProj = DFactory::Get().m_XMViewProj;
 
 		m_pConstVertexBuffer->Update(transforms);

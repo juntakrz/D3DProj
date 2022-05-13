@@ -2,8 +2,8 @@
 #include "RenderSurface.h"
 #include "D3DMgr_Def.h"
 
-RenderSurface::RenderSurface(float scale) noexcept
-	: scale(scale)
+RenderSurface::RenderSurface(float scale, std::string VS, std::string PS) noexcept
+	: scale(scale), m_VS(VS), m_PS(PS)
 {
 	// create mesh
 	vertices.push_back({ -scale,  scale, 0.0f, 0.0f  });	// top left
@@ -25,15 +25,23 @@ RenderSurface::RenderSurface(float scale) noexcept
 	
 	DF::Device()->CreateBuffer(&vBufDesc, &sd, &m_pVertexBuffer);
 
+	SetShaders(m_VS, m_PS);
+}
+
+void RenderSurface::SetShaders(const std::string& VS, const std::string& PS) noexcept
+{
+	m_VS = VS;
+	m_PS = PS;
+
 	// create vertex shader
-	std::wstring filePath = L"shaders//" + std::wstring(m_VSFilePath.begin(), m_VSFilePath.end()) + L".shd";
+	std::wstring filePath = L"shaders//" + std::wstring(VS.begin(), VS.end()) + L".shd";
 	D3DReadFileToBlob(filePath.c_str(), &m_pVSBlob);
 	DF::Device()->CreateVertexShader(
 		m_pVSBlob->GetBufferPointer(), m_pVSBlob->GetBufferSize(), nullptr, &m_pVS
 	);
-	
+
 	// create pixel shader
-	filePath = L"shaders//" + std::wstring(m_PSFilePath.begin(), m_PSFilePath.end()) + L".shd";
+	filePath = L"shaders//" + std::wstring(PS.begin(), PS.end()) + L".shd";
 	D3DReadFileToBlob(filePath.c_str(), &m_pPSBlob);
 	DF::Device()->CreatePixelShader(
 		m_pPSBlob->GetBufferPointer(), m_pPSBlob->GetBufferSize(), nullptr, &m_pPS

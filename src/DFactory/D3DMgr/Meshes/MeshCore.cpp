@@ -18,7 +18,7 @@ void MeshCore::BindCore() const noexcept
 	m_Binds[Bind::idTopology]->Bind();
 }
 
-void MeshCore::BindStandard() const noexcept
+void MeshCore::BindLocal() const noexcept
 {
 	for (uint8_t i = 3; i < Bind::MAXBINDS; i++)
 	{
@@ -40,7 +40,7 @@ const Bind::IndexBuffer* MeshCore::GetIndexBuffer() const noexcept
 
 void MeshCore::DrawIndexed() noexcept
 {
-	DF::pD3DM->DrawIndexed(m_pIndexBuffer->GetCount());
+	DF::DFM->DrawIndexed(m_pIndexBuffer->GetCount());
 }
 /*	//////////	*/
 
@@ -102,7 +102,7 @@ void MeshCore::SetMaterialRT(std::string name) noexcept
 
 	//get buffer copy resource
 	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(
-		std::make_shared<ID3D11ShaderResourceView*>(DF::pD3DM->m_pBufCopy_SR.Get()), 0
+		std::make_shared<ID3D11ShaderResourceView*>(DF::DFM->m_pBufCopy_SR.Get()), 0
 		);
 
 	//clear unused texture binds
@@ -122,9 +122,6 @@ void MeshCore::SetMaterialRT(std::string name) noexcept
 void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
 {
 	// change shaders for the current material
-	//(inVS == "") ? inVS = MatMgr.Mat(m_MatName).shaderVertex : MatMgr.Mat(m_MatName).shaderVertex = inVS;
-	//(inPS == "") ? inPS = MatMgr.Mat(m_MatName).shaderPixel : MatMgr.Mat(m_MatName).shaderPixel = inPS;
-
 	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + inVS + ".shd");
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);

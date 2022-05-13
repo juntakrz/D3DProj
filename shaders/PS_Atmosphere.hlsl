@@ -48,8 +48,8 @@ float4 main(PSInput iPS) : SV_TARGET
         float3 vecRefl = normalize(2 * L_DirIntensity * -iPS.W_Normal - L_DirPos);
         specular = pow(saturate(dot(vecRefl, -iPS.viewDir)), M_SpecPower) * M_SpecIntensity;
     }
+    
     //final color
-    //return float4((globalDiffuse.rgb + M_Ambient.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a);
-    return float4((globalDiffuse.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a);
+    return float4((globalDiffuse.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a * 1.25f);
 
 }

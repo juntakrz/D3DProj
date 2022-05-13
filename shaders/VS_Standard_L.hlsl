@@ -1,9 +1,4 @@
-cbuffer TransformBuffer
-{
-    matrix world;
-    matrix view;
-    matrix viewProj;
-};
+#include "include/HVS_Transform.hlsli"
 
 cbuffer CameraBuffer
 {

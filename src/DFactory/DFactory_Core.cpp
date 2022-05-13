@@ -12,14 +12,16 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 		pDescription->WndTitle.c_str());
 
 	// retrieve D3DMgr
-	DF::pD3DM = &_SInstance.pWndMgr->D3D();
-	_SInstance.pD3DMgr = DF::pD3DM;
+	DF::DFM = &_SInstance.pWndMgr->D3D();
+	_SInstance.pD3DMgr = DF::DFM;
 
 	// set Direct3D default viewport size
 	_SInstance.pD3DMgr->SetViewportSize(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
 
-	// create 'main' render surface
+	// create 'main' and 'aux' render surfaces
 	_SInstance.pD3DMgr->CreateRenderSurface("main", 1.0f);
+	_SInstance.pD3DMgr->CreateRenderSurface("aux", 1.0f);
+	_SInstance.pD3DMgr->SurfaceTargets(1)->SetShaders("VS_FSPP", "PS_FSPP_Blur8");
 
 	// init rendering manager
 	_SInstance.RenderM = new RenderQ;

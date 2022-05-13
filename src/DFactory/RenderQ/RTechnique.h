@@ -1,32 +1,67 @@
 #include "../D3DMgr/IBind/Bind_Includes.h"
 
-class RTechniqueStep
-{
-	friend class RenderQ;
-	friend class RTechnique;
-public:
-	RTechniqueStep(std::vector<std::unique_ptr<Bind::IBind>> fxBinds, uint8_t pathId, uint8_t pathPriority = 0) noexcept
-		: m_FXBinds(std::move(fxBinds)), m_PassId(pathId), m_PassPriority(pathPriority) {};
-
-	void StepBind() noexcept;		// bind bindables used in this step
-
-private:
-	uint8_t m_PassId;
-	uint8_t m_PassPriority;
-	std::vector<std::unique_ptr<Bind::IBind>> m_FXBinds;
-};
-
 class RTechnique
 {
-public:
-	RTechnique(uint32_t id) noexcept;
-	RTechnique(const RTechnique&) = default;
-	~RTechnique() = default;
+	friend class RTechniqueDB;
 
-	const uint32_t& GetId() const noexcept;
-	std::vector<RTechniqueStep>* Steps() noexcept;
+public:
+	RTechnique() = default;
+
+	const uint32_t& Id() const noexcept
+	{
+		return m_Id;
+	};
+	const bool& RequiresMeshBinds() const noexcept
+	{
+		return m_UseMeshBinds;
+	}
+	std::vector<std::unique_ptr<Bind::IBind>>* Binds() noexcept
+	{
+		return &m_Binds;
+	}
+
+	void BindTechnique() noexcept
+	{
+		for (const auto& it : m_Binds)
+		{
+			it ? it->Bind() : void();
+		}
+	};
 
 private:
-	uint32_t m_id;	// bitwise id
-	std::vector<RTechniqueStep> m_Steps;
+	uint32_t m_Id = 0;			// bitwise id
+	bool m_UseMeshBinds = false;
+	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;
+};
+
+class RTechniqueDB
+{
+private:
+	friend class RPass;
+	std::vector<RTechnique> m_Techniques;
+	bool m_InitializedDefaults = false;
+
+public:
+	RTechniqueDB() noexcept
+	{
+		/*
+		// !!! there are no 32 passes so do I need this?
+		// init technique vector
+		for (uint8_t i = 0; i < 32; i++)
+		{
+			m_Techniques.emplace_back();
+		}*/
+	};
+	RTechniqueDB(const RTechniqueDB&) = default;
+	~RTechniqueDB() = default;
+
+	static RTechniqueDB& Get() noexcept
+	{
+		static RTechniqueDB _SInstance;
+		return _SInstance;
+	}
+
+	// generate technique and store it into the vector
+	void InitDefaultTechniques() noexcept;
+	size_t Size() const noexcept;
 };

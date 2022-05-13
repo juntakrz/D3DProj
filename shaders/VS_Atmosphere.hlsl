@@ -1,9 +1,4 @@
-cbuffer TransformBuffer
-{
-    matrix world;
-    matrix view;
-    matrix viewProj;
-};
+#include "include/HVS_Transform.hlsli"
 
 cbuffer CameraBuffer
 {
@@ -21,7 +16,6 @@ struct VSOut
 {
     float3 worldPos : POSITION0;
     float3 W_Normal : NORMAL0;
-    //float2 tex : TEXCOORD0;
     float3 viewDir : VECTOR0;
     float4 pos : SV_POSITION;
 };
@@ -33,7 +27,6 @@ VSOut main(VSIn iVS)
     oVS.pos = mul(float4(iVS.pos, 1.0f), mul(world, viewProj));
     oVS.worldPos = (float3) mul(float4(iVS.pos, 1.0f), world);
     oVS.W_Normal = normalize(mul(iVS.normal, (float3x3) world));
-    //oVS.tex = iVS.tex;
 
     oVS.viewDir = normalize(camPos.xyz - oVS.worldPos);
 

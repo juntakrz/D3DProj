@@ -139,6 +139,8 @@ D3DMgr::D3DMgr(HWND hWnd)
 	vp.TopLeftY = 0.f;
 	m_pContext->RSSetViewports(1u, &vp);	//amount of viewports, pointer to array of viewports
 
+	renderTargets.back().vp = std::move(vp);
+
 	// Initializations
 
 	// init 'clear' colors
@@ -170,7 +172,7 @@ void D3DMgr::InitClearColors() noexcept
 		m_ClearColor[i][0] = 0.0f;
 		m_ClearColor[i][1] = 0.0f;
 		m_ClearColor[i][2] = 0.0f;
-		m_ClearColor[i][3] = 1.0f;
+		(i == 0) ? m_ClearColor[i][3] = 1.0f : m_ClearColor[i][3] = 0.0f;
 	}
 }
 
@@ -195,11 +197,14 @@ void D3DMgr::SetViewportSize(const uint16_t width, const uint16_t height) noexce
 	m_VHeight = (float)height;
 }
 
-void D3DMgr::BeginFrame(bool clear) noexcept
+void D3DMgr::BeginFrame() noexcept
 {
-	// bind secondary render target and depth buffer to render to
-	RTBind(1u, 1u);
+	/* NEW FRAME */
 	
+	// bind render target 1 and depth buffer 1 - primary rendering targets, which will be used on a main surface
+	RTBind(RB_Render, DSB_Render, 1u);
+	
+	// start new imGui frame
 	if (m_imguiEnabled)
 	{
 		ImGui_ImplDX11_NewFrame();
@@ -207,27 +212,45 @@ void D3DMgr::BeginFrame(bool clear) noexcept
 		ImGui::NewFrame();
 	}
 
-	//set to false if clearing buffers manually
-	if (clear)
-	{
-		for (uint8_t i = m_RTId, j = m_DSId; i < m_RTId + m_RTNum; i++, j++)
-		{
-			m_pContext->ClearRenderTargetView(renderTargets[i].pRTV.Get(), m_ClearColor[i]);
-			m_pContext->ClearDepthStencilView(depthTargets[j].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
-		}
-	}
+	// CLEAR FRAME BUFFERS
+	// 
+	// clear back buffer and its depth buffer
+	Clear();
+
+	// clear 'render' buffer and its depth buffer
+	Clear(RB_Render, true, DSB_Render);
+
+	// clear 'blur' buffer
+	Clear(RB_Blur, false);
+
+	// clear downsample buffer
+	Clear(RB_Resample, true, DSB_Resample);
 }
 
 void D3DMgr::EndFrame()
 {
+	// bind 'downsample' buffer and depth buffer with equal resolution
+	RTBind(RB_Resample, DSB_Resample);
+
+	// bind 'blur' buffer to surface target 1, which uses blur shader, then draw it to buffers 3/2
+	SurfaceTargets(1)->Bind(renderTargets[2u].pSRV.Get());
+	SurfaceTargets(1)->Draw();
+	SurfaceTargets(1)->Unbind();
+
+	// bind 'render' buffer and corresponding depth buffer
+	RTBind(RB_Render, DSB_Render);
+
+	SurfaceTargets(1)->Bind(renderTargets[3u].pSRV.Get());
+	SurfaceTargets(1)->Draw();
+	SurfaceTargets(1)->Unbind();
+
 	// bind main back buffer and its depth buffer
-	RTBind(0u, 0u);
-	Clear();
+	RTBind(RB_Back, DSB_Back);
 
 	// copy SRV from buffer 1 to buffer 0 (back buffer)
 	//RTCopyBuffer(1u, 0u);
 
-	// draw the 2D surface using render buffer 1
+	// draw the primary surface using data from render buffer 1
 	SurfaceTargets(0)->Bind(renderTargets[1u].pSRV.Get());
 	SurfaceTargets(0)->Draw();
 	SurfaceTargets(0)->Unbind();

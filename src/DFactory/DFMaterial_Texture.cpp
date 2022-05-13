@@ -46,9 +46,9 @@ uint32_t DFMaterial::TextureAdd(std::string name, std::string filePath) noexcept
 
 	dft.pSRV = std::make_shared<ID3D11ShaderResourceView*>(nullptr);
 
-	//HRESULT hr = DirectX::CreateDDSTextureFromFile(DF::pD3DM->Device(), wFilePath.c_str(),nullptr, dft.pSRV.get());
+	//HRESULT hr = DirectX::CreateDDSTextureFromFile(DF::DFM->Device(), wFilePath.c_str(),nullptr, dft.pSRV.get());
 	HRESULT hr = DirectX::CreateDDSTextureFromFileEx(
-		DF::pD3DM->Device(), nullptr, wFilePath.c_str(), 0uLL,
+		DF::DFM->Device(), nullptr, wFilePath.c_str(), 0uLL,
 		D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE,
 		0u, 0u, false, nullptr, dft.pSRV.get()
 		);
@@ -113,14 +113,14 @@ uint32_t DFMaterial::TextureAddRT(std::string name, UINT width, UINT height) noe
 	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = 0;
 
-	DF::pD3DM->Device()->CreateTexture2D(&texDesc, nullptr, &m_pTex2D);
+	DF::DFM->Device()->CreateTexture2D(&texDesc, nullptr, &m_pTex2D);
 
 	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc{};
 	RTVDesc.Format = texDesc.Format;
 	RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	RTVDesc.Texture2D.MipSlice = 0;
 
-	DF::pD3DM->Device()->CreateRenderTargetView(m_pTex2D.Get(), &RTVDesc, &newRTTex.pRTV);
+	DF::DFM->Device()->CreateRenderTargetView(m_pTex2D.Get(), &RTVDesc, &newRTTex.pRTV);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
 	SRVDesc.Format = texDesc.Format;
@@ -128,7 +128,7 @@ uint32_t DFMaterial::TextureAddRT(std::string name, UINT width, UINT height) noe
 	SRVDesc.Texture2D.MipLevels = 1;
 	SRVDesc.Texture2D.MostDetailedMip = 0;
 
-	DF::pD3DM->Device()->CreateShaderResourceView(m_pTex2D.Get(), &SRVDesc, &*newRTTex.pSRV);
+	DF::DFM->Device()->CreateShaderResourceView(m_pTex2D.Get(), &SRVDesc, &*newRTTex.pSRV);
 
 	m_DFTextures.emplace_back(std::move(newRTTex));
 

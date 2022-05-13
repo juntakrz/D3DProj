@@ -5,7 +5,7 @@ namespace Bind
 
 	InputLayout::InputLayout(const std::vector<D3D11_INPUT_ELEMENT_DESC>& d3dIEDesc, ID3DBlob* pVSBytecode)
 	{
-		D3D_DXGIDEBUG(*DF::pD3DM);
+		D3D_DXGIDEBUG(*DF::DFM);
 
 		//creating D3D input layout
 		D3D_THROW_INFO(GetDevice()->CreateInputLayout(

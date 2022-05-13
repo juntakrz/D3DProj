@@ -26,6 +26,7 @@ class DFMaterial
 		x = material intensity
 		y = specular intensity	/ metalness (PBS)
 		z = specular power		/ roughness (PBS)
+		w = bumpmapping intensity
 		*/
 		XMFLOAT4 data;
 
@@ -73,7 +74,7 @@ public:
 			float matIntensity = 1.0f;
 			float spec_metal = 1.0f;
 			float pow_roughness = 1.0f;
-			float extra = 0.0f;
+			float bumpIntensity = 1.0f;
 		} material;
 
 		uint32_t effects = DF::fxStandard;
