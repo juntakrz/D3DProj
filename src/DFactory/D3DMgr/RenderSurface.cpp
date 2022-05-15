@@ -1,6 +1,5 @@
 #include "../../pch.h"
 #include "RenderSurface.h"
-#include "D3DMgr_Def.h"
 
 RenderSurface::RenderSurface(float scale, std::string VS, std::string PS) noexcept
 	: scale(scale), m_VS(VS), m_PS(PS)
@@ -57,6 +56,34 @@ void RenderSurface::SetShaders(const std::string& VS, const std::string& PS) noe
 	DF::Device()->CreateInputLayout(
 		IEDesc.data(), IEDesc.size(), m_pVSBlob->GetBufferPointer(), m_pVSBlob->GetBufferSize(), &m_pLayout
 	);
+
+	// create sampler state
+	D3D11_SAMPLER_DESC smplDesc{};
+	smplDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	smplDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	smplDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+
+	DF::Device()->CreateSamplerState(&smplDesc, &m_pSampler);
+}
+
+const bool& RenderSurface::SetAsDepthView() noexcept
+{
+	if (!m_isDepthView)
+	{
+		SetShaders(m_VSRender, m_PSDepth);
+		m_isDepthView = true;
+	}
+	return m_isDepthView;
+}
+
+const bool& RenderSurface::SetAsRenderView() noexcept
+{
+	if (m_isDepthView)
+	{
+		SetShaders(m_VSRender, m_PSRender);
+		m_isDepthView = false;
+	}
+	return m_isDepthView;
 }
 
 void RenderSurface::Bind(ID3D11ShaderResourceView* pSRV) noexcept
@@ -68,6 +95,7 @@ void RenderSurface::Bind(ID3D11ShaderResourceView* pSRV) noexcept
 	DF::Context()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	DF::Context()->IASetVertexBuffers(0u, 1u, m_pVertexBuffer.GetAddressOf(), &m_VBufferStride, &offset);
 	DF::Context()->IASetInputLayout(m_pLayout.Get());
+	DF::Context()->PSSetSamplers(0u, 1u, m_pSampler.GetAddressOf());
 	DF::Context()->VSSetShader(m_pVS.Get(), nullptr, 0u);
 	DF::Context()->PSSetShader(m_pPS.Get(), nullptr, 0u);
 
@@ -82,6 +110,5 @@ void RenderSurface::Unbind() noexcept
 
 void RenderSurface::Draw() noexcept
 {
-	//DF::Context()->DrawIndexed(6u, 0u, 0u);
 	DF::Context()->Draw(4u, 0u);
 }

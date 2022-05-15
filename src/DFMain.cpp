@@ -159,7 +159,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 0.08f;
 	DFMatDesc.material.pow_roughness = 0.8f;
 	DFMatDesc.material.F0 = { 0.25f, 0.23f, 0.00f };
-	DFMatDesc.material.matIntensity = 2.0f;
+	DFMatDesc.material.matIntensity = 2.2f;
+	DFMatDesc.material.bumpIntensity = 1.5f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -239,6 +240,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
+	DFMatDesc.effects = DF::fxBlur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -282,7 +284,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Create(DF::idSphere, "MdlMars", 64);
 	DF.ModelM->SetMaterial("Mat_MarsPBS");
 	DF.ModelM->SetPos(600.0f, -1600.0f, 4000.0f);
-	DF.ModelM->SetScaling(2800.0f, 2800.0f, 2800.0f);
+	DF.ModelM->SetScaling(2600.0f, 2600.0f, 2600.0f);
 	DF.ModelM->SetRotation(-0.4f, 1.4f, -0.4f);
 	//DF.ModelM->SetRotation(-0.4f, 0.0f, -0.4f);
 	//DF.Mesh()->SetRotationY(-0.00005f);
@@ -291,7 +293,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Create(DF::idSphere, "MdlMarsAtmo", 64);
 	DF.ModelM->SetPos(600.0f, -1600.0f, 4000.0f);
 	//DF.ModelM->SetEffect(DF::fxOutline, true, 0); // not implemented yet
-	DF.ModelM->SetScaling(2860.0f, 2860.0f, 2860.0f);
+	DF.ModelM->SetScaling(2655.0f, 2655.0f, 2655.0f);
 	DF.ModelM->SetMaterial("Mat_Atmo");
 	
 	Animate();
@@ -386,7 +388,16 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Delete();
 	DF.MatM->MatDelete(1);
 
-	DF.Camera()->SetPos(-0.7f, 0.0f, 0.8f);
+	//DF.Camera()->SetPos(-0.7f, 0.0f, 0.8f);		// default position
+	DF.Camera()->SetPos(-1.4f, 0.3f, 1.0f);			// test position
+	DF.Camera()->SetRotation(-7, 25);
+
+	// camera that will be used for shadows from directional light
+	DF.CameraAdd("camLight");
+	DF.CameraSelect("camLight");
+	DF.Camera()->SetPos(DF.LightM->DL().pos);
+
+	//DF.CameraActivate("camLight1");
 
 	DF.UpdateRenderer();
 }

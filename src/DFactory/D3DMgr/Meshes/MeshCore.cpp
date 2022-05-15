@@ -40,7 +40,7 @@ const Bind::IndexBuffer* MeshCore::GetIndexBuffer() const noexcept
 
 void MeshCore::DrawIndexed() noexcept
 {
-	DF::DFM->DrawIndexed(m_pIndexBuffer->GetCount());
+	DF::D3DM->DrawIndexed(m_pIndexBuffer->GetCount());
 }
 /*	//////////	*/
 
@@ -102,7 +102,7 @@ void MeshCore::SetMaterialRT(std::string name) noexcept
 
 	//get buffer copy resource
 	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(
-		std::make_shared<ID3D11ShaderResourceView*>(DF::DFM->m_pBufCopy_SR.Get()), 0
+		std::make_shared<ID3D11ShaderResourceView*>(DF::D3DM->m_pBufCopy_SR.Get()), 0
 		);
 
 	//clear unused texture binds

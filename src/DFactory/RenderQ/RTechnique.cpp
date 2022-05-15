@@ -1,4 +1,5 @@
-#include "RTechnique.h"
+//#include "RTechnique.h"
+#include "../DFactory.h"
 
 // RTECHNIQUEDB
 
@@ -34,6 +35,16 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.back().m_Id = 1 << currentPass;
 		m_Techniques.back().m_UseMeshBinds = true;
 
+		// set player camera for this and next passes until changed
+		m_Techniques.back().m_pCamera = DF::Engine->Camera("camMain");
+
+		// set render buffer and depth buffer for rendering to
+		m_Techniques.back().m_RB = 1u;			// render buffer
+		m_Techniques.back().m_DSB = 1u;			// render depth
+
+		// depth stencil state writes to off
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Stencil::Off;
+
 		currentPass++;
 	}
 	// PASS 1
@@ -42,6 +53,13 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.emplace_back(RTechnique());
 		m_Techniques.back().m_Id = 1 << currentPass;
 		m_Techniques.back().m_UseMeshBinds = true;
+
+		// use same depth buffer from previous pass, but render to 'fxBlur' render buffer
+		m_Techniques.back().m_RB = 2u;			// fxBlur buffer
+		m_Techniques.back().m_DSB = 1u;			// render depth
+
+		// no change for depth state
+		m_Techniques.back().m_depthState = -1;
 
 		currentPass++;
 	}
@@ -62,6 +80,12 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.back().m_Id = 1 << currentPass;
 		m_Techniques.back().m_UseMeshBinds = false;
 		m_Techniques.back().m_Binds = std::move(pBinds);
+
+		//m_Techniques.back().m_RB = 1u;			// render buffer
+		//m_Techniques.back().m_DSB = 1u;			// render depth
+
+		// write to stencil buffer with this pass
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Stencil::Write;
 
 		currentPass++;
 	}
@@ -84,6 +108,9 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.back().m_Id = 1 << currentPass;
 		m_Techniques.back().m_UseMeshBinds = false;
 		m_Techniques.back().m_Binds = std::move(pBinds);
+
+		// mask this pass with what's in stencil buffer currently
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Stencil::Mask;
 
 		currentPass++;
 	}

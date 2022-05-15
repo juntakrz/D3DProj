@@ -197,12 +197,32 @@ void D3DMgr::SetViewportSize(const uint16_t width, const uint16_t height) noexce
 	m_VHeight = (float)height;
 }
 
+const float& D3DMgr::GetAspectRatio() const noexcept
+{
+	return m_AspectRatio;
+}
+
+void D3DMgr::SetShowDepth(bool show) noexcept
+{
+	m_ShowDepth = show;
+}
+
+void D3DMgr::SetShowDepth() noexcept
+{
+	(m_ShowDepth) ? SetShowDepth(false) : SetShowDepth(true);
+}
+
+const bool& D3DMgr::GetShowDepth() const noexcept
+{
+	return m_ShowDepth;
+}
+
 void D3DMgr::BeginFrame() noexcept
 {
 	/* NEW FRAME */
 	
 	// bind render target 1 and depth buffer 1 - primary rendering targets, which will be used on a main surface
-	RTBind(RB_Render, DSB_Render, 1u);
+	RTBind(DF::RBuffers::Render, DF::DSBuffers::Render, 1u);
 	
 	// start new imGui frame
 	if (m_imguiEnabled)
@@ -218,43 +238,17 @@ void D3DMgr::BeginFrame() noexcept
 	Clear();
 
 	// clear 'render' buffer and its depth buffer
-	Clear(RB_Render, true, DSB_Render);
+	Clear(DF::RBuffers::Render, DF::DSBuffers::Render);
 
-	// clear 'blur' buffer
-	Clear(RB_Blur, false);
+	// clear 'blur' buffer only
+	Clear(DF::RBuffers::Blur);
 
-	// clear downsample buffer
-	Clear(RB_Resample, true, DSB_Resample);
+	// clear 'downsample' buffers
+	Clear(DF::RBuffers::Resample, DF::DSBuffers::Resample);
 }
 
 void D3DMgr::EndFrame()
 {
-	// bind 'downsample' buffer and depth buffer with equal resolution
-	RTBind(RB_Resample, DSB_Resample);
-
-	// bind 'blur' buffer to surface target 1, which uses blur shader, then draw it to buffers 3/2
-	SurfaceTargets(1)->Bind(renderTargets[2u].pSRV.Get());
-	SurfaceTargets(1)->Draw();
-	SurfaceTargets(1)->Unbind();
-
-	// bind 'render' buffer and corresponding depth buffer
-	RTBind(RB_Render, DSB_Render);
-
-	SurfaceTargets(1)->Bind(renderTargets[3u].pSRV.Get());
-	SurfaceTargets(1)->Draw();
-	SurfaceTargets(1)->Unbind();
-
-	// bind main back buffer and its depth buffer
-	RTBind(RB_Back, DSB_Back);
-
-	// copy SRV from buffer 1 to buffer 0 (back buffer)
-	//RTCopyBuffer(1u, 0u);
-
-	// draw the primary surface using data from render buffer 1
-	SurfaceTargets(0)->Bind(renderTargets[1u].pSRV.Get());
-	SurfaceTargets(0)->Draw();
-	SurfaceTargets(0)->Unbind();
-	
 	if (IsImGuiEnabled())
 	{
 		ImGui::Render();
@@ -287,6 +281,16 @@ void D3DMgr::Clear(uint8_t rtIndex, bool clearDepthBuffer, int8_t dsIndex) noexc
 		(dsIndex < 0) ? dsIndex = rtIndex : 0;
 		m_pContext->ClearDepthStencilView(depthTargets[dsIndex].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	}
+}
+
+void D3DMgr::Clear(const DF::RBuffers& rtIndex)
+{
+	Clear((uint8_t)rtIndex, false);
+}
+
+void D3DMgr::Clear(const DF::RBuffers& rtIndex, const DF::DSBuffers& dsIndex) noexcept
+{
+	Clear((uint8_t)rtIndex, true, (uint8_t)dsIndex);
 }
 
 void D3DMgr::Clear(const float red, const float green, const float blue, uint8_t rtIndex, bool clearDepthBuffer, int8_t dsIndex) noexcept
@@ -354,7 +358,7 @@ void D3DMgr::SetCamera(CCamera* pCamera) noexcept
 	m_pCamera = pCamera;
 }
 
-CCamera* D3DMgr::GetCamera() const noexcept
+CCamera* D3DMgr::Camera() const noexcept
 {
 	return m_pCamera;
 }

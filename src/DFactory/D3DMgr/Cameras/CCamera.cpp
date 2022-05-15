@@ -9,13 +9,35 @@ void CCamera::SetView() noexcept
 {
 	m_vecPos = XMLoadFloat3(&m_pos);
 
-	// add X/Y rotated Z direction and position vectors to get adjusted view direction vector
-	m_vecFocus = m_vecPos + XMVector3Transform(
-		m_vecFwd,
-		XMMatrixRotationRollPitchYaw(-m_rot.x, -m_rot.y, 0.0f)
-	);
+	switch (m_lookAt)
+	{
+	case true:
+	{
+		// add X/Y rotated Z direction and position vectors to get adjusted view direction vector
+		m_vecFocus = m_vecPos + XMVector3Transform(
+			m_vecFwd,
+			XMMatrixRotationRollPitchYaw(-m_rot.x, -m_rot.y, 0.0f)
+		);
 
-	m_XMView = XMMatrixLookAtLH(m_vecPos, m_vecFocus, m_vecUp);
+		m_XMView = XMMatrixLookAtLH(m_vecPos, m_vecFocus, m_vecUp);
+		return;
+	}
+	case false:
+	{
+		m_vecFocus = XMVector3Transform(
+			m_vecFwd,
+			XMMatrixRotationRollPitchYaw(-m_rot.x, -m_rot.y, 0.0f)
+		);
+
+		m_XMView = XMMatrixLookToLH(m_vecPos, m_vecFocus, m_vecUp);
+		return;
+	}
+	}
+}
+
+void CCamera::LockTo(const bool& lookAt) noexcept
+{
+	m_lookAt = lookAt;
 }
 
 void CCamera::SetPos(float posX, float posY, float posZ) noexcept
@@ -28,6 +50,21 @@ void CCamera::SetPos(float posX, float posY, float posZ) noexcept
 void CCamera::SetPos(XMFLOAT3 pos) noexcept
 {
 	m_pos = pos;
+}
+
+void CCamera::SetRotation(int pitchDeg, int yawDeg) noexcept
+{
+	// limit pitch angle
+	(pitchDeg < -90) ? pitchDeg = -90 : (pitchDeg > 90) ? pitchDeg = 90 : pitchDeg;
+
+	m_rot.x = GMath::WrapAngle(XMConvertToRadians((float)pitchDeg));
+	m_rot.y = -GMath::WrapAngle(XMConvertToRadians((float)yawDeg));
+}
+
+void CCamera::SetRotation(float pitchRad, float yawRad) noexcept
+{
+	m_rot.x = GMath::WrapAngle(pitchRad);
+	m_rot.y = -GMath::WrapAngle(yawRad);
 }
 
 const XMFLOAT3& CCamera::GetPos() const noexcept

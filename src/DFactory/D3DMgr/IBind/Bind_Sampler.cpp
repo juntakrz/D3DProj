@@ -2,15 +2,18 @@
 
 namespace Bind
 {
-	Sampler::Sampler()
+	Sampler::Sampler(Mode mode)
 	{
-		D3D_DXGIDEBUG(*DF::DFM);
+		D3D_DXGIDEBUG(*DF::D3DM);
+
+		// enum type conversion
+		D3D11_TEXTURE_ADDRESS_MODE texAddressMode = (D3D11_TEXTURE_ADDRESS_MODE)mode;
 
 		D3D11_SAMPLER_DESC samplerDesc = {};
 		samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressU = texAddressMode;
+		samplerDesc.AddressV = texAddressMode;
+		samplerDesc.AddressW = texAddressMode;
 		samplerDesc.MinLOD = 0.0f;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 		samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;

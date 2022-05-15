@@ -52,9 +52,6 @@ float4 main(PSInput iPS) : SV_TARGET
     float1 roughness = texRoughness.Sample(smplr, iPS.tex).r * M_Roughness;
     float1 ao = texAO.Sample(smplr, iPS.tex).r;
     
-    // bump intensity - lower is higher
-    float1 bumpInt = 0.65f;
-    
     float3 L, radiance, color;
     
     float3 Lo = { 0.0f, 0.0f, 0.0f };

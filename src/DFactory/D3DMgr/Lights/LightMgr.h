@@ -10,21 +10,30 @@ private:
 	static const uint16_t m_maxPLights = 4;
 	uint16_t m_selPLight = 0;
 
+	// dir light view / proj matrix variables
+	DirectX::XMVECTOR m_vecUp = { 0.0f, 1.0f, 0.0f };
+	float m_FOV = 1.0f;
+
+	// point light unit
 	struct PLight
 	{
 		std::string name;
-		
 		std::unique_ptr<MeshPointLight> pMesh;
-
 		float intensity = 1.0f;
 		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 
+	// need to make all these variables externally set
 	struct DirLight_ConstPSBuffer {
 		DirectX::XMFLOAT3 pos = { -2.4f, 1.7f, 0.0f };
 		float intensity = 1.0f;
 		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	} dlData;
+
+	struct DirLight_ConstVSBuffer {
+		DirectX::XMMATRIX DLView;
+		DirectX::XMMATRIX DLProj;
+	} dlViewProj;
 
 	struct PointLight_ConstPSBuffer {
 		DirectX::XMFLOAT3A pos[m_maxPLights];
@@ -36,12 +45,14 @@ private:
 	std::vector<PLight> m_PLights;
 
 	mutable Bind::ConstPixelBuffer<DirLight_ConstPSBuffer> dirBuffer;
+	mutable Bind::ConstVertexBuffer<DirLight_ConstVSBuffer> dirVSBuffer;
 	mutable Bind::ConstPixelBuffer<PointLight_ConstPSBuffer> pointBuffer;
 
 public:
-	LightMgr() 
-		: dirBuffer(1u), pointBuffer(2u) {
+	LightMgr() // initialize buffers with their GPU registers
+		: dirBuffer(1u), dirVSBuffer(2u), pointBuffer(2u) {
 		m_PLights.reserve(16);
+		DLSetProjMatrix();
 	};
 	~LightMgr() = default;
 	LightMgr(const LightMgr&) = delete;
@@ -52,8 +63,9 @@ public:
 	}
 
 	// DIRECTIONAL LIGHT
-
 	DirLight_ConstPSBuffer& DL() noexcept;
+	void DLSetViewMatrix() noexcept;
+	void DLSetProjMatrix(float nearZ = 0.1f, float farZ = 5.0f) noexcept;
 
 	// POINT LIGHT
 	uint16_t GetMaxPLights() const noexcept;

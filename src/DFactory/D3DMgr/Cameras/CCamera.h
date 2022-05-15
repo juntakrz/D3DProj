@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../pch.h"
+#include "../../Common/DF_Math.h"
 
 using namespace DirectX;
 
@@ -11,15 +12,19 @@ private:
 	float m_deltaMove = 1.0f;
 	float m_deltaRotation = 0.03f;
 
-	//set vectors
+	// set vectors
 
 	XMFLOAT3 m_pos = { 0.0f, 0.0f, 0.0f };
 	XMFLOAT3 m_rot = { 0.0f, 0.0f, 0.0f };
 	XMVECTOR m_vecUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMVECTOR m_vecFwd = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
-	//processed vectors
+	// processed vectors
 	XMVECTOR m_vecPos, m_vecFocus;
+
+	// view mode - lookAt object or lookTo direction
+	bool m_lookAt = false;
+	XMFLOAT3 m_targetPos = { 0.0f, 0.0f, 0.0f };
 
 public:
 	XMMATRIX m_XMView;
@@ -29,9 +34,13 @@ public:
 	~CCamera() = default;
 
 	void SetView() noexcept;
+	void LockTo(const bool& lookAt) noexcept;		// needs updating with object methods / position, right now does basically nothing
+	void Unlock() noexcept;							// related to the above, not defined
 	
 	void SetPos(float posX = 0.0f, float posY = 0.0f, float posZ = 0.0f) noexcept;
 	void SetPos(XMFLOAT3 pos) noexcept;
+	void SetRotation(int pitchDeg, int yawDeg) noexcept;
+	void SetRotation(float pitchRad = 0.0f, float yawRad = 0.0f) noexcept;
 	const XMFLOAT3& GetPos() const noexcept;
 
 	void SetMovementDelta(float delta) noexcept;

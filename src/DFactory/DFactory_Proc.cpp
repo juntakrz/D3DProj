@@ -45,8 +45,8 @@ void DFactory::CProc::ProcessCamera() noexcept
 	}
 	}
 
-	pDF->Camera()->Move(m_camDir.x, m_camDir.y, m_camDir.z);
-	pDF->Camera()->RotateAdd(m_camRot.x, m_camRot.y, 0.0f);
+	DF::D3DM->Camera()->Move(m_camDir.x, m_camDir.y, m_camDir.z);
+	DF::D3DM->Camera()->RotateAdd(m_camRot.x, m_camRot.y, 0.0f);
 }
 
 void DFactory::CProc::ProcessFunctions() noexcept
@@ -72,10 +72,15 @@ void DFactory::CProc::ProcessFunctions() noexcept
 				exit(0);
 				break;
 			}
-			case VK_F2:
+			case VK_F2:			// show wireframe
 			{
-				pDF->pD3DMgr->RenderWireframe(!m_RenderWireframe);
+				DF::D3DM->RenderWireframe(!m_RenderWireframe);
 				m_RenderWireframe = !m_RenderWireframe;
+				break;
+			}
+			case VK_F3:			// show depth buffer
+			{
+				DF::D3DM->SetShowDepth();
 				break;
 			}
 			case VK_ADD:

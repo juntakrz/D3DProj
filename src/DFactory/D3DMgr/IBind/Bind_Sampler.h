@@ -7,7 +7,17 @@ namespace Bind
 	class Sampler : public IBind
 	{
 	public:
-		Sampler();
+		enum class Mode
+		{
+			None		= 0,
+			Wrap		= 1,
+			Mirror		= 2,
+			Clamp		= 3,
+			Border		= 4,
+			MirrorOnce	= 5
+		};
+
+		Sampler(Mode mode = Mode::Wrap);
 		void Bind() noexcept override;
 
 	protected:

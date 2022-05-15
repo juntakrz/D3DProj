@@ -198,6 +198,12 @@
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr_DL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\Common\DF_Const.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -432,11 +438,14 @@
     <FxCompile Include="shaders\PS_PBS_NoHDR.hlsl" />
     <FxCompile Include="shaders\VS_BasicRTT.hlsl" />
     <FxCompile Include="shaders\PS_BasicRTT.hlsl" />
-    <FxCompile Include="shaders\PS_FSPP.hlsl" />
-    <FxCompile Include="shaders\VS_FSPP.hlsl" />
-    <FxCompile Include="shaders\PS_FSPP_Blur32.hlsl" />
-    <FxCompile Include="shaders\PS_FSPP_Blur8.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface.hlsl" />
+    <FxCompile Include="shaders\surface\VS_Surface.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_Blur32.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_Blur8.hlsl" />
     <FxCompile Include="shaders\PS_Outline_s2.hlsl" />
     <FxCompile Include="shaders\VS_Outline_s2.hlsl" />
+    <FxCompile Include="shaders\VS_Shadow.hlsl" />
+    <FxCompile Include="shaders\PS_Shadow.hlsl" />
+    <FxCompile Include="shaders\surface\PS_SurfaceDepth.hlsl" />
   </ItemGroup>
 </Project>

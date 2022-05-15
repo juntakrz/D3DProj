@@ -1,7 +1,5 @@
 #pragma once
 
-//#include "../Common/DF_A.h"
-
 using namespace DirectX;
 
 // forward declaration
@@ -29,6 +27,7 @@ class RenderSurface
 	COMPTR<ID3DBlob>			m_pVSBlob;
 	COMPTR<ID3DBlob>			m_pPSBlob;
 	COMPTR<ID3D11InputLayout>	m_pLayout;
+	COMPTR<ID3D11SamplerState>	m_pSampler;
 
 	const UINT m_VBufferStride = sizeof(XMFLOAT4);
 	const UINT m_IBufferStride = sizeof(UINT);
@@ -38,12 +37,20 @@ class RenderSurface
 	std::string m_VS;
 	std::string m_PS;
 
+	const std::string m_VSRender = "surface//VS_Surface";
+	const std::string m_PSRender = "surface//PS_Surface";
+	const std::string m_PSDepth =  "surface//PS_SurfaceDepth";
+
+	bool m_isDepthView = false;
+
 public:
-	RenderSurface(float scale = 1.0f, std::string VS = "VS_FSPP", std::string PS = "PS_FSPP") noexcept;
+	RenderSurface(float scale = 1.0f, std::string VS = "surface//VS_Surface", std::string PS = "surface//PS_Surface") noexcept;
 	RenderSurface(const RenderSurface&) = default;
 	~RenderSurface() = default;
 
 	void SetShaders(const std::string& VS, const std::string& PS) noexcept;
+	const bool& SetAsDepthView() noexcept;
+	const bool& SetAsRenderView() noexcept;
 
 	void Bind(ID3D11ShaderResourceView* pSRV) noexcept;
 	void Unbind() noexcept;

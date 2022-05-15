@@ -10,7 +10,7 @@ namespace Bind
 		template<typename V>
 		VertexBuffer(const std::vector<V>& vertices) : m_stride(sizeof(V))
 		{
-			D3D_DXGIDEBUG(*DF::DFM);
+			D3D_DXGIDEBUG(*DF::D3DM);
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.Usage = D3D11_USAGE_DEFAULT;				//GPU read and write

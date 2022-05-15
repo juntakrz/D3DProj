@@ -21,11 +21,17 @@ namespace Bind
 
 namespace DF
 {
+	//
+	// POLYGONAL OBJECT ID
+	//
 	enum ObjectID
 	{
 		idPlane = 0, idCube, idSphere, idSkySphere, idImport
 	};
 
+	//
+	// RENDER TECHNIQUES
+	//
 	enum FXID
 	{
 		// mark bits that will run this mesh through corresponding passes
@@ -36,6 +42,48 @@ namespace DF
 		fxOutline =		(1 << 2) + (1 << 3)		// pass 2 and 3
 	};
 
+	//
+	// BUFFERS ENUM
+	//
+	enum class RBuffers		// render buffer enumeration
+	{
+		None =		-1,
+		Back =		 0,
+		Render =	 1,
+		Blur =		 2,
+		Resample =	 3
+	};
+
+	enum class DSBuffers	// depth stencil buffer enumeration
+	{
+		None =		-1,
+		Back =		 0,
+		Render =	 1,
+		Resample =	 2,
+		Shadow =	 3
+	};
+
+	//
+	// DEPTH STENCIL DATA AND METHODS
+	//
+	enum class DS_Stencil
+	{
+		Off = 0, Write, Mask
+	};
+
+	enum class DS_Usage
+	{
+		DepthStencil = 0, DepthShadow
+	};
+
+	DXGI_FORMAT GetDepthFormatTyped(const DS_Usage& usage) noexcept;
+	DXGI_FORMAT GetDepthFormatTypeless(const DS_Usage& usage) noexcept;
+	DXGI_FORMAT GetDepthFormatColor(const DS_Usage& usage) noexcept;
+
+	//
+	// VERTEX STRUCTURE
+	//
+
 	struct Vertex
 	{
 		DirectX::XMFLOAT3 pos;		//POSITION
@@ -45,6 +93,10 @@ namespace DF
 		DirectX::XMFLOAT3 b;		//BINORMAL
 	};
 
+	//
+	//	DIRECT3D INPUT LAYOUTS
+	//
+
 	const std::vector<D3D11_INPUT_ELEMENT_DESC> D3DLayout =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -53,5 +105,4 @@ namespace DF
 		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-
 }

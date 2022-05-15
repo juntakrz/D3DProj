@@ -17,23 +17,12 @@ class DFactory
 		std::unique_ptr<MeshCore> pMesh;
 	};
 
-	struct Camera
-	{
-		std::string name;
-		std::unique_ptr<CCamera> pCam;
-	};
-
-	struct CameraConstVSBuffer
-	{
-		XMFLOAT3A pos = { 0.0f, 0.0f, 0.0f };
-	} cameraConstBuffer;
-
 	struct
 	{
 		float simSpeedFactor = 1.0f;
-		uint16_t activeCamera = 0;
-		uint16_t selectedCamera = 0;
-		uint16_t selectedLight = 0;
+		uint16_t selectedLight = 0;				// selected light index
+		std::string activeCamera = "";			// keys for unordered map of cameras
+		std::string selectedCamera = "";
 	} vars;
 
 	struct
@@ -41,6 +30,12 @@ class DFactory
 		int64_t int64bit = 0;
 		float64 float64bit = 0.0f;
 	} debug;
+
+	struct CameraConstVSBuffer
+	{
+		XMFLOAT3A pos = { 0.0f, 0.0f, 0.0f };
+		XMFLOAT3A lookAt = { 0.0f, 0.0f, 0.1f };
+	} cameraConstBuffer;
 
 	class CProc
 	{
@@ -97,8 +92,8 @@ private:
 	static DFactory _SInstance;
 
 	std::vector<Mesh> m_Meshes;
-	std::vector<Camera> m_Cameras;
 
+	std::unordered_map<std::string, std::unique_ptr<CCamera>> m_Cameras;
 	std::unique_ptr<Bind::ConstVertexBuffer<CameraConstVSBuffer>> pCamCBuf;
 
 	static constexpr float m_projRatio = CWND_DEFAULTWIDTH / CWND_DEFAULTHEIGHT;
@@ -132,30 +127,30 @@ public:
 	const float& GetSimulationSpeed() const noexcept;
 
 	// frame counter
-	void AddFrame() noexcept;
-	const uint64_t& GetFrame() const noexcept;
+	void FrameCountIncrease() noexcept;
+	const uint64_t& GetFrameCount() const noexcept;
 
 	const XMMATRIX* GetProjection() const noexcept;
 	void SetProjection(float FOV, float ratio, float nearZ, float farZ) noexcept;
 
 	// CAMERA ------------------------
 
-	//create and add new camera
-	void AddCamera(std::string name) noexcept;
-	void AddCamera(std::string name, DirectX::XMFLOAT3& pos) noexcept;
-	void AddCamera(std::string name = "Camera1", float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
+	// create and add new camera
+	void CameraAdd(std::string name, float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
+	void CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept;
 
-	//select and set an active camera
-	void SetActiveCamera(std::string name, bool select = false) noexcept;
-	void SetActiveCamera(uint16_t index = 0, bool select = false) noexcept;
+	// select and set an active camera
+	void CameraActivate(std::string name, bool select = false) noexcept;
 
-	//select camera
-	void SelectCamera(std::string name) noexcept;
-	void SelectCamera(uint16_t index = 0) noexcept;
+	// select camera
+	void CameraSelect(std::string name) noexcept;
 
 	void CameraBindVS() noexcept;
 	void CameraUpdateVS() noexcept;
 
-	//operations with the currently selected camera
-	CCamera* Camera() noexcept;
+	// operations with the currently selected camera / retrieve camera without selecting it
+	CCamera* Camera(const std::string& name = "") noexcept;
+
+	// get active camera
+	std::pair<std::string, CCamera*> CameraGetActive() noexcept;
 };

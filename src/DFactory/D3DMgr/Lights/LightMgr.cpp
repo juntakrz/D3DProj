@@ -1,10 +1,5 @@
 #include "LightMgr.h"
 
-LightMgr::DirLight_ConstPSBuffer& LightMgr::DL() noexcept
-{
-	return dlData;
-}
-
 uint16_t LightMgr::GetMaxPLights() const noexcept
 {
 	return m_maxPLights;
@@ -39,8 +34,8 @@ void LightMgr::Draw() const noexcept {
 
 void LightMgr::Bind(const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept {
 
-	//this method calculates which point lights are within rendering distance of the model
-	//and fills the constant PS buffer with them
+	// this method calculates which point lights are within rendering distance of the model
+	// and fills the constant PS buffer with them
 
 	uint8_t addedPLights = 0;
 
@@ -70,7 +65,11 @@ void LightMgr::Bind(const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept {
 	pointBuffer.Update(plDataCopy);
 	pointBuffer.Bind();
 
-	//updating and binding directional light buffer
+	// updating and binding directional light buffer
 	dirBuffer.Update(dlData);
 	dirBuffer.Bind();
+
+	// update and bind directional light view buffer
+	dirVSBuffer.Update(dlViewProj);
+	dirVSBuffer.Bind();
 }
