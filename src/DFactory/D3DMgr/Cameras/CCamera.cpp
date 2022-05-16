@@ -1,8 +1,11 @@
+#include "../../Common/DF_A.h"
 #include "CCamera.h"
 
 CCamera::CCamera(const float posX, const float posY, const float posZ) noexcept
 	: m_pos({ posX, posY, posZ })
 {
+	SetAsPerspective(1.0f, DF::D3DM->GetAspectRatio(), 0.05f, 5000.0f);
+	m_orthoData = { 1.0f * 32.0f, 9.0f/16.0f * 32.0f, 0.05f, 100.0f };
 }
 
 void CCamera::SetView() noexcept
@@ -35,9 +38,41 @@ void CCamera::SetView() noexcept
 	}
 }
 
-void CCamera::LockTo(const bool& lookAt) noexcept
+void CCamera::SetViewProj() noexcept
 {
-	m_lookAt = lookAt;
+	m_XMViewProj = XMMatrixTranspose(XMMatrixMultiply(m_XMView, m_XMProj));
+}
+
+void CCamera::Lock() noexcept
+{
+	m_lookAt = true;
+}
+
+void CCamera::Unlock() noexcept
+{
+	m_lookAt = false;
+}
+
+void CCamera::SetAsPerspective() noexcept
+{
+	m_XMProj = XMMatrixPerspectiveFovLH(m_perspData.x, m_perspData.y, m_perspData.z, m_perspData.w);
+}
+
+void CCamera::SetAsPerspective(float FOV, float aspectRatio, float nearZ, float farZ) noexcept
+{
+	m_perspData = { FOV, aspectRatio, nearZ, farZ };
+	SetAsPerspective();
+}
+
+void CCamera::SetAsOrthographic() noexcept
+{
+	m_XMProj = XMMatrixOrthographicLH(m_orthoData.x, m_orthoData.y, m_orthoData.z, m_orthoData.w);
+}
+
+void CCamera::SetAsOrthographic(float width, float height, float nearZ, float farZ) noexcept
+{
+	m_orthoData = { width, height, nearZ, farZ };
+	SetAsOrthographic();
 }
 
 void CCamera::SetPos(float posX, float posY, float posZ) noexcept

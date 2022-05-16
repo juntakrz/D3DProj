@@ -8,9 +8,15 @@ namespace Bind
 		m_pSRV = pSRV;
 	}
 
+	Texture::Texture(ID3D11ShaderResourceView* m_pSRV, UINT slot) : m_slot(slot), m_pDirectSRV(m_pSRV)
+	{
+	}
+
 	void Texture::Bind() noexcept
 	{
-		GetContext()->PSSetShaderResources(m_slot, 1u, m_pSRV.get());
+		(m_pDirectSRV)
+			? GetContext()->PSSetShaderResources(m_slot, 1u, &m_pDirectSRV)
+			: GetContext()->PSSetShaderResources(m_slot, 1u, m_pSRV.get());
 	}
 	void Texture::Unbind() noexcept
 	{

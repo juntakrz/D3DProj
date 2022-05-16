@@ -19,7 +19,7 @@ namespace Bind
 	{
 		transforms.world = DirectX::XMMatrixTranspose(parent.GetTransformXM());
 		transforms.view = DirectX::XMMatrixTranspose(DF::D3DM->Camera()->m_XMView);
-		transforms.viewProj = DFactory::Get().m_XMViewProj;
+		transforms.viewProj = DF::D3DM->Camera()->m_XMViewProj;
 
 		m_pConstVertexBuffer->Update(transforms);
 		m_pConstVertexBuffer->Bind();

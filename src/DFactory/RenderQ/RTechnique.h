@@ -5,6 +5,11 @@ class RTechnique
 	friend class RTechniqueDB;
 	friend class RPass;
 
+	enum BindModes
+	{
+		BIND_MESH = 0, BIND_MESH_AND_TECHNIQUE = 1, BIND_TECHNIQUE = 2
+	};
+
 public:
 	RTechnique() = default;
 
@@ -12,9 +17,9 @@ public:
 	{
 		return m_Id;
 	};
-	const bool& RequiresMeshBinds() const noexcept
+	const uint8_t& BindMode() const noexcept
 	{
-		return m_UseMeshBinds;
+		return m_BindMode;
 	}
 	std::vector<std::unique_ptr<Bind::IBind>>* Binds() noexcept
 	{
@@ -31,9 +36,8 @@ public:
 
 private:
 	uint32_t m_Id = 0;										// bitwise id
-	bool m_UseMeshBinds = false;							// technique relies on mesh binds
-	//std::string m_CamId = "";								// camera that this technique will use for rendering, empty for no change
-	CCamera* m_pCamera = nullptr;
+	uint8_t m_BindMode = BIND_TECHNIQUE;					// bind mode of the pass
+	std::string m_Camera = "";								// camera that this technique will use for rendering, empty for no change
 	int8_t m_RB = -1, m_DSB = -1;							// render and depth buffers to switch to before rendering, -1 to not switch
 	int8_t m_depthState = -1;								// depth state for the current pass, -1 for no change
 	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;		// technique binds
@@ -47,16 +51,7 @@ private:
 	bool m_InitializedDefaults = false;
 
 public:
-	RTechniqueDB() noexcept
-	{
-		/*
-		// !!! there are no 32 passes so do I need this?
-		// init technique vector
-		for (uint8_t i = 0; i < 32; i++)
-		{
-			m_Techniques.emplace_back();
-		}*/
-	};
+	RTechniqueDB() noexcept {};
 	RTechniqueDB(const RTechniqueDB&) = default;
 	~RTechniqueDB() = default;
 

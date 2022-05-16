@@ -1,16 +1,15 @@
 #pragma once
 
-#include "D3DMgr/Meshes/Mesh_Includes.h"
 #include "D3DMgr/Lights/LightMgr.h"
-#include "D3DMgr/Cameras/CCamera.h"
 #include "WndMgr/WndMgr.h"
-#include "Common/DF_A.h"
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
 #include "RenderQ/RenderQ.h"
 
 class DFactory
 {
+	friend class RPass;		// grant access to vars
+
 	struct Mesh
 	{
 		std::string name;
@@ -86,8 +85,6 @@ public:
 	DFMaterial* MatM = &DFMaterial::Get();
 	imGuiMgr& imGUIMgr = imGuiMgr::Get();
 
-	XMMATRIX m_XMViewProj;
-
 private:
 	static DFactory _SInstance;
 
@@ -95,9 +92,6 @@ private:
 
 	std::unordered_map<std::string, std::unique_ptr<CCamera>> m_Cameras;
 	std::unique_ptr<Bind::ConstVertexBuffer<CameraConstVSBuffer>> pCamCBuf;
-
-	static constexpr float m_projRatio = CWND_DEFAULTWIDTH / CWND_DEFAULTHEIGHT;
-	XMMATRIX m_XMProj = XMMatrixPerspectiveFovLH(1.0f, (float)CWND_DEFAULTWIDTH / (float)CWND_DEFAULTHEIGHT, 0.1f, 5000.0f);
 
 	// frame counter
 	uint64_t m_frames = 0u;
@@ -129,9 +123,6 @@ public:
 	// frame counter
 	void FrameCountIncrease() noexcept;
 	const uint64_t& GetFrameCount() const noexcept;
-
-	const XMMATRIX* GetProjection() const noexcept;
-	void SetProjection(float FOV, float ratio, float nearZ, float farZ) noexcept;
 
 	// CAMERA ------------------------
 

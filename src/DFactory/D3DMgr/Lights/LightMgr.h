@@ -14,6 +14,8 @@ private:
 	DirectX::XMVECTOR m_vecUp = { 0.0f, 1.0f, 0.0f };
 	float m_FOV = 1.0f;
 
+	CCamera* m_pDirCamera = nullptr;
+
 	// point light unit
 	struct PLight
 	{
@@ -52,7 +54,6 @@ public:
 	LightMgr() // initialize buffers with their GPU registers
 		: dirBuffer(1u), dirVSBuffer(2u), pointBuffer(2u) {
 		m_PLights.reserve(16);
-		DLSetProjMatrix();
 	};
 	~LightMgr() = default;
 	LightMgr(const LightMgr&) = delete;
@@ -64,8 +65,12 @@ public:
 
 	// DIRECTIONAL LIGHT
 	DirLight_ConstPSBuffer& DL() noexcept;
-	void DLSetViewMatrix() noexcept;
-	void DLSetProjMatrix(float nearZ = 0.1f, float farZ = 5.0f) noexcept;
+
+	void DLSetCamera(CCamera* pCam) noexcept;
+	void DLSetViewData() noexcept;
+
+	void DLSetPos(float x, float y, float z) noexcept;
+	void DLSetPos(XMFLOAT3 pos) noexcept;
 
 	// POINT LIGHT
 	uint16_t GetMaxPLights() const noexcept;

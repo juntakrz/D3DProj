@@ -70,16 +70,12 @@ private:
 
 	HRESULT hr;
 	bool m_imguiEnabled = CWND_IMGUIENABLED;
-	//bool m_ZBufferEnabled = true;
 	bool m_ShowDepth = false;
 	bool m_IsHDR = false;
 	float m_ClearColor[6][4];
 	float m_VWidth = CWND_DEFAULTWIDTH, m_VHeight = CWND_DEFAULTHEIGHT;
-	float m_AspectRatio = m_VHeight / m_VWidth;
+	float m_AspectRatio = m_VWidth / m_VHeight;
 
-	DirectX::XMMATRIX m_ProjectionMatrix =
-		DirectX::XMMatrixPerspectiveFovLH(1.0f, m_AspectRatio, 0.001f, 10000.0f);
-		//DirectX::XMMatrixOrthographicLH(1.0f, m_DefaultViewportHeight / m_DefaultViewportWidth, 0.5f, 10000.0f);
 	class CCamera* m_pCamera;
 	std::vector<RenderTarget> renderTargets;
 	std::vector<DSTarget> depthTargets;
@@ -158,12 +154,11 @@ public:
 	void Clear(const float red, const float green, const float blue, uint8_t rtIndex = 0, bool clearDepthBuffer = true, int8_t dsIndex = -1) noexcept;
 	void SetClearColor(const float red, const float green, const float blue, uint8_t index = 0) noexcept;
 
+	void ClearDSBuffer(uint8_t index) noexcept;
+
 	void SetDepthStencilState(const uint8_t state) noexcept;
 
 	void RenderWireframe(bool enable = false) noexcept;
-
-	void SetProjection(DirectX::FXMMATRIX& projection) noexcept;
-	DirectX::XMMATRIX GetProjection() const noexcept;
 
 	//set and get currently active camera
 	void SetCamera(CCamera* pCamera) noexcept;

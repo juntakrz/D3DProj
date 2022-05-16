@@ -93,6 +93,16 @@ void DFactory::CProc::ProcessFunctions() noexcept
 				pDF->debug.int64bit--;
 				break;
 			}
+			case '1':
+			{
+				DF::Engine->CameraActivate("camMain");
+				break;
+			}
+			case '2':
+			{
+				DF::Engine->CameraActivate("camLight");
+				break;
+			}
 			case '5':
 			{
 				pDF->ModelM->Select(4);

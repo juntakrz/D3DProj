@@ -2,7 +2,7 @@
 
 namespace Bind
 {
-	Sampler::Sampler(Mode mode)
+	Sampler::Sampler(UINT mode, UINT slot) : m_slot(slot)
 	{
 		D3D_DXGIDEBUG(*DF::D3DM);
 
@@ -23,6 +23,6 @@ namespace Bind
 
 	void Sampler::Bind() noexcept
 	{
-		GetContext()->PSSetSamplers(0u, 1u, m_pSampler.GetAddressOf());
+		GetContext()->PSSetSamplers(m_slot, 1u, m_pSampler.GetAddressOf());
 	}
 }
