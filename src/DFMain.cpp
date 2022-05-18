@@ -9,7 +9,10 @@ DFMain::DFMain(DFactory::DFACTORY_INIT_DESC* pDesc) : DF(DFactory::Init(pDesc))
 
 void DFMain::DrawFrame()
 {
-	deltaA += 0.0001f;
+	deltaA += 0.002f;
+
+	DF.ModelM->Select("MdlTachi");
+	DF.ModelM->SetRotation(-0.6f - deltaA*0.7f , -0.4f + deltaA, -0.3f + deltaA * 0.7f);
 
 	// MdlMars
 	//DF.ModelM->Select(1);
@@ -192,8 +195,8 @@ void DFMain::LoadScreen() noexcept
 	//Mat_PBSMetal
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_PBSMetal";
-	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
+	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
 	DFMatDesc.textures.tex0 = "PBR//iron//rustediron2_basecolor.dds";
 	DFMatDesc.textures.tex1 = "PBR//iron//rustediron2_normal.dds";
 	DFMatDesc.textures.tex2 = "PBR//iron//rustediron2_metallic.dds";
@@ -210,8 +213,8 @@ void DFMain::LoadScreen() noexcept
 	//Mat_PBSGold
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_PBSGold";
-	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
+	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
 	DFMatDesc.textures.tex0 = "PBR//gold_ornate//albedo.dds";
 	DFMatDesc.textures.tex1 = "PBR//gold_ornate//normal.dds";
 	DFMatDesc.textures.tex2 = "PBR//gold_ornate//metallic.dds";
@@ -229,8 +232,8 @@ void DFMain::LoadScreen() noexcept
 	//Mat_PBSSteel
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_PBSSteel";
-	DFMatDesc.shaders.vertex = "VS_PBS";
-	DFMatDesc.shaders.pixel = "PS_PBS";
+	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
+	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
 	DFMatDesc.textures.tex0 = "PBR//steel_plate//albedo.dds";
 	DFMatDesc.textures.tex1 = "PBR//steel_plate//normal.dds";
 	DFMatDesc.textures.tex2 = "PBR//steel_plate//metallic.dds";
@@ -248,15 +251,21 @@ void DFMain::LoadScreen() noexcept
 	//Mat_Test
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Test";
-	DFMatDesc.shaders.vertex = "VS_Shadow";
-	DFMatDesc.shaders.pixel = "PS_Shadow";
-	DFMatDesc.textures.tex0 = "striped.dds";
-	DFMatDesc.material.matIntensity = 1.0f;
-	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.08f, 1.0f };
-	DFMatDesc.material.spec_metal = 0.2f;		//1.5
-	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
-	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
-	DFMatDesc.effects = DF::fxStandard;
+	//DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
+	//DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
+	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
+	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
+	DFMatDesc.textures.tex0 = "PBR//gold_ornate//albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR//gold_ornate//normal.dds";
+	DFMatDesc.textures.tex2 = "PBR//gold_ornate//metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR//gold_ornate//roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR//gold_ornate//ao.dds";
+	DFMatDesc.material.ambientColor = { 0.2f, 0.2f, 0.02f, 1.0f };
+	DFMatDesc.material.spec_metal = 1.0f;
+	DFMatDesc.material.pow_roughness = 1.0f;
+	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
+	DFMatDesc.material.bumpIntensity = 2.0f;
+	DFMatDesc.effects = DF::fxStandard | DF::fxShadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -288,7 +297,8 @@ void DFMain::LoadScreen() noexcept
 	
 	//MdlTachi
 	DF.ModelM->Create(DF::idImport, "MdlTachi", "tachilp1.obj");
-	DF.ModelM->SetShaders("VS_PBS", "PS_PBS");
+	DF.ModelM->SetShaders("VS_PBS_Shadow", "PS_PBS_Shadow");
+	DF.ModelM->SetEffect(DF::fxStandard | DF::fxShadow);
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
@@ -316,13 +326,13 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(-1.4f, 0.0f, 2.0f);
 
-	
+	/*
 	//MdlPlaneTest
 	DF.ModelM->Create(DF::idCube, "MdlPlaneTest");
 	DF.ModelM->SetMaterial("Mat_Test");
-	DF.ModelM->SetPos(1.0f, 0.0f, 3.0f);
-	DF.ModelM->SetScaling(2.0f, 2.0f, 0.5f);
-	DF.ModelM->SetRotation(0.0f, 0.8f, 0.0f);
+	DF.ModelM->SetPos(1.0f, -0.5f, 2.0f);
+	DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
+	DF.ModelM->SetRotation(0.8f, 1.2f, 0.0f);
 	/*
 	//MdlTestPlaneNoMip
 	DF.ModelM->Create(DF::idPlane, "MdlPlaneTestNoMip");
@@ -340,20 +350,20 @@ void DFMain::LoadScreen() noexcept
 	//DF.LMgr->ShowPLMeshes() = true;
 
 	//DF.LightM->DLSetPos({ -24.0f, 17.0f, 0.0f });
-	DF.LightM->DLSetPos({ -12.0f, 8.5f, 0.0f });
+	DF.LightM->DLSetPos({ -12.0f, 8.5f, -1.0f });
 	//DF.LightM->DLSetPos({ 0.0f, 0.0f, -1.0f });
 	
 	DF.LightM->PLAdd("Light1", 0.17f, 0.515f, 8.55f);
 	//DF.LightM->PL().pMesh->SetPos(0.0f, 0.0f, 0.0f);
 	//DF.LightM->PL().pMesh->SetRotationZ(0.05f);
-	DF.LightM->PL().intensity = 0.14f;
+	DF.LightM->PL().intensity = 0.07f;
 	DF.LightM->PL().color = { 1.0f, 0.02f, 0.02f, 1.0f };
 	
 	Animate();
 
 	DF.LightM->PLAdd("Light2", -0.6f, 0.345f, 8.36f);
 	//DF.LightM->PL().pMesh->SetRotationZ(-0.05f);
-	DF.LightM->PL().intensity = 0.14f;
+	DF.LightM->PL().intensity = 0.07f;
 	DF.LightM->PL().color = { 1.0f, 0.02f, 0.02f, 1.0f };
 
 	Animate();
@@ -390,11 +400,14 @@ void DFMain::LoadScreen() noexcept
 	DF.CameraAdd("camLight");
 	DF.CameraSelect("camLight");
 	DF.Camera()->SetPos(DF.LightM->DL().pos);
-	DF.Camera()->SetRotation(-30, 45);
+	//DF.Camera()->SetRotation(-30, 45);
 	DF.LightM->DLSetCamera(DF.Camera("camLight"));
 
-	DF.Camera()->SetAsOrthographic();
-	//DF.Camera()->LockTo(true);
+	DF.Camera()->SetAsOrthographic(8.0f, 4.5f, 0.001f, 100.0f);
+	//DF.Camera()->SetAsPerspective(1.0f, 16.0f / 9.0f, 0.01f, 100.0f);
+	DF.Camera()->LookAt(0.0f, 0.0f, 8.0f);
+	DF.Camera()->EnableLookAt();
+	//DF.Camera()->LockTo(DF.Camera("camMain"));
 
 	DF.UpdateRenderer();
 }

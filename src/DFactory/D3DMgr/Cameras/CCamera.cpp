@@ -4,8 +4,8 @@
 CCamera::CCamera(const float posX, const float posY, const float posZ) noexcept
 	: m_pos({ posX, posY, posZ })
 {
-	SetAsPerspective(1.0f, DF::D3DM->GetAspectRatio(), 0.05f, 5000.0f);
-	m_orthoData = { 1.0f * 32.0f, 9.0f/16.0f * 32.0f, 0.05f, 100.0f };
+	SetAsPerspective(1.0f, DF::D3DM->GetAspectRatio(), 0.05f, 5000.05f);
+	m_orthoData = { 1.0f * 32.0f, 9.0f/16.0f * 32.0f, 0.05f, 100.05f };
 }
 
 void CCamera::SetView() noexcept
@@ -16,13 +16,19 @@ void CCamera::SetView() noexcept
 	{
 	case true:
 	{
+		/*
 		// add X/Y rotated Z direction and position vectors to get adjusted view direction vector
 		m_vecFocus = m_vecPos + XMVector3Transform(
 			m_vecFwd,
 			XMMatrixRotationRollPitchYaw(-m_rot.x, -m_rot.y, 0.0f)
-		);
+		);*/
 
-		m_XMView = XMMatrixLookAtLH(m_vecPos, m_vecFocus, m_vecUp);
+		if (m_followCam)
+		{
+			
+		}
+
+		m_XMView = XMMatrixLookAtLH(m_vecPos, XMLoadFloat3(&m_targetPos), m_vecUp);
 		return;
 	}
 	case false:
@@ -43,14 +49,30 @@ void CCamera::SetViewProj() noexcept
 	m_XMViewProj = XMMatrixTranspose(XMMatrixMultiply(m_XMView, m_XMProj));
 }
 
-void CCamera::Lock() noexcept
+void CCamera::EnableLookAt() noexcept
 {
 	m_lookAt = true;
 }
 
-void CCamera::Unlock() noexcept
+void CCamera::DisableLookAt() noexcept
 {
 	m_lookAt = false;
+}
+
+void CCamera::LockTo(CCamera* pCam) noexcept
+{
+	m_followCam = pCam;
+	m_lookAt = true;
+}
+
+void CCamera::LookAt(float x, float y, float z) noexcept
+{
+	m_targetPos = { x, y, z };
+}
+
+void CCamera::LookAt(std::string objectId) noexcept
+{
+	m_targetId = objectId;
 }
 
 void CCamera::SetAsPerspective() noexcept
@@ -102,9 +124,15 @@ void CCamera::SetRotation(float pitchRad, float yawRad) noexcept
 	m_rot.y = -GMath::WrapAngle(yawRad);
 }
 
+const XMFLOAT3& CCamera::GetInitialPos() const noexcept
+{
+	return m_pos;
+}
+
 const XMFLOAT3& CCamera::GetPos() const noexcept
 {
 	return m_pos;
+	//return m_adjPos;
 }
 
 void CCamera::SetMovementDelta(float delta) noexcept

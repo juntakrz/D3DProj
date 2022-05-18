@@ -5,6 +5,7 @@
 #include "Bind_InputLayout.h"
 #include "Bind_Null.h"
 #include "Bind_PixelShader.h"
+#include "Bind_Rasterizer.h"
 #include "Bind_Sampler.h"
 #include "Bind_Stencil.h"
 #include "Bind_Texture.h"

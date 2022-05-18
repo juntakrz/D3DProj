@@ -39,8 +39,9 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		pBinds[Bind::idVertexShader] = std::move(pVS);
 		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
-		pBinds[Bind::idSampler1] = std::make_unique<Bind::Sampler>(3u, 1u);
+		pBinds[Bind::idSampler1] = std::make_unique<Bind::Sampler>(10u, 6u);
 		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Null_Texture>(6u);
+		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_FRONT);
 
 		m_Techniques.emplace_back(RTechnique());
 		m_Techniques.back().m_Id = 1 << currentPass;
@@ -63,6 +64,7 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		fInitBinds();
 
 		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Texture>(DF::D3DM->DepthTargets()->at(3u).pDS_SRV.Get(), 6u);
+		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
 
 		m_Techniques.emplace_back(RTechnique());
 		m_Techniques.back().m_Id = 1 << currentPass;
@@ -87,6 +89,7 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		fInitBinds();
 
 		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Texture>(DF::D3DM->DepthTargets()->at(3u).pDS_SRV.Get(), 6u);
+		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
 
 		m_Techniques.emplace_back(RTechnique());
 		m_Techniques.back().m_Id = 1 << currentPass;

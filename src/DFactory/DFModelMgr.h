@@ -98,7 +98,7 @@ public:
 	void SetMaterial(std::string material = "Mat_Default", uint32_t meshID = 0) noexcept;
 	void SetMaterialRT(std::string material = "Mat_RTTDefault", uint32_t meshID = 0) noexcept;
 	void SetShaders(std::string VS = "", std::string PS = "", uint32_t meshID = 0) noexcept;
-	void SetEffect(uint8_t index, bool enabled = true, uint32_t meshID = 0);
+	void SetEffect(uint32_t techniqueIds = DF::fxStandard, uint32_t meshID = 0) noexcept;
 
 	void DEBUG_ShowModelList() const noexcept;
 

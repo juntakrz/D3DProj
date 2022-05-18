@@ -106,7 +106,7 @@ public:
 	void SetMaterial(std::string name) noexcept;
 	void SetMaterialRT(std::string name) noexcept;
 	void SetShaders(std::string& inVS, std::string& inPS) noexcept;
-	void SetEffects() noexcept;
+	void SetEffects(uint32_t techniqueIds) noexcept;
 
 	//set origin position
 	void SetPos(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
