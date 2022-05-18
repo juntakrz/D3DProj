@@ -130,9 +130,9 @@ void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
 	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 }
 
-void MeshCore::SetEffects() noexcept
+void MeshCore::SetEffects(uint32_t techniqueIds) noexcept
 {
-	//
+	m_TechniqueIds = techniqueIds;
 }
 
 DirectX::XMMATRIX MeshCore::GetTransformXM() const noexcept

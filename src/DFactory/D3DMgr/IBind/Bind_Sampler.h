@@ -14,7 +14,8 @@ namespace Bind
 			Mirror		= 2,
 			Clamp		= 3,
 			Border		= 4,
-			MirrorOnce	= 5
+			MirrorOnce	= 5,
+			Comparison  = 10	// used by hardware PCF sampler comparison state
 		};
 
 		Sampler(UINT mode = Mode::Wrap, UINT slot = 0u);

@@ -218,57 +218,19 @@ void DFModelMgr::SetShaders(std::string VS, std::string PS, uint32_t meshID) noe
 	}
 }
 
-void DFModelMgr::SetEffect(uint8_t index, bool enabled, uint32_t meshID)
+void DFModelMgr::SetEffect(uint32_t techniqueIds, uint32_t meshID) noexcept
 {
-	switch (index)
+	// if ID is 0 - set effect for all meshes
+	if (meshID == 0)
 	{
-	case DF::fxOutline:
-	{
-		// if ID is 0 - set effect for all meshes
-		if (meshID == 0)
+		for (auto& it : m_Models[m_curModel].meshes)
 		{
-			for (auto& it : m_Models[m_curModel].meshes)
-			{
-				it.pMesh->SetEffects();
-			}
+			it.pMesh->SetEffects(techniqueIds);
 		}
-		else
-		{
-			m_Models[m_curModel].meshes[meshID].pMesh->SetEffects();
-		}
-		break;
 	}
-	/*
-	case DF::fxRenderTarget:
+	else
 	{
-		if (meshID == 0)
-		{
-			for (auto& it : m_Models[m_curModel].meshes)
-			{
-				it.pMesh->isRenderTarget = enabled;
-			}
-		}
-		else
-		{
-			m_Models[m_curModel].meshes[meshID].pMesh->isRenderTarget = enabled;
-		}
-		break;
-	}*/
-	default:
-	{
-		if (meshID == 0)
-		{
-			for (auto& it : m_Models[m_curModel].meshes)
-			{
-				it.pMesh->isRenderTarget = false;
-			}
-		}
-		else
-		{
-			m_Models[m_curModel].meshes[meshID].pMesh->isRenderTarget = false;
-		}
-		break;
-	}
+		m_Models[m_curModel].meshes[meshID].pMesh->SetEffects(techniqueIds);
 	}
 }
 

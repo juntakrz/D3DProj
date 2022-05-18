@@ -8,7 +8,7 @@ namespace Bind
 	{
 		idVertexBuffer, idIndexBuffer, idTopology,		// core binds
 		idVertexShader, idPixelShader,
-		idSampler0, idSampler1,
+		idSampler0, idSampler1, idRasterizer,
 		idTexture0, idTexture1, idTexture2, idTexture3, idTexture4, idTexture5, idTextureDepth,
 		idConstVertexBuf0, idConstPixelBuf0,
 		idInputLayout, idTransform

@@ -204,6 +204,9 @@
     <ClCompile Include="src\DFactory\Common\DF_Const.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\IBind\Bind_Rasterizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -398,6 +401,9 @@
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Rasterizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\c-logo-icon.ico">
@@ -416,6 +422,7 @@
     </None>
     <None Include="shaders\include\HPS_PBS.hlsli" />
     <None Include="shaders\include\HVS_Transform.hlsli" />
+    <None Include="shaders\include\HPS_PBS_H.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc">
@@ -445,7 +452,10 @@
     <FxCompile Include="shaders\PS_Outline_s2.hlsl" />
     <FxCompile Include="shaders\VS_Outline_s2.hlsl" />
     <FxCompile Include="shaders\VS_Shadow.hlsl" />
-    <FxCompile Include="shaders\PS_Shadow.hlsl" />
+    <FxCompile Include="shaders\PS_PBS_Shadow.hlsl" />
     <FxCompile Include="shaders\surface\PS_SurfaceDepth.hlsl" />
+    <FxCompile Include="shaders\PS_Shadow.hlsl" />
+    <FxCompile Include="shaders\VS_PBS_Shadow.hlsl" />
+    <FxCompile Include="shaders\PS_PBS_Shadow_HW.hlsl" />
   </ItemGroup>
 </Project>

@@ -13,7 +13,8 @@ private:
 	float m_deltaRotation = 0.03f;
 
 	// set vectors
-	XMFLOAT3 m_pos = { 0.0f, 0.0f, 0.0f };
+	XMFLOAT3 m_pos = { 0.0f, 0.0f, 0.0f };		// original position
+	XMFLOAT3 m_adjPos = m_pos;					// adjusted position
 	XMFLOAT3 m_rot = { 0.0f, 0.0f, 0.0f };
 	XMVECTOR m_vecUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMVECTOR m_vecFwd = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -23,7 +24,9 @@ private:
 
 	// view mode - lookAt object or lookTo direction
 	bool m_lookAt = false;
+	std::string m_targetId = "";	// if empty - target pos is used
 	XMFLOAT3 m_targetPos = { 0.0f, 0.0f, 0.0f };
+	CCamera* m_followCam = nullptr;	// if nullptr - won't follow
 	XMFLOAT4 m_perspData;
 	XMFLOAT4 m_orthoData;
 
@@ -40,8 +43,9 @@ public:
 	void SetView() noexcept;						// calculate camera view
 	void SetViewProj() noexcept;					// calculate view*proj matrix
 
-	void Lock() noexcept;		
-	void Unlock() noexcept;
+	void EnableLookAt() noexcept;	
+	void DisableLookAt() noexcept;
+	void LockTo(CCamera* pCam) noexcept;		// nullptr to stop following
 	void LookAt(float x, float y, float z) noexcept;
 	void LookAt(std::string objectId) noexcept;
 
@@ -54,6 +58,7 @@ public:
 	void SetPos(XMFLOAT3 pos) noexcept;
 	void SetRotation(int pitchDeg, int yawDeg) noexcept;
 	void SetRotation(float pitchRad = 0.0f, float yawRad = 0.0f) noexcept;
+	const XMFLOAT3& GetInitialPos() const noexcept;
 	const XMFLOAT3& GetPos() const noexcept;
 
 	void SetMovementDelta(float delta) noexcept;
