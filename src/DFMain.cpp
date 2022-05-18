@@ -203,6 +203,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.0f, 0.0f, 0.0f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
+	DFMatDesc.effects = DF::fxStandard | DF::fxShadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -220,8 +221,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
-	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
 	DFMatDesc.material.bumpIntensity = 2.0f;
+	DFMatDesc.effects = DF::fxStandard | DF::fxShadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -240,35 +241,22 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::fxBlur;
+	DFMatDesc.effects = DF::fxBlur | DF::fxShadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
 	//Mat_Test
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Test";
-	DFMatDesc.shaders.vertex = "VS_BasicTexture";
-	DFMatDesc.shaders.pixel = "PS_BasicTexture";
+	DFMatDesc.shaders.vertex = "VS_Shadow";
+	DFMatDesc.shaders.pixel = "PS_Shadow";
 	DFMatDesc.textures.tex0 = "striped.dds";
-	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
+	DFMatDesc.material.matIntensity = 1.0f;
+	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.08f, 1.0f };
 	DFMatDesc.material.spec_metal = 0.2f;		//1.5
 	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
 	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
-	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
-
-	DF.MatM->MatAdd(&DFMatDesc);
-
-	//Mat_TestNoMip
-	DFMatDesc = {};
-	DFMatDesc.name = "Mat_TestNoMip";
-	DFMatDesc.shaders.vertex = "VS_BasicTexture";
-	DFMatDesc.shaders.pixel = "PS_BasicTexture";
-	DFMatDesc.textures.tex0 = "striped_nomip.dds";
-	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
-	DFMatDesc.material.spec_metal = 0.2f;		//1.5
-	DFMatDesc.material.pow_roughness = 0.1f;	//1.2
-	DFMatDesc.material.F0 = { 0.08, 0.07, 0.06 };
-	DFMatDesc.effects = DF::fxStandard | DF::fxOutline;
+	DFMatDesc.effects = DF::fxStandard;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -277,7 +265,7 @@ void DFMain::LoadScreen() noexcept
 	//MdlStars
 	DF.ModelM->Create(DF::idSkySphere, "MdlStars");
 	DF.ModelM->SetMaterial("Mat_Stars");
-	DF.ModelM->SetScaling(3700.0f, 3700.0f, 3700.0f);
+	DF.ModelM->SetScaling(4000.0f, 4000.0f, 4000.0f);
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	
 	//MdlMars
@@ -328,12 +316,14 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(-1.4f, 0.0f, 2.0f);
 
-	//MdlTestPlane
-	DF.ModelM->Create(DF::idPlane, "MdlPlaneTest");
+	
+	//MdlPlaneTest
+	DF.ModelM->Create(DF::idCube, "MdlPlaneTest");
 	DF.ModelM->SetMaterial("Mat_Test");
-	DF.ModelM->SetPos(-0.6f, 0.5f, 2.0f);
-	DF.ModelM->SetScaling(0.1f, 0.1f, 0.1f);
-
+	DF.ModelM->SetPos(1.0f, 0.0f, 3.0f);
+	DF.ModelM->SetScaling(2.0f, 2.0f, 0.5f);
+	DF.ModelM->SetRotation(0.0f, 0.8f, 0.0f);
+	/*
 	//MdlTestPlaneNoMip
 	DF.ModelM->Create(DF::idPlane, "MdlPlaneTestNoMip");
 	DF.ModelM->SetMaterial("Mat_TestNoMip");
@@ -348,6 +338,10 @@ void DFMain::LoadScreen() noexcept
 	*/
 
 	//DF.LMgr->ShowPLMeshes() = true;
+
+	//DF.LightM->DLSetPos({ -24.0f, 17.0f, 0.0f });
+	DF.LightM->DLSetPos({ -12.0f, 8.5f, 0.0f });
+	//DF.LightM->DLSetPos({ 0.0f, 0.0f, -1.0f });
 	
 	DF.LightM->PLAdd("Light1", 0.17f, 0.515f, 8.55f);
 	//DF.LightM->PL().pMesh->SetPos(0.0f, 0.0f, 0.0f);
@@ -396,8 +390,11 @@ void DFMain::LoadScreen() noexcept
 	DF.CameraAdd("camLight");
 	DF.CameraSelect("camLight");
 	DF.Camera()->SetPos(DF.LightM->DL().pos);
+	DF.Camera()->SetRotation(-30, 45);
+	DF.LightM->DLSetCamera(DF.Camera("camLight"));
 
-	//DF.CameraActivate("camLight1");
+	DF.Camera()->SetAsOrthographic();
+	//DF.Camera()->LockTo(true);
 
 	DF.UpdateRenderer();
 }

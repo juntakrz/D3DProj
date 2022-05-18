@@ -7,7 +7,7 @@ namespace Bind
 	class Sampler : public IBind
 	{
 	public:
-		enum class Mode
+		enum Mode
 		{
 			None		= 0,
 			Wrap		= 1,
@@ -17,10 +17,11 @@ namespace Bind
 			MirrorOnce	= 5
 		};
 
-		Sampler(Mode mode = Mode::Wrap);
+		Sampler(UINT mode = Mode::Wrap, UINT slot = 0u);
 		void Bind() noexcept override;
 
 	protected:
 		COMPTR<ID3D11SamplerState> m_pSampler;
+		UINT m_slot = 0u;
 	};
 }

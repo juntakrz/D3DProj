@@ -235,7 +235,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 		}
 	}
 
-	pBinds[Bind::idSampler] = std::make_unique<Bind::Sampler>();
+	pBinds[Bind::idSampler0] = std::make_unique<Bind::Sampler>();
 
 	pBinds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(vertices);
 	pBinds[Bind::idIndexBuffer] = std::make_unique<Bind::IndexBuffer>(indices);

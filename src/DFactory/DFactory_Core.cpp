@@ -71,10 +71,6 @@ void DFactory::BeginFrame() noexcept
 	proc.ProcessCamera();
 	proc.ProcessFunctions();
 
-	//calculate View and ViewProj matrices only once per frame
-	pD3DMgr->Camera()->SetView();
-	m_XMViewProj = XMMatrixTranspose(XMMatrixMultiply(pD3DMgr->Camera()->m_XMView, m_XMProj));
-
 	//hand off to Direct3D manager
 	pD3DMgr->BeginFrame();
 }
@@ -93,7 +89,7 @@ void DFactory::DrawFrame() noexcept
 	CameraUpdateVS();
 
 	// update directional light view
-	LightM->DLSetViewMatrix();
+	LightM->DLSetViewData();
 
 	// update model matrix and propagate it among meshes through nodes
 	for (auto& it : ModelM->m_Models)
@@ -131,14 +127,4 @@ void DFactory::FrameCountIncrease() noexcept
 const uint64_t& DFactory::GetFrameCount() const noexcept
 {
 	return m_frames;
-}
-
-const XMMATRIX* DFactory::GetProjection() const noexcept
-{
-	return &m_XMProj;
-}
-
-void DFactory::SetProjection(float FOV, float ratio, float nearZ, float farZ) noexcept
-{
-	m_XMProj = XMMatrixPerspectiveFovLH(FOV, ratio, nearZ, farZ);
 }

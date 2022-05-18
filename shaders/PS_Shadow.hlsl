@@ -25,26 +25,22 @@ struct PSIn
 };
 
 Texture2D texAlbedo : register(t0);
-Texture2D texDepth : register(t1);
-SamplerState SampleTypeClamp : register(s0);
-SamplerState SampleTypeWrap : register(s1);
+Texture2D texDepth : register(t6);
+SamplerState SampleTypeWrap : register(s0);
+SamplerState SampleTypeClamp : register(s1);
 
 float4 main(PSIn iPS) : SV_TARGET
 {
     // init variables
     float1 bias = 0.001f;
-    float4 color = M_Ambient;
+    float4 color = { 0.0f, 0.0f, 0.0f, 1.0f };
     float4 albedo = texAlbedo.Sample(SampleTypeWrap, iPS.tex);
     float2 projTexCoord;
     float1 pixelDepth;
     float1 L_Depth;
-    float1 L_DirIntensity;
-    
-    // light vector
-    float3 L = normalize(L_DirPos - iPS.worldPos);
     
     // calculate projected texture coords (sampling depth buffer texture based on light pos)
-    projTexCoord.x = iPS.lightViewPos.x / iPS.lightViewPos.w / 2.0f + 0.5f;
+    projTexCoord.x =  iPS.lightViewPos.x / iPS.lightViewPos.w / 2.0f + 0.5f;
     projTexCoord.y = -iPS.lightViewPos.y / iPS.lightViewPos.w / 2.0f + 0.5f;
     
     // if saturated coords are within 0 - 1 range - the pixel is lit
@@ -60,16 +56,29 @@ float4 main(PSIn iPS) : SV_TARGET
         // compare depth of the depth map value and the depth of the light to determine whether to shadow or to light pixel
         if(L_Depth < pixelDepth)
         {
-            // calculate the amount of light for this pixel
-            L_DirIntensity = saturate(dot(iPS.W_Normal, normalize(L_DirPos))) * L_DirInt;
+            //calculate directional light intensity
+            float1 L_DirIntensity = saturate(dot(iPS.W_Normal, normalize(L_DirPos))) * L_DirInt;
             
+            //add directional light
             if(L_DirIntensity > 0.0f)
             {
-                color += color * L_DirIntensity;
-                //color = saturate(color);
+                color += L_DirDiffuse * L_DirIntensity * M_MatIntensity;
+                color = saturate(color);
             }
         }
     }
+    else
+    {
+        //calculate directional light intensity
+        float1 L_DirIntensity = saturate(dot(iPS.W_Normal, normalize(L_DirPos))) * L_DirInt;
+
+        //add directional light
+        if (L_DirIntensity > 0.0f)
+        {
+            color += L_DirDiffuse * L_DirIntensity * M_MatIntensity;
+            color = saturate(color);
+        }
+    }
     
-	return color * albedo;
+    return (color + M_Ambient) * albedo;
 }

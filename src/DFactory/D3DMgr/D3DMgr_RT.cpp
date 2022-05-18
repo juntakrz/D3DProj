@@ -149,11 +149,8 @@ void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 	// create downsampled render and depth buffer for post processing	(RB3 / DSB2)
 	CreateDepthBuffer(CreateRenderBuffer(m_VWidth / 2, m_VHeight / 2, isHDR));
 
-	// create render buffer for storing directional light view depth	(RB4)
-	//CreateRenderBuffer(m_VWidth, m_VHeight, isHDR);
-
-	// create depth buffer for directional light view based on RB1		(DSB3)
-	CreateDepthBuffer((uint8_t)DF::RBuffers::Render, true, DF::DS_Usage::DepthShadow);
+	// create high resolution render and depth buffers for shadows		(RB4 / DSB3)
+	CreateDepthBuffer(CreateRenderBuffer(m_VWidth * 2, m_VHeight * 2, isHDR), true, DF::DS_Usage::DepthShadow);
 
 	// create compatible buffer for DSB1 for depth visualizer			(DSB4)
 	CreateCompatibleBuffer(1u, true, false);

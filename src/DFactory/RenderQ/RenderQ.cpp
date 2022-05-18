@@ -5,8 +5,9 @@ RenderQ::RenderQ() noexcept
 	// create preset passes
 	PassCreate("fxStandard0");			// 0 = fxStandard
 	PassCreate("fxBlur0");				// 1 = fxBlur
-	PassCreate("fxOutline0");			// 2 = fxOutline (step 0)
-	PassCreate("fxOutline1");			// 3 = fxOutline (step 1)
+	PassCreate("fxShadow0");			// 2 = fxShadow
+	PassCreate("fxOutline0");			// 3 = fxOutline (step 0)
+	PassCreate("fxOutline1");			// 4 = fxOutline (step 1)
 
 	// initialize default techniques
 	RTechniqueDB::Get().InitDefaultTechniques();
@@ -23,10 +24,11 @@ void RenderQ::Render() noexcept
 	// PASS PROCESSOR
 	//
 
-	m_Passes[0].PassDraw();				// fxStandard
-	m_Passes[1].PassDraw();				// fxBlur drawing to blur buffer and render stencil pass
-	m_Passes[2].PassDraw();				// fxOutline stencil writing step
-	m_Passes[3].PassDraw();				// fxOutline stencil masking step
+	m_Passes[0].PassDraw();				// fxShadow - draw 'shadow' depth pass
+	m_Passes[1].PassDraw();				// fxStandard
+	m_Passes[2].PassDraw();				// fxBlur - draw to 'blur' buffer and 'render' depth pass
+	m_Passes[3].PassDraw();				// fxOutline stencil writing step
+	m_Passes[4].PassDraw();				// fxOutline stencil masking step
 
 	// disable stencil
 	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Stencil::Off);
@@ -54,9 +56,8 @@ void RenderQ::Render() noexcept
 
 	// draw the primary surface using data from render buffer 1 or draw depth data
 	(DF::D3DM->GetShowDepth())
-		? DF::D3DM->RenderDepthToSurface(0u, (DF::DSBuffers)4u)
+		? DF::D3DM->RenderDepthToSurface(0u, (DF::DSBuffers)DF::DEBUG.depthView)
 		: DF::D3DM->RenderBufferToSurface(0u, DF::RBuffers::Render);
-
 }
 
 void RenderQ::PassCreate(std::string name) noexcept

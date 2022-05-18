@@ -223,7 +223,7 @@ void D3DMgr::BeginFrame() noexcept
 	
 	// bind render target 1 and depth buffer 1 - primary rendering targets, which will be used on a main surface
 	RTBind(DF::RBuffers::Render, DF::DSBuffers::Render, 1u);
-	
+
 	// start new imGui frame
 	if (m_imguiEnabled)
 	{
@@ -245,6 +245,9 @@ void D3DMgr::BeginFrame() noexcept
 
 	// clear 'downsample' buffers
 	Clear(DF::RBuffers::Resample, DF::DSBuffers::Resample);
+
+	// clear dir light depth buffer
+	ClearDSBuffer(3u);
 }
 
 void D3DMgr::EndFrame()
@@ -318,6 +321,13 @@ void D3DMgr::SetClearColor(const float red, const float green, const float blue,
 	}
 }
 
+void D3DMgr::ClearDSBuffer(uint8_t index) noexcept
+{
+	(index > -1 && index < depthTargets.size() - 1)
+		? m_pContext->ClearDepthStencilView(depthTargets[index].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u)
+		: void();
+}
+
 void D3DMgr::RenderWireframe(bool enable) noexcept
 {
 	COMPTR<ID3D11RasterizerState> pRState;
@@ -341,16 +351,6 @@ void D3DMgr::RenderWireframe(bool enable) noexcept
 
 	D3D_THROW_INFO(m_pDevice->CreateRasterizerState(&RDesc, &pRState));
 	m_pContext->RSSetState(pRState.Get());
-}
-
-void D3DMgr::SetProjection(DirectX::FXMMATRIX& projection) noexcept
-{
-	m_ProjectionMatrix = projection;
-}
-
-DirectX::XMMATRIX D3DMgr::GetProjection() const noexcept
-{
-	return m_ProjectionMatrix;
 }
 
 void D3DMgr::SetCamera(CCamera* pCamera) noexcept

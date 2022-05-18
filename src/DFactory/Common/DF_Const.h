@@ -7,8 +7,9 @@ namespace Bind
 	enum BindID
 	{
 		idVertexBuffer, idIndexBuffer, idTopology,		// core binds
-		idVertexShader, idPixelShader, idSampler,
-		idTexture0, idTexture1, idTexture2, idTexture3, idTexture4, idTexture5,
+		idVertexShader, idPixelShader,
+		idSampler0, idSampler1,
+		idTexture0, idTexture1, idTexture2, idTexture3, idTexture4, idTexture5, idTextureDepth,
 		idConstVertexBuf0, idConstPixelBuf0,
 		idInputLayout, idTransform
 	};
@@ -36,10 +37,11 @@ namespace DF
 	{
 		// mark bits that will run this mesh through corresponding passes
 		fxNone =		0,						// exclude from rendering
-		fxStandard =	1 << 0,					// pass 0
-		fxBlur =		1 << 1,					// pass 1
-		fxMask =		1 << 2,					// pass 2
-		fxOutline =		(1 << 2) + (1 << 3)		// pass 2 and 3
+		fxShadow =		1 << 0,					// pass 0
+		fxStandard =	1 << 1,					// pass 1
+		fxBlur =		1 << 2,					// pass 2
+		fxMask =		1 << 3,					// pass 3
+		fxOutline =		(1 << 3) + (1 << 4)		// pass 3 and 4
 	};
 
 	//

@@ -8,7 +8,7 @@ struct VSIn
 
 struct VSOut
 {
-	float2 tex : TEXCOORD;
+	float2 tex : TEXCOORD0;
 	float4 pos : SV_POSITION;
 };
 

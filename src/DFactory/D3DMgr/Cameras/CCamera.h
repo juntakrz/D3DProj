@@ -13,7 +13,6 @@ private:
 	float m_deltaRotation = 0.03f;
 
 	// set vectors
-
 	XMFLOAT3 m_pos = { 0.0f, 0.0f, 0.0f };
 	XMFLOAT3 m_rot = { 0.0f, 0.0f, 0.0f };
 	XMVECTOR m_vecUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -25,17 +24,31 @@ private:
 	// view mode - lookAt object or lookTo direction
 	bool m_lookAt = false;
 	XMFLOAT3 m_targetPos = { 0.0f, 0.0f, 0.0f };
+	XMFLOAT4 m_perspData;
+	XMFLOAT4 m_orthoData;
+
 
 public:
 	XMMATRIX m_XMView;
+	XMMATRIX m_XMProj;
+	XMMATRIX m_XMViewProj;	// transposed view*proj matrix
 
 public:
 	CCamera(const float posX = 0.0f, const float posY = 0.0f, const float posZ = 0.0f) noexcept;
 	~CCamera() = default;
 
-	void SetView() noexcept;
-	void LockTo(const bool& lookAt) noexcept;		// needs updating with object methods / position, right now does basically nothing
-	void Unlock() noexcept;							// related to the above, not defined
+	void SetView() noexcept;						// calculate camera view
+	void SetViewProj() noexcept;					// calculate view*proj matrix
+
+	void Lock() noexcept;		
+	void Unlock() noexcept;
+	void LookAt(float x, float y, float z) noexcept;
+	void LookAt(std::string objectId) noexcept;
+
+	void SetAsPerspective() noexcept;
+	void SetAsPerspective(float FOV, float aspectRatio, float nearZ, float farZ) noexcept;
+	void SetAsOrthographic() noexcept;
+	void SetAsOrthographic(float width, float height, float nearZ, float farZ) noexcept;
 	
 	void SetPos(float posX = 0.0f, float posY = 0.0f, float posZ = 0.0f) noexcept;
 	void SetPos(XMFLOAT3 pos) noexcept;

@@ -31,7 +31,7 @@ VSOut main( VSIn iVS )
 {
     VSOut oVS;
     float4 W_Pos4 = mul(float4(iVS.pos, 1.0f), world);
-    oVS.pos = mul(W_Pos4, mul(world, viewProj));
+    oVS.pos = mul(W_Pos4, viewProj);
     oVS.worldPos = W_Pos4.xyz;
     oVS.tex = iVS.tex;
     oVS.W_Normal = normalize(mul(iVS.normal, (float3x3) world));

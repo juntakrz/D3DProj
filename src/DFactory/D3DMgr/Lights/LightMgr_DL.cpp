@@ -5,13 +5,26 @@ LightMgr::DirLight_ConstPSBuffer& LightMgr::DL() noexcept
 	return dlData;
 }
 
-void LightMgr::DLSetViewMatrix() noexcept
+void LightMgr::DLSetCamera(CCamera* pCam) noexcept
 {
-	DirectX::XMFLOAT3 lookAt = { 0.0f, 0.0f, 0.0f };		// ?
-	dlViewProj.DLView = XMMatrixTranspose(XMMatrixLookAtLH(DirectX::XMLoadFloat3(&dlData.pos), DirectX::XMLoadFloat3(&lookAt), m_vecUp));
+	m_pDirCamera = pCam;
 }
 
-void LightMgr::DLSetProjMatrix(float nearZ, float farZ) noexcept
+void LightMgr::DLSetViewData() noexcept
 {
-	dlViewProj.DLProj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(m_FOV, DF::D3DM->GetAspectRatio(), nearZ, farZ));
+	if (m_pDirCamera)
+	{
+		dlViewProj.DLView = XMMatrixTranspose(m_pDirCamera->m_XMView);
+		dlViewProj.DLProj = XMMatrixTranspose(m_pDirCamera->m_XMProj);
+	}
+}
+
+void LightMgr::DLSetPos(float x, float y, float z) noexcept
+{
+	dlData.pos = { x, y, z };
+}
+
+void LightMgr::DLSetPos(XMFLOAT3 pos) noexcept
+{
+	dlData.pos = pos;
 }
