@@ -53,16 +53,14 @@ namespace Bind
 			GetContext()->Unmap(m_pConstBuffer.Get(), 0u);
 		};
 		
-		void Update(const std::vector<C>* cbuf, int size)
+		void Update(const std::vector<C>& cbuf, int size)
 		{
 			D3D_DXGIDEBUG(*DF::D3DM);
 
-			std::vector<C> tbuf(cbuf->size());
-			memcpy(tbuf.data(), cbuf->data(), sizeof(C) * cbuf->size());
-
 			D3D11_MAPPED_SUBRESOURCE msr = {};
 			D3D_THROW(GetContext()->Map(m_pConstBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr));
-			memcpy(msr.pData, tbuf.data(), sizeof(C) * cbuf->size());
+			memcpy(msr.pData, cbuf.data(), sizeof(C) * cbuf.size());
+
 			GetContext()->Unmap(m_pConstBuffer.Get(), 0u);
 		};
 

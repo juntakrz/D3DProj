@@ -81,11 +81,12 @@ CCamera* DFactory::Camera(const std::string& name) noexcept
 	}
 
 #ifdef _DEBUG || _DFDEBUG
-	std::string str = "DF Camera error: '" + name + "' not found! Returning currently selected camera.\n";
+	std::string str = "WARNING! DF Camera: '" + name + "' not found! Returning nullptr.\n";
 	OutputDebugStringA(str.c_str());
 #endif
 
-	return m_Cameras.at(vars.selectedCamera).get();
+	//return m_Cameras.at(vars.selectedCamera).get();
+	return nullptr;
 }
 
 std::pair<std::string, CCamera*> DFactory::CameraGetActive() noexcept

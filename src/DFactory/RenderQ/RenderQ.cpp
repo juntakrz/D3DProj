@@ -24,7 +24,8 @@ void RenderQ::Render() noexcept
 	// PASS PROCESSOR
 	//
 
-	m_Passes[0].PassDraw();				// fxShadow - draw 'shadow' depth pass
+	//m_Passes[0].PassDraw();				// fxShadow - draw 'shadow' depth pass
+	m_Passes[0].PassDrawCS();
 	m_Passes[1].PassDraw();				// fxStandard
 	m_Passes[2].PassDraw();				// fxBlur - draw to 'blur' buffer and 'render' depth pass
 	m_Passes[3].PassDraw();				// fxOutline stencil writing step
@@ -34,7 +35,7 @@ void RenderQ::Render() noexcept
 	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Stencil::Off);
 
 	//
-	// SURFACE PROCESSER
+	// SURFACE PROCESSOR
 	//
 
 	// bind 'downsample' buffer and depth buffer with equal resolution
@@ -44,7 +45,7 @@ void RenderQ::Render() noexcept
 	DF::D3DM->RenderBufferToSurface(1u, DF::RBuffers::Blur);
 
 	// copy "render" depth buffer to its compatible clone if visualizing depth
-	(DF::D3DM->GetShowDepth()) ? DF::D3DM->RTCopyBuffer(1u, 4u, true) : void();
+	//(DF::D3DM->GetShowDepth()) ? DF::D3DM->RTCopyBuffer(1u, 4u, true) : void();
 
 	// bind 'render' buffer and corresponding depth buffer
 	DF::D3DM->RTBind(DF::RBuffers::Render, DF::DSBuffers::Render);

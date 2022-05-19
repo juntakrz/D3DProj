@@ -246,7 +246,7 @@ void D3DMgr::BeginFrame() noexcept
 	// clear 'downsample' buffers
 	Clear(DF::RBuffers::Resample, DF::DSBuffers::Resample);
 
-	// clear dir light depth buffer
+	// clear CSM depth buffer
 	ClearDSBuffer(3u);
 }
 
@@ -322,8 +322,8 @@ void D3DMgr::SetClearColor(const float red, const float green, const float blue,
 }
 
 void D3DMgr::ClearDSBuffer(uint8_t index) noexcept
-{
-	(index > -1 && index < depthTargets.size() - 1)
+{	
+	(index > -1 && index < depthTargets.size())
 		? m_pContext->ClearDepthStencilView(depthTargets[index].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u)
 		: void();
 }

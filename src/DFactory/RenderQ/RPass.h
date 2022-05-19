@@ -28,6 +28,7 @@ public:
 
 	// execute jobs
 	void PassDraw() const noexcept;
+	void PassDrawCS() noexcept;			// special cascade shadows pass, requires appropriate technique
 	
 private:
 	size_t m_Id;						// pass Id, which should be the same for technique steps

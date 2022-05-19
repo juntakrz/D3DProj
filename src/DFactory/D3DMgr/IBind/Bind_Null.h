@@ -38,12 +38,12 @@ namespace Bind
 
 		void Bind() noexcept override
 		{
-			GetContext()->PSSetShaderResources(m_slot, m_numViews, &m_pNullSRV);
+			GetContext()->PSSetShaderResources(m_slot, m_numViews, m_pNullSRV);
 		}
 
 	private:
 		UINT m_slot = 0u;
 		UINT m_numViews = 1u;
-		ID3D11ShaderResourceView* m_pNullSRV = nullptr;
+		ID3D11ShaderResourceView* m_pNullSRV[4] = { nullptr, nullptr, nullptr, nullptr };
 	};
 }

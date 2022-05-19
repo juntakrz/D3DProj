@@ -14,6 +14,9 @@ void DFMain::DrawFrame()
 	DF.ModelM->Select("MdlTachi");
 	DF.ModelM->SetRotation(-0.6f - deltaA*0.7f , -0.4f + deltaA, -0.3f + deltaA * 0.7f);
 
+	//DF.Camera("camMain")->SetPos(-1.4f, 0.3f, 1.0f + deltaA * 12.0f);
+	//DF.Camera("camMain")->Move(0.0f, 0.0f, 0.018f);
+
 	// MdlMars
 	//DF.ModelM->Select(1);
 	//DF.ModelM->SetPos(DF.Camera()->GetPos().x + 600.0f, DF.Camera()->GetPos().y - 1600.0f, DF.Camera()->GetPos().z + 4000.0f);
@@ -38,9 +41,25 @@ void DFMain::DrawFrame()
 	{
 		float simspeed = DF.GetSimulationSpeed();
 		ImGui::Text("\nStatistics\n");
-		ImGui::Text("%.1f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("%.1f ms/frame (%.1f FPS)\n", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("\n'camMain' position: %.1f, %.1f, %.1f\n",
+			DF.Camera("camMain")->GetPos().x,
+			DF.Camera("camMain")->GetPos().y,
+			DF.Camera("camMain")->GetPos().z);
+		ImGui::Text("'camMain' focus point: %.1f, %.1f, %.1f\n",
+			DF.Camera("camMain")->GetFocus().x + DF.Camera("camMain")->GetPos().x,
+			DF.Camera("camMain")->GetFocus().y + DF.Camera("camMain")->GetPos().y,
+			DF.Camera("camMain")->GetFocus().z + DF.Camera("camMain")->GetPos().z);
+		ImGui::Text("'camLight' position: %.1f, %.1f, %.1f\n",
+			DF.Camera("camLight")->GetPos().x,
+			DF.Camera("camLight")->GetPos().y,
+			DF.Camera("camLight")->GetPos().z);
+		ImGui::Text("'camLight' focus point: %.1f, %.1f, %.1f\n",
+			DF.Camera("camLight")->GetFocus().x,
+			DF.Camera("camLight")->GetFocus().y,
+			DF.Camera("camLight")->GetFocus().z);
 		
-		ImGui::SliderFloat("Simulation Speed", &simspeed, 0.25f, 4.0f, "%.1f");
+		//ImGui::SliderFloat("Simulation Speed", &simspeed, 0.25f, 4.0f, "%.1f");
 
 		DF.SetSimulationSpeed(simspeed);
 	}
@@ -326,11 +345,11 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(-1.4f, 0.0f, 2.0f);
 
-	/*
+	
 	//MdlPlaneTest
 	DF.ModelM->Create(DF::idCube, "MdlPlaneTest");
 	DF.ModelM->SetMaterial("Mat_Test");
-	DF.ModelM->SetPos(1.0f, -0.5f, 2.0f);
+	DF.ModelM->SetPos(1.0f, -1.0f, 2.0f);
 	DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
 	DF.ModelM->SetRotation(0.8f, 1.2f, 0.0f);
 	/*
@@ -394,20 +413,17 @@ void DFMain::LoadScreen() noexcept
 
 	//DF.Camera()->SetPos(-0.7f, 0.0f, 0.8f);		// default position
 	DF.Camera()->SetPos(-1.4f, 0.3f, 1.0f);			// test position
-	DF.Camera()->SetRotation(-7, 25);
+	//DF.Camera()->SetRotation(-7, 25);
 
 	// camera that will be used for shadows from directional light
 	DF.CameraAdd("camLight");
 	DF.CameraSelect("camLight");
 	DF.Camera()->SetPos(DF.LightM->DL().pos);
-	//DF.Camera()->SetRotation(-30, 45);
 	DF.LightM->DLSetCamera(DF.Camera("camLight"));
 
 	DF.Camera()->SetAsOrthographic(8.0f, 4.5f, 0.001f, 100.0f);
 	//DF.Camera()->SetAsPerspective(1.0f, 16.0f / 9.0f, 0.01f, 100.0f);
-	DF.Camera()->LookAt(0.0f, 0.0f, 8.0f);
-	DF.Camera()->EnableLookAt();
-	//DF.Camera()->LockTo(DF.Camera("camMain"));
+	DF.Camera()->LockToCamera(DF.Camera("camMain"));
 
 	DF.UpdateRenderer();
 }

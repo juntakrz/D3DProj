@@ -10,13 +10,24 @@ void LightMgr::DLSetCamera(CCamera* pCam) noexcept
 	m_pDirCamera = pCam;
 }
 
-void LightMgr::DLSetViewData() noexcept
+void LightMgr::DLVSBufferClear() noexcept
+{
+	//dlViewProj.DLViewProj.clear();
+}
+
+void LightMgr::DLVSBufferSetViewProj(uint8_t index) noexcept
 {
 	if (m_pDirCamera)
 	{
-		dlViewProj.DLView = XMMatrixTranspose(m_pDirCamera->m_XMView);
-		dlViewProj.DLProj = XMMatrixTranspose(m_pDirCamera->m_XMProj);
+		dlViewProj.DLViewProj[index] = m_pDirCamera->m_XMViewProj;
 	}
+}
+
+void LightMgr::DLVSBufferBind() noexcept
+{
+	// update and bind directional light view buffer
+	dirVSBuffer.Update(dlViewProj);
+	dirVSBuffer.Bind();
 }
 
 void LightMgr::DLSetPos(float x, float y, float z) noexcept

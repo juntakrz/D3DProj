@@ -12,6 +12,6 @@ namespace Bind
 		void Bind() noexcept override;
 
 	private:
-		COMPTR<ID3D11RasterizerState> pRState;
+		COMPTR<ID3D11RasterizerState> m_pRState;
 	};
 }

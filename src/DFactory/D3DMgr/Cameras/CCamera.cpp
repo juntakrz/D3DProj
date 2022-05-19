@@ -5,13 +5,11 @@ CCamera::CCamera(const float posX, const float posY, const float posZ) noexcept
 	: m_pos({ posX, posY, posZ })
 {
 	SetAsPerspective(1.0f, DF::D3DM->GetAspectRatio(), 0.05f, 5000.05f);
-	m_orthoData = { 1.0f * 32.0f, 9.0f/16.0f * 32.0f, 0.05f, 100.05f };
+	m_orthoData = { 16.0f, 9.0f, 0.05f, 120.0f };
 }
 
 void CCamera::SetView() noexcept
 {
-	m_vecPos = XMLoadFloat3(&m_pos);
-
 	switch (m_lookAt)
 	{
 	case true:
@@ -23,12 +21,23 @@ void CCamera::SetView() noexcept
 			XMMatrixRotationRollPitchYaw(-m_rot.x, -m_rot.y, 0.0f)
 		);*/
 
-		if (m_followCam)
+		if (m_pTargetCam)
 		{
-			
+			XMFLOAT3 targetPos = m_pTargetCam->GetPos();
+			XMFLOAT3 targetFocus = m_pTargetCam->GetFocus();
+			XMVECTOR adjPos;
+
+			// adjust position in relation to target camera
+			adjPos = XMVectorAdd(XMLoadFloat3(&m_initPos), XMLoadFloat3(&targetPos));
+			adjPos = XMVectorAdd(adjPos, XMLoadFloat3(&targetFocus));
+			XMStoreFloat3(&m_pos, adjPos);
+
+			// adjust focus point in relation to target camera's focus point
+			m_vecFocus = XMVectorAdd(XMLoadFloat3(&targetPos), XMLoadFloat3(&targetFocus));
 		}
 
-		m_XMView = XMMatrixLookAtLH(m_vecPos, XMLoadFloat3(&m_targetPos), m_vecUp);
+		m_vecPos = XMLoadFloat3(&m_pos);
+		m_XMView = XMMatrixLookAtLH(m_vecPos, m_vecFocus, m_vecUp);
 		return;
 	}
 	case false:
@@ -38,6 +47,7 @@ void CCamera::SetView() noexcept
 			XMMatrixRotationRollPitchYaw(-m_rot.x, -m_rot.y, 0.0f)
 		);
 
+		m_vecPos = XMLoadFloat3(&m_pos);
 		m_XMView = XMMatrixLookToLH(m_vecPos, m_vecFocus, m_vecUp);
 		return;
 	}
@@ -59,20 +69,31 @@ void CCamera::DisableLookAt() noexcept
 	m_lookAt = false;
 }
 
-void CCamera::LockTo(CCamera* pCam) noexcept
+void CCamera::LockToCamera(CCamera* pCam) noexcept
 {
-	m_followCam = pCam;
-	m_lookAt = true;
+	if (pCam)
+	{
+		m_pTargetCam = pCam;
+		m_lookAt = true;
+	}
 }
 
 void CCamera::LookAt(float x, float y, float z) noexcept
 {
-	m_targetPos = { x, y, z };
+	XMFLOAT3 focusPoint = { x, y, z };
+	XMLoadFloat3(&focusPoint);
 }
 
 void CCamera::LookAt(std::string objectId) noexcept
 {
 	m_targetId = objectId;
+}
+
+const XMFLOAT3& CCamera::GetFocus() const noexcept
+{
+	XMFLOAT3 focus;
+	XMStoreFloat3(&focus, m_vecFocus);
+	return focus;
 }
 
 void CCamera::SetAsPerspective() noexcept
@@ -89,6 +110,7 @@ void CCamera::SetAsPerspective(float FOV, float aspectRatio, float nearZ, float 
 void CCamera::SetAsOrthographic() noexcept
 {
 	m_XMProj = XMMatrixOrthographicLH(m_orthoData.x, m_orthoData.y, m_orthoData.z, m_orthoData.w);
+	//m_XMProj = XMMatrixOrthographicOffCenterLH(-m_orthoData.x, m_orthoData.x, -m_orthoData.y, m_orthoData.y, m_orthoData.z, m_orthoData.w);
 }
 
 void CCamera::SetAsOrthographic(float width, float height, float nearZ, float farZ) noexcept
@@ -102,11 +124,13 @@ void CCamera::SetPos(float posX, float posY, float posZ) noexcept
 	m_pos.x = posX;
 	m_pos.y = posY;
 	m_pos.z = posZ;
+	m_initPos = m_pos;
 }
 
 void CCamera::SetPos(XMFLOAT3 pos) noexcept
 {
 	m_pos = pos;
+	m_initPos = pos;
 }
 
 void CCamera::SetRotation(int pitchDeg, int yawDeg) noexcept
@@ -124,15 +148,9 @@ void CCamera::SetRotation(float pitchRad, float yawRad) noexcept
 	m_rot.y = -GMath::WrapAngle(yawRad);
 }
 
-const XMFLOAT3& CCamera::GetInitialPos() const noexcept
-{
-	return m_pos;
-}
-
 const XMFLOAT3& CCamera::GetPos() const noexcept
 {
 	return m_pos;
-	//return m_adjPos;
 }
 
 void CCamera::SetMovementDelta(float delta) noexcept
