@@ -15,10 +15,10 @@ Bind::Rasterizer::Rasterizer(D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode)
 	RDesc.ScissorEnable = false;
 	RDesc.SlopeScaledDepthBias = 0.0f;
 
-	D3D_THROW(GetDevice()->CreateRasterizerState(&RDesc, &pRState));
+	D3D_THROW(GetDevice()->CreateRasterizerState(&RDesc, &m_pRState));
 }
 
 void Bind::Rasterizer::Bind() noexcept
 {
-	GetContext()->RSSetState(pRState.Get());
+	GetContext()->RSSetState(m_pRState.Get());
 }

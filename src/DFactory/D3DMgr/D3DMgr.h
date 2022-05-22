@@ -68,6 +68,9 @@ private:
 		std::unique_ptr<RenderSurface> pRS = nullptr;
 	};
 
+	ID3D11RenderTargetView* nullRTV = nullptr;
+	ID3D11DepthStencilView* nullDSV = nullptr;
+
 	HRESULT hr;
 	bool m_imguiEnabled = CWND_IMGUIENABLED;
 	bool m_ShowDepth = false;
@@ -179,11 +182,14 @@ public:
 	// creates depth-stencil buffer using given render buffer and returns its index
 	int8_t	CreateDepthBuffer(uint8_t rtIndex, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
 
+	// creates standalone depth-stencil buffer
+	int8_t	CreateDepthBuffer(int16_t width, int16_t height, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
+
 	// create compatible render target
 	uint8_t CreateCompatibleBuffer(uint8_t index, bool isDepthBuffer, bool createRenderView) noexcept;
 
 	// binds render target view and depth stencil view (same if used first overload)
-	void	RTBind(const uint8_t& rtIndex, const uint8_t& dsIndex, const uint8_t& num = 1) noexcept;
+	void	RTBind(const int8_t& rtIndex, const int8_t& dsIndex, const int8_t& num = 1) noexcept;
 	void	RTBind(const DF::RBuffers& rtIndex, const DF::DSBuffers& dsIndex, const uint8_t& num = 1) noexcept;
 
 	// copies render target buffer

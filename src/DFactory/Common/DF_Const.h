@@ -83,6 +83,18 @@ namespace DF
 	DXGI_FORMAT GetDepthFormatColor(const DS_Usage& usage) noexcept;
 
 	//
+	// CASCADE SHADOW MAPPING
+	//
+	namespace CSM
+	{
+		constexpr float cascades = 4.0f;	// number of cascades (must be integer)
+		extern float bufferSize;			// size of a square depth texture in pixels
+		extern float FOVmult;				// light camera ortho FOV multiplier
+		extern float minZ;					// minimum nearZ
+		extern float maxZ;					// maximum farZ
+	};
+
+	//
 	// VERTEX STRUCTURE
 	//
 

@@ -32,6 +32,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.ModelM->pMatMgr = _SInstance.MatM;
 
 	// create default camera, activate and bind it
+	//_SInstance.CameraAdd("$camNULL");
 	_SInstance.CameraAdd("camMain");
 	_SInstance.CameraActivate("camMain", true);
 	_SInstance.CameraBindVS();
@@ -70,7 +71,7 @@ void DFactory::BeginFrame() noexcept
 	//Process controls
 	proc.ProcessCamera();
 	proc.ProcessFunctions();
-
+	
 	//hand off to Direct3D manager
 	pD3DMgr->BeginFrame();
 }
@@ -85,11 +86,18 @@ void DFactory::EndFrame() noexcept
 
 void DFactory::DrawFrame() noexcept
 {
+	// update camera view matrices
+	for (const auto& [camName, camera] : m_Cameras)
+	{
+		camera->SetView();
+		camera->SetViewProj();
+	}
+
 	// update camera buffer for use in vertex shader slot 1
 	CameraUpdateVS();
 
 	// update directional light view
-	LightM->DLSetViewData();
+	//LightM->DLSetViewData();
 
 	// update model matrix and propagate it among meshes through nodes
 	for (auto& it : ModelM->m_Models)

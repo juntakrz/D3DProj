@@ -33,8 +33,7 @@ private:
 	} dlData;
 
 	struct DirLight_ConstVSBuffer {
-		DirectX::XMMATRIX DLView;
-		DirectX::XMMATRIX DLProj;
+		DirectX::XMMATRIX DLViewProj[(uint8_t)DF::CSM::cascades];
 	} dlViewProj;
 
 	struct PointLight_ConstPSBuffer {
@@ -67,7 +66,9 @@ public:
 	DirLight_ConstPSBuffer& DL() noexcept;
 
 	void DLSetCamera(CCamera* pCam) noexcept;
-	void DLSetViewData() noexcept;
+	void DLVSBufferClear() noexcept;
+	void DLVSBufferSetViewProj(uint8_t index) noexcept;
+	void DLVSBufferBind() noexcept;
 
 	void DLSetPos(float x, float y, float z) noexcept;
 	void DLSetPos(XMFLOAT3 pos) noexcept;

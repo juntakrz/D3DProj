@@ -68,8 +68,4 @@ void LightMgr::Bind(const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept {
 	// updating and binding directional light buffer
 	dirBuffer.Update(dlData);
 	dirBuffer.Bind();
-
-	// update and bind directional light view buffer
-	dirVSBuffer.Update(dlViewProj);
-	dirVSBuffer.Bind();
 }
