@@ -162,6 +162,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\DFactory\Common\DF_Const.cpp" />
+    <ClCompile Include="src\DFactory\D3DMgr\Math\CFrustum.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RS.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\IBind\Bind_Rasterizer.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr_DL.cpp" />
@@ -274,6 +275,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\CApp.h" />
+    <ClInclude Include="src\DFactory\D3DMgr\Math\CFrustum.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Rasterizer.h" />
     <ClInclude Include="src\DFactory\D3DMgr\RenderSurface.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h" />

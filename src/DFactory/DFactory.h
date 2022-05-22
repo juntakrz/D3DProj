@@ -5,6 +5,7 @@
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
 #include "RenderQ/RenderQ.h"
+#include "D3DMgr/Math/CFrustum.h"
 
 class DFactory
 {

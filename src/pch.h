@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include <math.h>
 #include <DirectXMath.h>
+#include <DirectXCollision.h>
 
 //Direct3D
 #pragma comment (lib, "d3d11.lib")
@@ -39,6 +40,8 @@
 
 //D3D11 DDS Loader
 #include "DFactory/Util/DDSTextureLoader11.h"
+
+using namespace DirectX;
 
 #ifdef _DEBUG
 #pragma comment (lib, "dxguid.lib")

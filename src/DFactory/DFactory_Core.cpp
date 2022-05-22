@@ -96,14 +96,17 @@ void DFactory::DrawFrame() noexcept
 	// update camera buffer for use in vertex shader slot 1
 	CameraUpdateVS();
 
-	// update directional light view
-	//LightM->DLSetViewData();
-
 	// update model matrix and propagate it among meshes through nodes
 	for (auto& it : ModelM->m_Models)
 	{
-		it.pRootNode->XMUpdate(it.GetModelXMTransform());
+		it.pRootNode->XMUpdate(it.GetModelXMTransform(), it.calcBoundaries);
+		it.calcBoundaries = false;
 	}
+
+	// update bounding frustrum
+	CFrustum::CalcFrustum(m_Cameras.at(vars.activeCamera)->m_XMView, m_Cameras.at(vars.activeCamera)->m_XMProj);
+
+	ModelM->UpdateRenderer();
 	
 	// process lights
 	LightM->Draw();

@@ -1,8 +1,10 @@
 #include "MeshImport.h"
 
-MeshImport::MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds)
+MeshImport::MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds, const std::vector<DF::Vertex>& vertices)
 {
 	m_Binds = std::move(pBinds);
+
+	CalcMeshRadius(vertices, m_radius);
 
 	m_pIndexBuffer = reinterpret_cast<Bind::IndexBuffer*>(m_Binds[Bind::idIndexBuffer].get());
 
