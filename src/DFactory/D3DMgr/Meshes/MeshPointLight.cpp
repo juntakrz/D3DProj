@@ -7,6 +7,8 @@ MeshPointLight::MeshPointLight()
 	//create instance
 	auto model = CSphere::Create<DF::Vertex>(4);
 
+	CalcMeshAABBPoints(model.vertices);
+
 	// create VertexBuffer with vertices
 	m_Binds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(model.vertices);
 

@@ -12,7 +12,29 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
     //float1 color = tex2D.Sample(smplr, tex).r;
     
     // exponential inverted
-    float1 color = 1.0 - tex2D.Sample(smplr, tex).r;
+    //float1 color = 1.0 - tex2D.Sample(smplr, tex).r;
     
-    return float4(color, color, color, 1.0);
+    //float2 coords = tex;
+    //coords.x = (coords.x / 4.0) + 0.5;
+    
+    // color coded
+    float1 color = tex2D.Sample(smplr, tex).r;
+    
+    float1 red = color * 2.0f;
+    if(red > 1.0f)
+    {
+        red = 1.0f - (red - 1.0f);
+    }
+    float1 green = (color - 0.2f) / 0.6f * 2.0f;
+    if(green > 1.0f)
+    {
+        green = 1.0f - (green - 1.0f);
+    }
+    float1 blue = 1.0f - color * 2.0f;
+    if(blue < 0.0f)
+    {
+        blue = -blue;
+    }
+    
+    return float4(red, green, blue, 1.0f);
 }

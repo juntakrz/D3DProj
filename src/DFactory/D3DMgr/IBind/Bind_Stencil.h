@@ -4,8 +4,7 @@
 
 namespace Bind
 {
-	//enum class StencilMode;
-
+	/*
 	class Stencil : public IBind
 	{
 		enum class Mode
@@ -17,6 +16,8 @@ namespace Bind
 		{
 			//default stencil description setting
 			D3D11_DEPTH_STENCIL_DESC DSDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
+
+			DSDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 			switch (mode)
 			{
@@ -53,4 +54,5 @@ namespace Bind
 	protected:
 		COMPTR<ID3D11DepthStencilState> m_pDSS;
 	};
+	*/
 }

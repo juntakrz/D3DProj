@@ -57,4 +57,7 @@ namespace DF
 		float minZ		 = 0.01f;
 		float maxZ		 = 48.0f;
 	}
+
+	bool isCullingEnabled = true;
+	uint64_t framesRendered = 0;
 }

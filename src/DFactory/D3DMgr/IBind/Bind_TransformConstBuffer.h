@@ -10,6 +10,7 @@ namespace Bind
 		{
 			DirectX::XMMATRIX world;
 			DirectX::XMMATRIX view;
+			DirectX::XMMATRIX proj;
 			DirectX::XMMATRIX viewProj;
 		} transforms;
 

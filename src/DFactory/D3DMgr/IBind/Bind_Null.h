@@ -29,6 +29,17 @@ namespace Bind
 		}
 	};
 
+	class Null_GeometryShader : public IBind
+	{
+	public:
+		Null_GeometryShader() noexcept {};
+
+		void Bind() noexcept override
+		{
+			GetContext()->GSSetShader(nullptr, nullptr, NULL);
+		}
+	};
+
 	class Null_Texture : public IBind
 	{
 	public:

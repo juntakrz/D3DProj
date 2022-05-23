@@ -16,7 +16,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.pD3DMgr = DF::D3DM;
 
 	// set Direct3D default viewport size
-	_SInstance.pD3DMgr->SetViewportSize(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
+	_SInstance.pD3DMgr->SetResolution(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
 
 	// create 'main' and 'aux' render surfaces
 	_SInstance.pD3DMgr->CreateRenderSurface("main", 1.0f);
@@ -38,19 +38,20 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.CameraBindVS();
 
 	// init rendering manager
-	_SInstance.RenderM = new RenderQ;
+	_SInstance.RenderM = new RenderGraph;
 	_SInstance.ModelM->pRenderMgr = _SInstance.RenderM;
 
 	//create and add default material
 	DFMaterial::DFMATERIAL_DESC DFMatDesc{};
 	DFMatDesc.name = "Mat_Default";
-	DFMatDesc.shaders.vertex = "VS_BasicTexture";
-	DFMatDesc.shaders.pixel = "PS_BasicTexture";
+	DFMatDesc.shaders.vertex = "VS_FlatTexture";
+	DFMatDesc.shaders.pixel = "PS_FlatTexture";
 	DFMatDesc.textures.tex0 = "default//default.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.material.spec_metal = 0.0f;
 	DFMatDesc.material.pow_roughness = 0.5f;
+	DFMatDesc.effects = DF::fxStandard;
 	_SInstance.MatM->MatAdd(&DFMatDesc);
 
 	//create and add default RTT material
@@ -62,6 +63,13 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 
 	// initialize DFactory procedure manager
 	_SInstance.proc.Init();
+
+	// load primary ImGui font
+	//_SInstance.m_imFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 14.0f);
+	_SInstance.m_imFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("res//font1.ttf", 16.0f);
+
+	// disable ImGui INI file
+	ImGui::GetIO().IniFilename = NULL;
 
 	return _SInstance;
 }
@@ -99,15 +107,13 @@ void DFactory::DrawFrame() noexcept
 	// update model matrix and propagate it among meshes through nodes
 	for (auto& it : ModelM->m_Models)
 	{
-		it.pRootNode->XMUpdate(it.GetModelXMTransform(), it.calcBoundaries);
-		it.calcBoundaries = false;
+		// if model follows camera - recalculate boundaries every frame
+		it.pRootNode->XMUpdate(it.GetModelXMTransform());
 	}
 
-	// update bounding frustrum
-	CFrustum::CalcFrustum(m_Cameras.at(vars.activeCamera)->m_XMView, m_Cameras.at(vars.activeCamera)->m_XMProj);
-
+	// clear rendering queue and generate new jobs
 	ModelM->UpdateRenderer();
-	
+
 	// process lights
 	LightM->Draw();
 
@@ -132,10 +138,20 @@ const float& DFactory::GetSimulationSpeed() const noexcept
 
 void DFactory::FrameCountIncrease() noexcept
 {
-	m_frames++;
+	DF::framesRendered++;
 }
 
-const uint64_t& DFactory::GetFrameCount() const noexcept
+void DFactory::ToggleCulling() noexcept
 {
-	return m_frames;
+	DF::isCullingEnabled = !DF::isCullingEnabled;
+}
+
+const bool& DFactory::DevUIMode() const noexcept
+{
+	return m_showDevUI;
+}
+
+void DFactory::ToggleDevUI() noexcept
+{
+	m_showDevUI = !m_showDevUI;
 }

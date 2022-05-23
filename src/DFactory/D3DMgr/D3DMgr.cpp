@@ -158,6 +158,10 @@ D3DMgr::D3DMgr(HWND hWnd)
 	// initialize imGui here
 	imGuiMgr::Get();
 	ImGui_ImplDX11_Init(m_pDevice.Get(), m_pContext.Get());
+
+	// experimental predicate code
+	Device()->CreatePredicate(&qPred, &m_pPredicate);
+	//
 }
 
 D3DMgr::~D3DMgr()
@@ -191,10 +195,15 @@ bool D3DMgr::IsImGuiEnabled() const noexcept
 	return m_imguiEnabled;
 }
 
-void D3DMgr::SetViewportSize(const uint16_t width, const uint16_t height) noexcept
+void D3DMgr::SetResolution(const uint16_t width, const uint16_t height) noexcept
 {
 	m_VWidth = (float)width;
 	m_VHeight = (float)height;
+}
+
+const XMFLOAT2& D3DMgr::GetResolution() const noexcept
+{
+	return { m_VWidth, m_VHeight };
 }
 
 const float& D3DMgr::GetAspectRatio() const noexcept
@@ -274,6 +283,8 @@ void D3DMgr::EndFrame()
 		}
 	}
 }
+
+// // //
 
 void D3DMgr::Clear(uint8_t rtIndex, bool clearDepthBuffer, int8_t dsIndex) noexcept
 {

@@ -30,19 +30,24 @@ protected:
 		DirectX::XMFLOAT4 data;
 	} matCBuffer;
 
-	// DirectX variables
-	mutable DirectX::XMMATRIX xmMain;
-	mutable DirectX::XMFLOAT3A xmPos;	// for storing transformed 3D position
-	mutable BoundingSphere m_BSphere;	// for storing culling sphere
-	float m_radius = 1.0f;				// radius modifier for culling sphere
-	bool m_calcBSphere = false;		// mark to recalculate boundaries only when necessary
-
 	struct
 	{
 		DirectX::XMFLOAT3A scale = { 1.0f, 1.0f, 1.0f };
 		DirectX::XMFLOAT3A rotation = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT3A translation = { 0.0f, 0.0f, 0.0f };
 	} transform;
+
+	// DirectX variables
+	mutable DirectX::XMMATRIX xmMain;
+	mutable DirectX::XMFLOAT3A xmPos;	// for storing transformed 3D position
+
+	XMFLOAT3 m_AABBcoords[2];			// coordinates used by AABB mesh generation
+
+	// GPU occlusion query data
+	COMPTR<ID3D11Query> m_pQuery = nullptr;
+	D3D11_QUERY_DESC m_qPDesc{ D3D11_QUERY_OCCLUSION_PREDICATE };
+	const uint8_t m_queryDelay = 2;
+	uint8_t m_framesElapsed = 0;		// frames since the last query
 
 	// BUFFERS
 
@@ -58,6 +63,10 @@ public:
 	std::string m_Name = "";				// mesh name (currently unused)
 	uint16_t m_MaterialIndex = 0;			// material index used by this mesh with a standard technique
 	uint32_t m_TechniqueIds;				// technique ids in bit format, applied to this mesh
+
+	bool m_isAABB = false;					// is this mesh bounding mesh
+	//UINT64 m_QueryResult = 100;				// GPU occlusion query result
+	BOOL m_QueryResult = true;
 
 protected:
 	void AddMaterialBind(uint16_t matIndex) noexcept;	
@@ -82,6 +91,8 @@ public:
 		{
 			m_Binds.push_back(nullptr);
 		}
+
+		DF::D3DM->Device()->CreateQuery(&m_qPDesc, &m_pQuery);
 	};
 	MeshCore(const MeshCore&) = delete;
 	~MeshCore() = default;
@@ -105,11 +116,13 @@ public:
 
 	DirectX::XMFLOAT3A* GetXMPos() noexcept;
 
-	DirectX::BoundingSphere* GetXMSphere() noexcept;
-	void SetXMSphereRadius(const float& radius) noexcept;
-	void CalcXMSphereBoundaries() noexcept;
+	// AABB methods
+	void CalcMeshAABBPoints(const std::vector<DF::Vertex>& vertices) noexcept;
+	const XMFLOAT3* AABBPoints() const noexcept;
 
-	void CalcMeshRadius(const std::vector<DF::Vertex>& inVertices, float& outRadius) noexcept;
+	void BeginQuery() noexcept;
+	void EndQuery() noexcept;
+	void GetQueryResult(MeshCore* pMesh = nullptr) noexcept;
 
 	void SetMaterial(std::string name) noexcept;
 	void SetMaterialRT(std::string name) noexcept;

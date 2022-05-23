@@ -13,9 +13,9 @@ private:
 	float m_deltaRotation = 0.03f;
 
 	// set vectors
-	XMFLOAT3 m_pos = { 0.0f, 0.0f, 0.0f };		// camera position
-	XMFLOAT3 m_initPos = { 0.0f, 0.0f, 0.0f };	// initial position
-	XMFLOAT3 m_rot = { 0.0f, 0.0f, 0.0f };
+	XMFLOAT3A m_pos = { 0.0f, 0.0f, 0.0f };		// camera position
+	XMFLOAT3A m_initPos = { 0.0f, 0.0f, 0.0f };	// initial position
+	XMFLOAT3A m_rot = { 0.0f, 0.0f, 0.0f };
 	XMVECTOR m_vecUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMVECTOR m_vecFwd = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
@@ -44,10 +44,11 @@ public:
 
 	void EnableLookAt() noexcept;	
 	void DisableLookAt() noexcept;
-	void LockToCamera(CCamera* pCam) noexcept;		// nullptr to stop following
+	void LockToCameraTarget(CCamera* pCam) noexcept;	// nullptr to stop following
 	void LookAt(float x, float y, float z) noexcept;
 	void LookAt(std::string objectId) noexcept;
-	const XMFLOAT3& GetFocus() const noexcept;
+	const XMFLOAT3A& GetFocus() const noexcept;
+	const XMVECTOR& GetFocusVector() const noexcept;
 
 	void SetAsPerspective() noexcept;
 	void SetAsPerspective(float FOV, float aspectRatio, float nearZ, float farZ) noexcept;
@@ -55,10 +56,12 @@ public:
 	void SetAsOrthographic(float width, float height, float nearZ, float farZ) noexcept;
 	
 	void SetPos(float posX = 0.0f, float posY = 0.0f, float posZ = 0.0f) noexcept;
-	void SetPos(XMFLOAT3 pos) noexcept;
+	void SetPos(const XMFLOAT3A& pos) noexcept;
 	void SetRotation(int pitchDeg, int yawDeg) noexcept;
 	void SetRotation(float pitchRad = 0.0f, float yawRad = 0.0f) noexcept;
-	const XMFLOAT3& GetPos() const noexcept;
+
+	const XMFLOAT3A& GetPos() const noexcept;
+	const XMVECTOR& GetUpVector() const noexcept;
 
 	void SetMovementDelta(float delta) noexcept;
 	const float& GetMovementDelta() const noexcept;
@@ -69,9 +72,9 @@ public:
 	void Move(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
 
 	void Rotate(float pitch = 0.0f, float yaw = 0.0f, float roll = 0.0f) noexcept;
-	void Rotate(const XMFLOAT3& rotation) noexcept;
+	void Rotate(const XMFLOAT3A& rotation) noexcept;
 	void RotateAdd(float pitch = 0.0f, float yaw = 0.0f, float roll = 0.0f) noexcept;
-	void RotateAdd(const XMFLOAT3& rotation) noexcept;
+	void RotateAdd(const XMFLOAT3A& rotation) noexcept;
 
 	void SetUpDirection(float dirX = 0.0f, float dirY = 0.0f, float dirZ = 0.0f) noexcept;
 };

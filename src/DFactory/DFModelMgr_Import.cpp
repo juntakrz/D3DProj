@@ -1,6 +1,6 @@
 #include "DFModelMgr.h"
 
-void DFModelMgr::Create(uint8_t type, std::string name, std::string path) noexcept
+void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept
 {
 	uint32_t newID = 0;
 
@@ -40,7 +40,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, std::string path) noexce
 
 		for (uint32_t i = 0; i < pScene->mNumMeshes; i++)
 		{
-			newModel.meshes.emplace_back(std::move(ParseAIMesh(*pScene->mMeshes[i], pScene->mMaterials, i + 1)));
+			newModel.meshes.emplace_back(std::move(ParseAIMesh(*pScene->mMeshes[i], pScene->mMaterials, i + 1, createAABB)));
 		}
 
 		newModel.pRootNode = ParseAINode(*pScene->mRootNode, &newModel.meshes);
@@ -52,7 +52,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, std::string path) noexce
 	}
 }
 
-DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterials, uint32_t meshID)
+DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterials, uint32_t meshID, const bool& createAABB)
 {
 	DFMesh newMesh;
 	DFMaterial::Material* pDFMat = nullptr;
@@ -208,8 +208,8 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 					);
 			}
 
-			DFMatDesc.shaders.vertex = "VS_BasicTexture";
-			DFMatDesc.shaders.pixel = "PS_BasicTexture";
+			DFMatDesc.shaders.vertex = "VS_FlatTexture";
+			DFMatDesc.shaders.pixel = "PS_FlatTexture";
 
 			// default normal mapping intensity
 			DFMatDesc.material.bumpIntensity = 1.5f;
@@ -227,8 +227,10 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			pDFMat = &pMatMgr->Mat(matName);
 			newMesh.meshMat = matName;
 
-			for (uint16_t i = 0; i < sizeof(pDFMat->idTex) / sizeof(uint16_t); i++) {
-				pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(
+			uint8_t arrSize = sizeof(pDFMat->idTex) / sizeof(uint32_t);
+
+			for (uint16_t i = 0; i < arrSize; i++) {
+				pBinds[Bind::idTexture0 + i] = std::make_unique<Bind::Texture>(
 					pMatMgr->TextureGet(pDFMat->idTex[i]), i
 					);
 			}
@@ -254,12 +256,12 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	struct PSConstBuffer
 	{
-		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.5f, 1.0f };
+		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.7f, 1.0f };
 		XMFLOAT3A F0 = { 0.1f, 0.1f, 0.1f };
 		float matIntensity = 2.0f;
 		float spec_metal = 1.12f;
 		float pow_rough = 0.8f;
-		float bumpIntensity = 1.0f;
+		float bumpIntensity = 1.5f;
 	} material;
 
 	material.bumpIntensity = pDFMat->data.w;
@@ -268,12 +270,16 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	newMesh.pMesh = std::make_unique<MeshImport>(std::move(pBinds), vertices);
 
+	// create AABB for this mesh if required
+	newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
+
 	return newMesh;
 }
 
 std::unique_ptr<DFModelNode> DFModelMgr::ParseAINode(const aiNode& node, const std::vector<DFMesh>* pDFMeshes)
 {
 	std::vector<MeshCore*> pMeshes;
+	std::vector<MeshCore*> pAABBs;
 
 	pMeshes.reserve(node.mNumMeshes);
 
@@ -285,10 +291,13 @@ std::unique_ptr<DFModelNode> DFModelMgr::ParseAINode(const aiNode& node, const s
 	{
 		const auto meshId = node.mMeshes[i];
 		pMeshes.push_back(pDFMeshes->at(meshId).pMesh.get());
+		pAABBs.push_back(pDFMeshes->at(meshId).pOTMesh.get());
 	}
 
 	// create node with unique ptr
-	auto pNode = std::make_unique<DFModelNode>(std::move(pMeshes), nodeTransform);
+	auto pNode = (pAABBs.size() > 0)
+		? std::make_unique<DFModelNode>(std::move(pMeshes), std::move(pAABBs), nodeTransform)
+		: std::make_unique<DFModelNode>(std::move(pMeshes), nodeTransform);
 
 	for (uint32_t j = 0; j < node.mNumChildren; j++)
 	{

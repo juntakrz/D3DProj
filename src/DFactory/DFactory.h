@@ -4,18 +4,11 @@
 #include "WndMgr/WndMgr.h"
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
-#include "RenderQ/RenderQ.h"
-#include "D3DMgr/Math/CFrustum.h"
+#include "RenderGraph/RenderGraph.h"
 
 class DFactory
 {
 	friend class RPass;		// grant access to vars
-
-	struct Mesh
-	{
-		std::string name;
-		std::unique_ptr<MeshCore> pMesh;
-	};
 
 	struct
 	{
@@ -24,12 +17,6 @@ class DFactory
 		std::string activeCamera = "";			// keys for unordered map of cameras
 		std::string selectedCamera = "";
 	} vars;
-
-	struct
-	{
-		int64_t int64bit = 0;
-		float64 float64bit = 0.0f;
-	} debug;
 
 	struct CameraConstVSBuffer
 	{
@@ -77,10 +64,19 @@ public:
 		} Wnd;
 	};
 
+	struct
+	{
+		int64_t int64bit = 0;
+		uint64_t uint64 = 0;
+		float64 float64bit = 0.0f;
+	} debug;
+
+	ImFont* m_imFont = nullptr;
+
 	//managers
 	std::unique_ptr<WndMgr> pWndMgr;
 	D3DMgr* pD3DMgr = nullptr;
-	RenderQ* RenderM = nullptr;
+	RenderGraph* RenderM = nullptr;
 	DFModelMgr* ModelM = nullptr;
 	LightMgr* LightM = nullptr;
 	DFMaterial* MatM = &DFMaterial::Get();
@@ -89,13 +85,10 @@ public:
 private:
 	static DFactory _SInstance;
 
-	std::vector<Mesh> m_Meshes;
-
 	std::unordered_map<std::string, std::unique_ptr<CCamera>> m_Cameras;
 	std::unique_ptr<Bind::ConstVertexBuffer<CameraConstVSBuffer>> pCamCBuf;
 
-	// frame counter
-	uint64_t m_frames = 0u;
+	bool m_showDevUI = false;
 
 public:
 
@@ -125,6 +118,13 @@ public:
 	void FrameCountIncrease() noexcept;
 	const uint64_t& GetFrameCount() const noexcept;
 
+	// enable or disable culling
+	void ToggleCulling() noexcept;
+	
+	// developer UI methods
+	const bool& DevUIMode() const noexcept;
+	void ToggleDevUI() noexcept;
+
 	// CAMERA ------------------------
 
 	// create and add new camera
@@ -145,4 +145,9 @@ public:
 
 	// get active camera
 	std::pair<std::string, CCamera*> CameraGetActive() noexcept;
+
+	// imGui methods
+	void ShowEditModelWindow() noexcept;
+	void ShowCameraWindow() noexcept;
+	void ShowStatsWindow() noexcept;
 };

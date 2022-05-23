@@ -43,6 +43,9 @@ WndMgr::WndMgr(uint16_t width, uint16_t height, uint16_t posX, uint16_t posY, co
 
 	//would closing this window close the whole program
 
+	m_width = width;
+	m_height = height;
+
 	RECT wr = AdjustWindow(width, height);
 	m_posX = posX;
 	m_posY = posY;

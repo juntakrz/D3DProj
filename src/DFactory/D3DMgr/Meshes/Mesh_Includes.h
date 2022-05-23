@@ -1,6 +1,8 @@
 #pragma once
 
-#include "MeshPlane.h"
+#include "MeshAABB.h"
 #include "MeshCube.h"
-#include "MeshSphere.h"
 #include "MeshImport.h"
+#include "MeshPlane.h"
+#include "MeshPoint.h"
+#include "MeshSphere.h"

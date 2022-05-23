@@ -6,23 +6,6 @@ void MeshCore::XMUpdate(FXMMATRIX transform) noexcept
 	xmMain = transform;
 
 	DirectX::XMStoreFloat3A(&xmPos, DirectX::FXMVECTOR(xmMain.r[3]));
-
-	// bounding sphere calculations
-	if (m_calcBSphere)
-	{
-		m_BSphere.Center = *reinterpret_cast<XMFLOAT3*>(&xmPos);
-
-		float scaleX = xmMain.r[0].m128_f32[0];
-		float scaleY = xmMain.r[1].m128_f32[1];
-		float scaleZ = xmMain.r[2].m128_f32[2];
-
-		m_BSphere.Radius = (scaleX >= scaleY && scaleX >= scaleZ)
-			? scaleX * m_radius
-			: (scaleY >= scaleZ)
-			? scaleY * m_radius : scaleZ * m_radius;
-
-		m_calcBSphere = false;
-	}
 }
 
 DirectX::XMMATRIX MeshCore::GetXMTransform() const noexcept
@@ -50,29 +33,14 @@ DirectX::XMFLOAT3A* MeshCore::GetXMPos() noexcept
 	return &xmPos;
 }
 
-DirectX::BoundingSphere* MeshCore::GetXMSphere() noexcept
-{
-	return &m_BSphere;
-}
-
-void MeshCore::SetXMSphereRadius(const float& radius) noexcept
-{
-	m_radius = radius;
-}
-
-void MeshCore::CalcXMSphereBoundaries() noexcept
-{
-	m_calcBSphere = true;
-}
-
-void MeshCore::CalcMeshRadius(const std::vector<DF::Vertex>& inVertices, float& outRadius) noexcept
+void MeshCore::CalcMeshAABBPoints(const std::vector<DF::Vertex>& vertices) noexcept
 {
 	// get initial vertex values
-	XMFLOAT3 vMin = { inVertices[0].pos.x, inVertices[0].pos.y, inVertices[0].pos.z };
-	XMFLOAT3 vMax = { inVertices[0].pos.x, inVertices[0].pos.y, inVertices[0].pos.z };
+	XMFLOAT3 vMin = { vertices[0].pos.x, vertices[0].pos.y, vertices[0].pos.z };
+	XMFLOAT3 vMax = { vertices[0].pos.x, vertices[0].pos.y, vertices[0].pos.z };
 
 	// compare and get min and max values
-	for (const auto& it : inVertices)
+	for (const auto& it : vertices)
 	{
 		vMin.x = std::min(vMin.x, it.pos.x);
 		vMin.y = std::min(vMin.y, it.pos.y);
@@ -83,13 +51,14 @@ void MeshCore::CalcMeshRadius(const std::vector<DF::Vertex>& inVertices, float& 
 		vMax.z = std::max(vMax.z, it.pos.z);
 	}
 
-	// get radius
-	(vMin.x < 0) ? vMin.x *= -1.0f : 0u;
-	(vMin.y < 0) ? vMin.y *= -1.0f : 0u;
-	(vMin.z < 0) ? vMin.z *= -1.0f : 0u;
+	// return opposite points for AABB construction
+	m_AABBcoords[0] = vMin;
+	m_AABBcoords[1] = vMax;
+}
 
-	// determine which resulting vector is the longest and return it as a radius
-	outRadius = std::max((vMin.x + vMin.y + vMin.z), (vMax.x + vMax.y + vMax.z));
+const XMFLOAT3* MeshCore::AABBPoints() const noexcept
+{
+	return &m_AABBcoords[0];
 }
 
 void MeshCore::SetPos(float x, float y, float z) noexcept

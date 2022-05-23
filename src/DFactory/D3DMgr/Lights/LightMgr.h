@@ -7,7 +7,6 @@
 class LightMgr
 {
 private:
-	static const uint16_t m_maxPLights = 4;
 	uint16_t m_selPLight = 0;
 
 	// dir light view / proj matrix variables
@@ -36,11 +35,16 @@ private:
 		DirectX::XMMATRIX DLViewProj[(uint8_t)DF::CSM::cascades];
 	} dlViewProj;
 
+	struct SPointLight
+	{
+		DirectX::XMFLOAT3A pos;
+		DirectX::XMFLOAT4 diffuse;
+		DirectX::XMFLOAT2A intensity;
+	};
+
 	struct PointLight_ConstPSBuffer {
-		DirectX::XMFLOAT3A pos[m_maxPLights];
-		DirectX::XMFLOAT4 diffuse[m_maxPLights];
-		DirectX::XMFLOAT2A intensity[m_maxPLights];
 		DirectX::XMUINT4 numPLights;
+		SPointLight PL[DF::maxPointLights];
 	} plData;
 
 	std::vector<PLight> m_PLights;
@@ -70,8 +74,11 @@ public:
 	void DLVSBufferSetViewProj(uint8_t index) noexcept;
 	void DLVSBufferBind() noexcept;
 
-	void DLSetPos(float x, float y, float z) noexcept;
-	void DLSetPos(XMFLOAT3 pos) noexcept;
+	void DLSetPos(const float& x, const float& y, const float& z) noexcept;
+	void DLSetPos(const XMFLOAT3A& pos) noexcept;
+
+	const XMFLOAT3& DLGetPos() const noexcept;
+	const XMFLOAT3A& DLGetPosA() const noexcept;
 
 	// POINT LIGHT
 	uint16_t GetMaxPLights() const noexcept;

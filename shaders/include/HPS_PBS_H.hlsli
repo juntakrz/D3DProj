@@ -15,10 +15,15 @@ cbuffer L_DirLight : register(b1)
     float4 L_DirDiffuse;
 };
 
+struct SPointLight
+{
+    float3 L_PLPos;
+    float4 L_PLDiffuse;
+    float2 L_PLInt;
+};
+
 cbuffer L_PointLight : register(b2)
 {
-    float3 L_PLPos[4];
-    float4 L_PLDiffuse[4];
-    float2 L_PLInt[4];
-    uint4 numPLights;
+    const uint4 numPLights;
+    SPointLight PL[8];
 };

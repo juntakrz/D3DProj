@@ -3,6 +3,7 @@
 #include "Bind_ConstBuffer.h"
 #include "Bind_IndexBuffer.h"
 #include "Bind_InputLayout.h"
+#include "Bind_GeometryShader.h"
 #include "Bind_Null.h"
 #include "Bind_PixelShader.h"
 #include "Bind_Rasterizer.h"

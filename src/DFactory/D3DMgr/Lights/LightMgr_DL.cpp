@@ -30,12 +30,22 @@ void LightMgr::DLVSBufferBind() noexcept
 	dirVSBuffer.Bind();
 }
 
-void LightMgr::DLSetPos(float x, float y, float z) noexcept
+void LightMgr::DLSetPos(const float& x, const float& y, const float& z) noexcept
 {
 	dlData.pos = { x, y, z };
 }
 
-void LightMgr::DLSetPos(XMFLOAT3 pos) noexcept
+void LightMgr::DLSetPos(const XMFLOAT3A& pos) noexcept
 {
 	dlData.pos = pos;
+}
+
+const XMFLOAT3& LightMgr::DLGetPos() const noexcept
+{
+	return dlData.pos;
+}
+
+const XMFLOAT3A& LightMgr::DLGetPosA() const noexcept
+{
+	return *(reinterpret_cast<const XMFLOAT3A*>(&dlData.pos));
 }

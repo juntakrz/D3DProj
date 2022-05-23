@@ -1,5 +1,5 @@
 #include "include//HPS_PBS_H.hlsli"
-#include "include//HPS_PBS.hlsli"
+#include "include//HPS_PBS_Func.hlsli"
 
 struct PSInput
 {
@@ -104,14 +104,14 @@ float4 main(PSInput iPS) : SV_TARGET
         if (i == 0)
         {
             L = normalize(L_DirPos);
-            radiance = L_DirDiffuse.rgb * L_DirInt * M_MatIntensity * shadow;
+            radiance = L_DirDiffuse.rgb * L_DirInt * M_MatIntensity * max(shadow, 0.0015f);
         }
         else
         {
-            L = normalize(L_PLPos[i - 1] - iPS.worldPos);
-            float1 distance = length(L_PLPos[i - 1] - iPS.worldPos);
+            L = normalize(PL[i - 1].L_PLPos - iPS.worldPos);
+            float1 distance = length(PL[i - 1].L_PLPos - iPS.worldPos);
             float1 attenuation = 1.0 / (distance * distance);
-            radiance = L_PLDiffuse[i - 1].rgb * attenuation * L_PLInt[i - 1].x;
+            radiance = PL[i - 1].L_PLDiffuse.rgb * attenuation * PL[i - 1].L_PLInt.x * M_MatIntensity;
         }
         float3 H = normalize(V + L); //half vector between view and light
     

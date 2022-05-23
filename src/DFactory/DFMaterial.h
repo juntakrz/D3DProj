@@ -15,7 +15,7 @@ class DFMaterial
 		uint16_t id;
 		std::string name;
 
-		std::string shaderVertex, shaderPixel;
+		std::string shaderVertex, shaderPixel, shaderGeometry;
 		uint32_t idTex[6] = { 0, 0, 0, 0, 0, 0 };
 
 		XMFLOAT4 ambientColor;
@@ -59,7 +59,7 @@ public:
 
 		struct
 		{
-			std::string vertex = "VS_Default", pixel = "PS_Default";
+			std::string vertex = "VS_Default", pixel = "PS_Default", geometry = "";
 		} shaders;
 
 		struct

@@ -9,7 +9,81 @@ void RPass::PassJobAdd(RPassJob&& job) noexcept
 	m_Jobs.emplace_back(std::move(job));
 }
 
-void RPass::PassDraw() const noexcept
+void RPass::DrawAABBs() noexcept
+{
+	// get pass technique
+	m_pTech = &m_pTechDB->m_Techniques[m_Id];
+
+	// switch to pass-defined camera, if available
+	// or switch to camera tied to special id, if defined
+	(m_pTech->m_Camera != "")
+		? (m_pTech->m_Camera == "$active_camera")
+		? DF::D3DM->SetCamera(DF::Engine->Camera(DF::Engine->vars.activeCamera))
+		: DF::D3DM->SetCamera(DF::Engine->Camera(m_pTech->m_Camera))
+		: void();
+
+	m_pTech->BindTechnique();
+
+	// switch to appropriate pass render / depth stencil buffers
+	DF::D3DM->RTBind(m_pTech->m_RB, m_pTech->m_DSB);
+
+	// change depth stencil state if defined
+	(m_pTech->m_depthState > -1) ? DF::D3DM->SetDepthStencilState(m_pTech->m_depthState) : void();
+
+	// render all AABBs to depth buffer
+	// then render same AABBs and compare if any are fully occluded and mark their corresponding mesh as occluded
+
+	/*
+	for (auto& it : m_Jobs)
+	{
+		// bind core mesh buffers
+		it.pMesh->BindCore();
+		it.pMesh->Binds()->at(Bind::idTransform)->Bind();
+
+		// issue draw call
+		it.pMesh->DrawIndexed();
+	}
+
+	UINT result = 0;*/
+
+	switch (DF::isCullingEnabled)
+	{
+	case true:
+	{
+		for (auto& it : m_Jobs)
+		{
+			// bind core mesh buffers
+			it.pMesh->BindCore();
+			it.pMesh->Binds()->at(Bind::idTransform)->Bind();
+
+			// begin occlusion query
+			it.pMesh->BeginQuery();
+
+			// issue draw call
+			it.pMesh->DrawIndexed();
+
+			// end and write the result to primary mesh
+			it.pMesh->EndQuery();
+
+			it.pMesh->GetQueryResult(it.pMesh);
+		}
+		break;
+	}
+	case false:
+	{
+		for (auto& it : m_Jobs)
+		{
+			it.pMesh->m_QueryResult = 100;
+		}
+		break;
+	}
+	}
+
+	// clear depth buffer
+	//DF::D3DM->ClearDSBuffer(m_pTech->m_DSB);
+}
+
+void RPass::Draw() noexcept
 {
 	// get pass technique
 	m_pTech = &m_pTechDB->m_Techniques[m_Id];
@@ -64,7 +138,7 @@ void RPass::PassDraw() const noexcept
 	}
 }
 
-void RPass::PassDrawCS() noexcept
+void RPass::DrawCSM() noexcept
 {
 	float coef = 2.0f;		// coefficient using which orthogonal camera will be adjusted
 	m_pTech = &m_pTechDB->m_Techniques[m_Id];

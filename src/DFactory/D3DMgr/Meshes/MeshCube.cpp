@@ -5,12 +5,12 @@ MeshCube::MeshCube(uint16_t matId, uint16_t paramA, uint16_t paramB)
 	auto model = CCube::Create<DF::Vertex>();
 	model.SetTangentBinormalNormal();
 
+	// calculate mesh bounding box
+	CalcMeshAABBPoints(model.vertices);
+
 	//
 	// CORE BUFFERS
 	//
-
-	// calculate bounding radius
-	CalcMeshRadius(model.vertices, m_radius);
 
 	// create VertexBuffer with vertices
 	m_Binds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(model.vertices);

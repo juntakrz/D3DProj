@@ -11,12 +11,23 @@ void DFModelNode::AddChildNode(std::unique_ptr<DFModelNode> pChild) noexcept
 DFModelNode::DFModelNode(std::vector<MeshCore*> pMeshes, const XMMATRIX& transform) noexcept
 	: m_pMeshes(pMeshes), m_nodeTransform(transform)
 {
-	//
+	// overload for meshes without AABBs
+}
+
+DFModelNode::DFModelNode(std::vector<MeshCore*> pMeshes, std::vector<MeshCore*> pAABBs, const XMMATRIX& transform) noexcept
+	: m_pMeshes(std::move(pMeshes)), m_pAABBs(std::move(pAABBs)), m_nodeTransform(transform)
+{
+	// overload for node meshes with AABBs
 }
 
 void DFModelNode::XMUpdate(FXMMATRIX transform) noexcept
 {
 	m_accTransform = m_nodeTransform * transform;
+
+	for (const auto& pAABB : m_pAABBs)
+	{
+		pAABB->XMUpdate(m_accTransform);
+	}
 
 	for (const auto& mesh : m_pMeshes)
 	{
@@ -29,33 +40,33 @@ void DFModelNode::XMUpdate(FXMMATRIX transform) noexcept
 	}
 }
 
-void DFModelNode::XMUpdate(FXMMATRIX transform, const bool& calcBoundaries) noexcept
+void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
 {
-	m_accTransform = m_nodeTransform * transform;
+	for (uint32_t i = 0; i < m_pMeshes.size(); i++)
+	{
+		// generate job using technique flags
+		(i < m_pAABBs.size() && m_pAABBs[i])
+			? (m_pMeshes[i]->m_QueryResult > 0) ? renderMgr->GenerateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds()) : void()
+			: renderMgr->GenerateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds());
 
+		// generate occlusion test query jobs using AABBs if available
+		(i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->GenerateQueryJob(m_pMeshes[i], m_pAABBs[i]) : void();
+
+		// if debug-showing AABBs enabled - show them in a special pass
+		(true) ? (i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->GenerateJob(m_pAABBs[i], DF::fxAABBShow) : void() : void();
+	}
+
+	/*
 	for (const auto& mesh : m_pMeshes)
 	{
-		(calcBoundaries) ? mesh->CalcXMSphereBoundaries() : void();
-		mesh->XMUpdate(m_accTransform);
+		renderMgr->GenerateJob(mesh, mesh->GetTechniqueIds());
 	}
 
-	for (const auto& node : m_pChildNodes)
+	// show AABBs in a special dedicated pass when enabled
+	for (const auto& pAABB : m_pAABBs)
 	{
-		node->XMUpdate(m_accTransform, calcBoundaries);
-	}
-}
-
-void DFModelNode::CreateRenderJob(RenderQ* renderMgr) const noexcept
-{
-	for (const auto& mesh : m_pMeshes)
-	{
-		// if mesh's bounding sphere is in view frustum
-		if (CFrustum::Frustum()->Intersects(*mesh->GetXMSphere()))
-		{
-			// ask Render Manager to generate a render job using ptr to mesh and its techniques
-			renderMgr->GenerateJob(mesh, mesh->GetTechniqueIds());
-		};
-	}
+		(pAABB) ? renderMgr->GenerateJob(pAABB, DF::fxAABBShow) : void();
+	}*/
 
 	for (const auto& pNode : m_pChildNodes)
 	{

@@ -2,11 +2,12 @@
 
 // DF MODEL MANAGER
 
-void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_t paramB) noexcept
+void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, uint16_t paramA, uint16_t paramB) noexcept
 {
 	DFModel newModel;
 	DFMesh newMesh;
 	std::vector<MeshCore*> pMeshes;
+	std::vector<MeshCore*> pAABBs;
 	uint32_t newID = 0;
 
 	for (const auto& it : m_Models)
@@ -37,14 +38,22 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		newMesh.meshName = "Plane" + std::to_string(newID);
 		newMesh.pMesh = std::make_unique<MeshPlane>(0, paramA, paramB);
 
+		// generate AABB if required
+		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
+
 		newModel.id = newID;
 		newModel.name = name;
 		newModel.meshes.push_back(std::move(newMesh));
 
 		pMeshes.push_back(newModel.meshes[0].pMesh.get());
+		(createAABB) ? pAABBs.push_back(newModel.meshes[0].pOTMesh.get()) : void();
 
 		m_Models.emplace_back(std::move(newModel));
-		m_Models.back().pRootNode = std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
+		
+		// if AABB is present - add it to node
+		m_Models.back().pRootNode = (createAABB)
+			? std::make_unique<DFModelNode>(std::move(pMeshes), std::move(pAABBs), XMMatrixIdentity())
+			: std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
 		m_curModel = m_Models.size() - 1;
 
 		break;
@@ -56,14 +65,21 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		newMesh.meshName = "Cube" + std::to_string(newID);
 		newMesh.pMesh = std::make_unique<MeshCube>(0);
 
+		// generate AABB if required
+		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
+
 		newModel.id = newID;
 		newModel.name = name;
 		newModel.meshes.push_back(std::move(newMesh));
 
 		pMeshes.push_back(newModel.meshes[0].pMesh.get());
+		(createAABB) ? pAABBs.push_back(newModel.meshes[0].pOTMesh.get()) : void();
 
 		m_Models.emplace_back(std::move(newModel));
-		m_Models.back().pRootNode = std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
+		// if AABB is present - add it to node
+		m_Models.back().pRootNode = (createAABB)
+			? std::make_unique<DFModelNode>(std::move(pMeshes), std::move(pAABBs), XMMatrixIdentity())
+			: std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
 		m_curModel = m_Models.size() - 1;
 
 		break;
@@ -77,20 +93,29 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 		newMesh.meshName = "Sphere" + std::to_string(newID);
 		newMesh.pMesh = std::make_unique<MeshSphere>(0, paramA);
 
+		// generate AABB if required
+		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
+
 		newModel.id = newID;
 		newModel.name = name;
 		newModel.meshes.push_back(std::move(newMesh));
 
 		pMeshes.push_back(newModel.meshes[0].pMesh.get());
+		(createAABB) ? pAABBs.push_back(newModel.meshes[0].pOTMesh.get()) : void();
 
 		m_Models.emplace_back(std::move(newModel));
-		m_Models.back().pRootNode = std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
+		// if AABB is present - add it to node
+		m_Models.back().pRootNode = (createAABB)
+			? std::make_unique<DFModelNode>(std::move(pMeshes), std::move(pAABBs), XMMatrixIdentity())
+			: std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
 		m_curModel = m_Models.size() - 1;
 		
 		break;
 	}
 	case DF::idSkySphere:
 	{
+		// skysphere does not require any bounding meshes as it shouldn't be occlusion tested
+
 		(paramA < 1) ? paramA = 12 : paramA;
 
 		newMesh.meshid = 1;
@@ -110,39 +135,66 @@ void DFModelMgr::Create(uint8_t type, std::string name, uint16_t paramA, uint16_
 
 		break;
 	}
+	case DF::idPoint:
+	{
+		newMesh.meshid = 1;
+		newMesh.meshMat = pMatMgr->Mat(0).name;
+		newMesh.meshName = "Point" + std::to_string(newMesh.meshid);
+		newMesh.pMesh = std::make_unique<MeshPoint>(0, 1.0f);
+
+		newModel.id = newID;
+		newModel.name = name;
+		newModel.meshes.push_back(std::move(newMesh));
+
+		pMeshes.push_back(newModel.meshes[0].pMesh.get());
+
+		m_Models.emplace_back(std::move(newModel));
+		m_Models.back().pRootNode = std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
+		m_curModel = m_Models.size() - 1;
+		break;
+	}
 	}
 	m_curModel = newID;
 }
 
-uint32_t DFModelMgr::Select(std::string name) noexcept
+DFModelMgr::DFModel& DFModelMgr::Select(std::string name) noexcept
 {
 	uint32_t index = 0;
-	for (const auto& it : m_Models)
+	for (auto& it : m_Models)
 	{
 		if (it.name == name)
 		{
 			m_curModel = index;
-			return it.id;
+			return it;
 		}
 		index++;
 	}
-	return m_curModel;
+	return m_Models[m_curModel];
 }
 
-std::string DFModelMgr::Select(uint32_t modelID) noexcept
+DFModelMgr::DFModel& DFModelMgr::Select(uint32_t modelID) noexcept
 {
 	uint32_t index = 0;
-	for (const auto& it : m_Models)
+	for (auto& it : m_Models)
 	{
 		if (it.id == modelID)
 		{
 			m_curModel = index;
-			return it.name;
+			return it;
 		}
 		index++;
 	}
 
-	return !m_Models.empty() ? m_Models[m_curModel].name : "ERROR! No models present";
+	if (m_Models.empty())
+	{
+		MessageBoxA(nullptr, "No models were loaded.", "Model Manager Error", MB_OK | MB_ICONERROR);
+	}
+	return m_Models[m_curModel];
+}
+
+DFModelMgr::DFModel& DFModelMgr::Model() noexcept
+{
+	return m_Models[m_curModel];
 }
 
 void DFModelMgr::Delete() noexcept

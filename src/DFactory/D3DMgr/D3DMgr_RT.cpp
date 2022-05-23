@@ -259,15 +259,18 @@ void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 	// create downsampled render and depth buffer for post processing	(RB3 / DSB2)
 	CreateDepthBuffer(CreateRenderBuffer(m_VWidth / 2, m_VHeight / 2, isHDR));
 
-	// create render and depth buffer for shadows						(RB4 / DSB3)
-	CreateDepthBuffer(CreateRenderBuffer(DF::CSM::bufferSize * DF::CSM::cascades, DF::CSM::bufferSize, isHDR), true, DF::DS_Usage::DepthShadow);
+	// create depth buffer for shadows									(DSB3)
+	CreateDepthBuffer(DF::CSM::bufferSize * DF::CSM::cascades, DF::CSM::bufferSize, true, DF::DS_Usage::DepthShadow);
+
+	// buffer clone of DSB1 so it can be used as a texture				(DSB4)
+	CreateCompatibleBuffer(1u, true, false);
 }
 
 void D3DMgr::RTBind(const int8_t& rtIndex, const int8_t& dsIndex, const int8_t& num) noexcept
 {
-	(rtIndex > renderTargets.size() - 1) ?
+	(rtIndex > (int)renderTargets.size() - 1) ?
 		MessageBoxA(nullptr, "Render target index is out of bounds.", "RTBind Error", MB_OK | MB_ICONERROR) : 0;
-	(dsIndex > depthTargets.size() - 1) ?
+	(dsIndex > (int)depthTargets.size() - 1) ?
 		MessageBoxA(nullptr, "Depth buffer index is out of bounds.", "RTBind Error", MB_OK | MB_ICONERROR) : 0;
 
 	D3D_THROW_INFO(m_pContext->OMSetRenderTargets(
@@ -276,7 +279,10 @@ void D3DMgr::RTBind(const int8_t& rtIndex, const int8_t& dsIndex, const int8_t& 
 		(dsIndex > -1) ? depthTargets[dsIndex].pDSV.Get() : nullDSV)
 	);
 
-	D3D_THROW_INFO(m_pContext->RSSetViewports(1u, &renderTargets[rtIndex].vp));
+	if (rtIndex > -1)
+	{
+		D3D_THROW_INFO(m_pContext->RSSetViewports(1u, &renderTargets[rtIndex].vp));
+	};
 
 	m_RTId = rtIndex;
 	m_DSId = dsIndex;
