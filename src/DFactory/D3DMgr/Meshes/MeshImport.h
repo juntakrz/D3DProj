@@ -8,5 +8,6 @@ private:
 	mutable XMFLOAT4X4 transform;
 
 public:
-	MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds);
+	// get binds and vertices for boundaries calculations from assimp mesh
+	MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds, const std::vector<DF::Vertex>& vertices);
 };

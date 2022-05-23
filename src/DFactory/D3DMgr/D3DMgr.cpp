@@ -262,7 +262,7 @@ void D3DMgr::EndFrame()
 	dxgiDebug.Set();
 #endif
 
-	if (FAILED(hr = m_pSwap->Present(1u, NULL)))
+	if (FAILED(hr = m_pSwap->Present(0u, NULL)))
 	{
 		if (hr == DXGI_ERROR_DEVICE_REMOVED)
 		{

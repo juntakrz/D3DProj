@@ -17,7 +17,7 @@ namespace Bind
 
 	void TransformConstBuffer::Bind() noexcept
 	{
-		transforms.world = DirectX::XMMatrixTranspose(parent.GetTransformXM());
+		transforms.world = DirectX::XMMatrixTranspose(parent.GetXMTransform());
 		transforms.view = DirectX::XMMatrixTranspose(DF::D3DM->Camera()->m_XMView);
 		transforms.viewProj = DF::D3DM->Camera()->m_XMViewProj;
 

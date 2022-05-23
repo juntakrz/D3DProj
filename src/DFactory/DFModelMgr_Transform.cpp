@@ -3,6 +3,7 @@
 void DFModelMgr::SetPos(float x, float y, float z) noexcept
 {
 	m_Models[m_curModel].transform.translation = { x, y, z };
+	m_Models[m_curModel].calcBoundaries = true;		// recalculate boundaries after every shape change
 }
 
 void DFModelMgr::SetRotation(float x, float y, float z) noexcept
@@ -13,6 +14,7 @@ void DFModelMgr::SetRotation(float x, float y, float z) noexcept
 void DFModelMgr::SetScaling(float x, float y, float z) noexcept
 {
 	m_Models[m_curModel].transform.scaling = { x, y, z };
+	m_Models[m_curModel].calcBoundaries = true;
 }
 
 FXMMATRIX DFModelMgr::DFModel::GetModelXMTransform() noexcept

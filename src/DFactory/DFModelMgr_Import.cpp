@@ -266,7 +266,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	pBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<PSConstBuffer>>(material, 0u);
 
-	newMesh.pMesh = std::make_unique<MeshImport>(std::move(pBinds));
+	newMesh.pMesh = std::make_unique<MeshImport>(std::move(pBinds), vertices);
 
 	return newMesh;
 }

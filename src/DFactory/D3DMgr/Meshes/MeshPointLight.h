@@ -25,5 +25,5 @@ public:
 
 	void DEBUG_Rotate(float delta = 0.0f) noexcept;
 
-	DirectX::XMMATRIX GetTransformXM() const noexcept override;
+	DirectX::XMMATRIX GetXMTransform() const noexcept override;
 };

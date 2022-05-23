@@ -134,10 +134,3 @@ void MeshCore::SetEffects(uint32_t techniqueIds) noexcept
 {
 	m_TechniqueIds = techniqueIds;
 }
-
-DirectX::XMMATRIX MeshCore::GetTransformXM() const noexcept
-{
-	DirectX::XMStoreFloat3A(&xmPos, DirectX::FXMVECTOR(xmMain.r[3]));
-
-	return xmMain;
-}

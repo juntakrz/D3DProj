@@ -32,7 +32,10 @@ protected:
 
 	// DirectX variables
 	mutable DirectX::XMMATRIX xmMain;
-	mutable DirectX::XMFLOAT3A xmPos;	//for storing transformed 3D position
+	mutable DirectX::XMFLOAT3A xmPos;	// for storing transformed 3D position
+	mutable BoundingSphere m_BSphere;	// for storing culling sphere
+	float m_radius = 1.0f;				// radius modifier for culling sphere
+	bool m_calcBSphere = false;		// mark to recalculate boundaries only when necessary
 
 	struct
 	{
@@ -91,10 +94,9 @@ public:
 	void BindLocal() const noexcept;								// bind other mesh buffers
 	std::vector<std::unique_ptr<Bind::IBind>>* Binds() noexcept;	// get standard mesh binds
 	const Bind::IndexBuffer* GetIndexBuffer() const noexcept;	
-	void DrawIndexed() noexcept;								// mesh draw call
+	void DrawIndexed() noexcept;									// mesh draw call
 
-	//virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
-	virtual DirectX::XMMATRIX GetTransformXM() const noexcept;
+	virtual DirectX::XMMATRIX GetXMTransform() const noexcept;
 	void XMUpdate(FXMMATRIX transform) noexcept;
 
 	DirectX::XMMATRIX* GetMatrix() noexcept;
@@ -102,6 +104,12 @@ public:
 	void SetMatrix(DirectX::FXMMATRIX& matrix) noexcept;
 
 	DirectX::XMFLOAT3A* GetXMPos() noexcept;
+
+	DirectX::BoundingSphere* GetXMSphere() noexcept;
+	void SetXMSphereRadius(const float& radius) noexcept;
+	void CalcXMSphereBoundaries() noexcept;
+
+	void CalcMeshRadius(const std::vector<DF::Vertex>& inVertices, float& outRadius) noexcept;
 
 	void SetMaterial(std::string name) noexcept;
 	void SetMaterialRT(std::string name) noexcept;

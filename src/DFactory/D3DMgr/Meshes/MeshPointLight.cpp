@@ -68,7 +68,7 @@ void MeshPointLight::DEBUG_Rotate(float delta) noexcept
 	mod.rotation.z += delta;
 }
 
-DirectX::XMMATRIX MeshPointLight::GetTransformXM() const noexcept
+DirectX::XMMATRIX MeshPointLight::GetXMTransform() const noexcept
 {
 	//mod.rotation.z = GMath::WrapAngle(mod.rotation.z + -0.005f);
 

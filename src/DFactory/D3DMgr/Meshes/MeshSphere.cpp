@@ -10,6 +10,9 @@ MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 	// CORE BUFFERS
 	//
 
+	// calculate bounding radius
+	CalcMeshRadius(model.vertices, m_radius);
+
 	// create VertexBuffer with vertices
 	m_Binds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(model.vertices);
 

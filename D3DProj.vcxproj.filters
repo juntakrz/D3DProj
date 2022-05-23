@@ -207,6 +207,9 @@
     <ClCompile Include="src\DFactory\D3DMgr\IBind\Bind_Rasterizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\Math\CFrustum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -404,6 +407,9 @@
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Rasterizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\Math\CFrustum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\c-logo-icon.ico">
@@ -456,6 +462,5 @@
     <FxCompile Include="shaders\surface\PS_SurfaceDepth.hlsl" />
     <FxCompile Include="shaders\PS_Shadow.hlsl" />
     <FxCompile Include="shaders\VS_PBS_Shadow.hlsl" />
-    <FxCompile Include="shaders\PS_PBS_Shadow_HW.hlsl" />
   </ItemGroup>
 </Project>

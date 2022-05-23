@@ -147,7 +147,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(16.0f, 9.0f, 0.0f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 16.5f);
 
-	DF.UpdateRenderer();
+	//DF.UpdateRenderer();
 	
 	DF.DrawFrame();
 
@@ -425,7 +425,7 @@ void DFMain::LoadScreen() noexcept
 	//DF.Camera()->SetAsPerspective(1.0f, 16.0f / 9.0f, 0.01f, 100.0f);
 	DF.Camera()->LockToCamera(DF.Camera("camMain"));
 
-	DF.UpdateRenderer();
+	//DF.UpdateRenderer();
 }
 
 void DFMain::CreateMaterials() noexcept

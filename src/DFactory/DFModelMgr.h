@@ -30,6 +30,7 @@ private:
 public:
 	DFModelNode(std::vector<MeshCore*> pMeshes, const XMMATRIX& transform) noexcept;
 	void XMUpdate(FXMMATRIX transform) noexcept;
+	void XMUpdate(FXMMATRIX transform, const bool& calcBoundaries) noexcept;
 	void CreateRenderJob(RenderQ* renderMgr) const noexcept;
 };
 
@@ -47,6 +48,8 @@ private:
 		std::string name;
 		std::unique_ptr<DFModelNode> pRootNode;
 		std::vector<DFMesh> meshes;
+
+		bool calcBoundaries = true;
 
 		struct
 		{
