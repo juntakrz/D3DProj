@@ -13,12 +13,14 @@ void DFactory::CProc::ProcessCamera() noexcept
 	m_camRot.x = 0.0f;
 	m_camRot.y = 0.0f;
 
-	pKbd->IsKeyDown('W') ? m_camDir.z += 0.02f : 0.0f;
-	pKbd->IsKeyDown('S') ? m_camDir.z += -0.02f : 0.0f;
-	pKbd->IsKeyDown('A') ? m_camDir.x += -0.02f : 0.0f;
-	pKbd->IsKeyDown('D') ? m_camDir.x += 0.02f : 0.0f;
-	pKbd->IsKeyDown('R') ? m_camDir.y += 0.02f : 0.0f;
-	pKbd->IsKeyDown('F') ? m_camDir.y += -0.02f : 0.0f;
+	float m_camSpeed = 0.012f;
+
+	pKbd->IsKeyDown('W') ? m_camDir.z += m_camSpeed : 0.0f;
+	pKbd->IsKeyDown('S') ? m_camDir.z += -m_camSpeed : 0.0f;
+	pKbd->IsKeyDown('A') ? m_camDir.x += -m_camSpeed : 0.0f;
+	pKbd->IsKeyDown('D') ? m_camDir.x += m_camSpeed : 0.0f;
+	pKbd->IsKeyDown('R') ? m_camDir.y += m_camSpeed : 0.0f;
+	pKbd->IsKeyDown('F') ? m_camDir.y += -m_camSpeed : 0.0f;
 
 	switch (pMouse->IsCursorOn())
 	{
@@ -69,7 +71,7 @@ void DFactory::CProc::ProcessFunctions() noexcept
 			}
 			case VK_ESCAPE:
 			{
-				exit(0);
+				pDF->ToggleDevUI();
 				break;
 			}
 			case VK_F2:			// show wireframe
@@ -81,6 +83,11 @@ void DFactory::CProc::ProcessFunctions() noexcept
 			case VK_F3:			// show depth buffer
 			{
 				DF::D3DM->SetShowDepth();
+				break;
+			}
+			case VK_F8:
+			{
+				pDF->ToggleCulling();
 				break;
 			}
 			case VK_ADD:
@@ -107,9 +114,9 @@ void DFactory::CProc::ProcessFunctions() noexcept
 			{
 				pDF->ModelM->Select(4);
 				pDF->ModelM->Delete();
-				pDF->MatM->MatDelete(8);
-				pDF->MatM->MatDelete(9);
-				pDF->MatM->MatDelete(10);
+				pDF->MatM->MatDelete(11);
+				pDF->MatM->MatDelete(12);
+				pDF->MatM->MatDelete(13);
 			}
 			}
 		}

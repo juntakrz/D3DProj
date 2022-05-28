@@ -4,7 +4,7 @@ MeshImport::MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds, const s
 {
 	m_Binds = std::move(pBinds);
 
-	CalcMeshRadius(vertices, m_radius);
+	CalcMeshAABBPoints(vertices);
 
 	m_pIndexBuffer = reinterpret_cast<Bind::IndexBuffer*>(m_Binds[Bind::idIndexBuffer].get());
 

@@ -24,8 +24,6 @@ void MeshCore::BindLocal() const noexcept
 	{
 		m_Binds[i] ? m_Binds[i]->Bind() : void();
 	}
-
-	m_Binds[Bind::idTransform] ? m_Binds[Bind::idTransform]->Bind() : void();
 }
 
 std::vector<std::unique_ptr<Bind::IBind>>* MeshCore::Binds() noexcept

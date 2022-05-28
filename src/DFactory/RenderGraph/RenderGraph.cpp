@@ -1,13 +1,17 @@
-#include "RenderQ.h"
+#include "RenderGraph.h"
 
-RenderQ::RenderQ() noexcept
+RenderGraph::RenderGraph() noexcept
 {
-	// create preset passes
-	PassCreate("fxStandard0");			// 0 = fxStandard
-	PassCreate("fxBlur0");				// 1 = fxBlur
-	PassCreate("fxShadow0");			// 2 = fxShadow
-	PassCreate("fxOutline0");			// 3 = fxOutline (step 0)
-	PassCreate("fxOutline1");			// 4 = fxOutline (step 1)
+	// create passes that correspond to their technique Id
+	PassCreate("CSM");				// 0 = special CSM pass
+	PassCreate("Query");			// 1 = occlusion query pass
+	PassCreate("Background");		// 2 = fxBackground
+	PassCreate("Standard0");		// 3 = fxStandard
+	PassCreate("Blur");				// 4 = fxBlur
+	PassCreate("Foreground");		// 5 = experimental occlusion query pass
+	PassCreate("AABBShow");			// 6 = fxAABBShow
+	PassCreate("Outline0");			// 7 = fxOutline (step 0)
+	PassCreate("Outline1");			// 8 = fxOutline (step 1)
 
 	// initialize default techniques
 	RTechniqueDB::Get().InitDefaultTechniques();
@@ -16,7 +20,7 @@ RenderQ::RenderQ() noexcept
 	RPass::Init();
 }
 
-void RenderQ::Render() noexcept
+void RenderGraph::Render() noexcept
 {
 	// RENDER SCENARIO (need to rewrite this)
 	
@@ -24,16 +28,24 @@ void RenderQ::Render() noexcept
 	// PASS PROCESSOR
 	//
 
-	//m_Passes[0].PassDraw();				// fxShadow - draw 'shadow' depth pass
-	m_Passes[0].PassDrawCS();
-	m_Passes[1].PassDraw();				// fxStandard
-	m_Passes[2].PassDraw();				// fxBlur - draw to 'blur' buffer and 'render' depth pass
-	m_Passes[3].PassDraw();				// fxOutline stencil writing step
-	m_Passes[4].PassDraw();				// fxOutline stencil masking step
+	m_Passes[0].DrawCSM();
+	//m_Passes[0].DrawAABBs();
+	m_Passes[2].Draw();					// fxBackground
+	m_Passes[3].Draw();					// fxStandard
+	m_Passes[4].Draw();					// fxBlur - draw to 'blur' buffer and 'render' depth pass
+
+	// create a texture out of depth buffer by copying it to a free resource
+	DF::D3DM->RTCopyBuffer(1u, 4u, true);
+
+	m_Passes[1].DrawAABBs();			// draw AABBs to depth buffer twice and query occlusion of AABBs in depth buffer
+	//m_Passes[5].DrawOT();				// fxForeground - NOT READY YET
+	//m_Passes[6].Draw();				// fxAABBShow
+	m_Passes[7].Draw();					// fxOutline stencil writing step
+	m_Passes[8].Draw();					// fxOutline stencil masking step
 
 	// disable stencil
-	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Stencil::Off);
-
+	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Mode::Default);
+	
 	//
 	// SURFACE PROCESSOR
 	//
@@ -61,14 +73,14 @@ void RenderQ::Render() noexcept
 		: DF::D3DM->RenderBufferToSurface(0u, DF::RBuffers::Render);
 }
 
-void RenderQ::PassCreate(std::string name) noexcept
+void RenderGraph::PassCreate(std::string name) noexcept
 {
 	for (const auto& it : m_Passes)
 	{
 		if (it.m_Name == name)
 		{
 #ifdef _DEBUG || _DFDEBUG
-			name = "RenderQ Error: Pass '" + name + "' already exists.";
+			name = "RenderGraph Error: Pass '" + name + "' already exists.";
 			OutputDebugStringA(name.c_str());
 #endif
 			return;
@@ -77,7 +89,7 @@ void RenderQ::PassCreate(std::string name) noexcept
 	m_Passes.emplace_back(RPass{ m_Passes.size(), name });
 }
 
-RPass& RenderQ::Pass(std::string name) noexcept
+RPass& RenderGraph::Pass(std::string name) noexcept
 {
 	for (auto& it : m_Passes)
 	{
@@ -88,14 +100,14 @@ RPass& RenderQ::Pass(std::string name) noexcept
 	}
 
 #ifdef _DEBUG || _DFDEBUG
-	name = "RenderQ: Pass " + name + " not found. Returning Pass 0.\n";
+	name = "RenderGraph: Pass " + name + " not found. Returning Pass 0.\n";
 	OutputDebugStringA(name.c_str());
 #endif
 
 	return m_Passes[0];
 }
 
-void RenderQ::ResetRenderPasses() noexcept
+void RenderGraph::ResetRenderPasses() noexcept
 {
 	for (auto& it : m_Passes)
 	{
@@ -103,7 +115,7 @@ void RenderQ::ResetRenderPasses() noexcept
 	}
 }
 
-void RenderQ::GenerateJob(MeshCore* pMesh, uint32_t techniqueIds) noexcept
+void RenderGraph::GenerateJob(MeshCore* pMesh, uint32_t techniqueIds) noexcept
 {
 	if (!techniqueIds)	// if 0 - ignore and don't render
 	{
@@ -116,4 +128,10 @@ void RenderQ::GenerateJob(MeshCore* pMesh, uint32_t techniqueIds) noexcept
 		// job: a ptr to mesh, binds will be received from technique with the same index as this pass
 		(techniqueIds >> i & 1) ? m_Passes[i].PassJobAdd(RPassJob{ pMesh }) : void();
 	}
+}
+
+void RenderGraph::GenerateQueryJob(MeshCore* pMesh, MeshCore* pOTMesh) noexcept
+{
+	// will use 'OTMesh' for querying / occlusion testing and will write the result to 'Mesh'
+	m_Passes[1].PassJobAdd(RPassJob{ pMesh, pOTMesh });
 }

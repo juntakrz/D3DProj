@@ -1,17 +1,8 @@
-#include "MeshPlane.h"
+#include "MeshAABB.h"
 
-MeshPlane::MeshPlane(uint16_t matId, uint16_t divisionsX, uint16_t divisionsY)
+MeshAABB::MeshAABB(const XMFLOAT3* AABBcoords)
 {
-	//create instance
-	auto model = CPlane::Create<DF::Vertex>(divisionsX, divisionsY);
-	model.SetTangentBinormalNormal();
-
-	// calculate mesh bounding box
-	CalcMeshAABBPoints(model.vertices);
-
-	//
-	// CORE BUFFERS
-	//
+	auto model = CCube::Create<DF::Vertex>(AABBcoords[0], AABBcoords[1]);
 
 	// create VertexBuffer with vertices
 	m_Binds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(model.vertices);
@@ -25,29 +16,27 @@ MeshPlane::MeshPlane(uint16_t matId, uint16_t divisionsX, uint16_t divisionsY)
 	// assign core pointers
 	m_pIndexBuffer = reinterpret_cast<Bind::IndexBuffer*>(m_Binds[Bind::idIndexBuffer].get());
 
-	/*	//////////	*/
-
-	// load color texture
-	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(MatMgr.TextureGet(0));
-
-	m_Binds[Bind::idSampler0] = std::make_unique<Bind::Sampler>();
-
-	// fill material const buffer
-	AddMaterialBind(matId);
-
-	// create vertex shader
-	std::string VSPath = "shaders//" + MatMgr.Mat(matId).shaderVertex + ".shd";
+	//create and bind vertex shader
+	std::string VSPath = "shaders//VS_Wireframe.shd";
 	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + MatMgr.Mat(matId).shaderPixel + ".shd";
+	std::string PSPath = "shaders//PS_Wireframe.shd";
 	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
 
 	//create and bind InputLayout
-	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
+	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(ied, pVSByteCode);
 
 	//create and bind transform constant buffer
 	m_Binds[Bind::idTransform] = std::make_unique<Bind::TransformConstBuffer>(*this);
+
+	// mark it for a bounding mesh usage
+	m_isAABB = true;
 }

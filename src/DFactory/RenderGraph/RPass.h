@@ -6,11 +6,12 @@
 struct RPassJob
 {
 	MeshCore* pMesh;
+	MeshCore* pOTMesh = nullptr;
 };
 
 class RPass
 {
-	friend class RenderQ;
+	friend class RenderGraph;
 	static class DFactory* Engine;
 
 	static void Init() noexcept
@@ -19,7 +20,9 @@ class RPass
 	};
 
 public:
-	RPass(size_t id, std::string name) noexcept : m_Id(id), m_Name(name), m_pTechDB(&RTechniqueDB::Get()) {};
+	RPass(size_t id, std::string name) noexcept : m_Id(id), m_Name(name), m_pTechDB(&RTechniqueDB::Get())
+	{
+	};
 	RPass(const RPass&) = default;
 	~RPass() = default;
 
@@ -27,8 +30,9 @@ public:
 	void PassJobAdd(RPassJob&& job) noexcept;
 
 	// execute jobs
-	void PassDraw() const noexcept;
-	void PassDrawCS() noexcept;			// special cascade shadows pass, requires appropriate technique
+	void DrawAABBs() noexcept;
+	void Draw() noexcept;
+	void DrawCSM() noexcept;			// special cascade shadows pass, requires appropriate technique
 	
 private:
 	size_t m_Id;						// pass Id, which should be the same for technique steps

@@ -4,13 +4,13 @@
 
 // RENDER QUEUE MANAGER
 
-class RenderQ
+class RenderGraph
 {
 public:
 	// when initialized - pre-generates default techniques
-	RenderQ() noexcept;
-	RenderQ(const RenderQ&) = default;
-	~RenderQ() = default;
+	RenderGraph() noexcept;
+	RenderGraph(const RenderGraph&) = default;
+	~RenderGraph() = default;
 
 	void Render() noexcept;						// frame processing scenario
 
@@ -19,6 +19,7 @@ public:
 
 	void ResetRenderPasses() noexcept;			// clears all render jobs
 	void GenerateJob(MeshCore* pMesh, uint32_t techniqueIds) noexcept;
+	void GenerateQueryJob(MeshCore* pMesh, MeshCore* pOTMesh) noexcept;
 
 private:
 	// store passes and techniques

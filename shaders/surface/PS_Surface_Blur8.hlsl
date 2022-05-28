@@ -22,7 +22,7 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
     
     // sample neighboring pixels
     /* sample intensity = 1.0 - loop step * multiplier
-    */
+    */   
     for (int1 y = -r; y <= r; y++)
     {
         for (int1 x = -r; x <= r; x++)

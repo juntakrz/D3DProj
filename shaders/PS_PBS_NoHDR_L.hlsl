@@ -1,4 +1,20 @@
-#include "include//HPS_PBS_H.hlsli"
+cbuffer M_Material : register(b0)
+{
+    float4 M_Ambient;
+    float4 M_F0;
+    float1 M_MatIntensity;
+    float1 M_Metalness;
+    float1 M_Roughness;
+    float1 M_BumpIntensity;
+};
+
+cbuffer L_DirLight : register(b1)
+{
+    float3 L_DirPos;
+    float1 L_DirInt;
+    float4 L_DirDiffuse;
+};
+
 #include "include//HPS_PBS_Func.hlsli"
 
 struct PSInput
@@ -45,20 +61,9 @@ float4 main(PSInput iPS) : SV_TARGET
     float3 N = normalize(normalTex.x * iPS.tangent + normalTex.y * iPS.binormal + normalTex.z * bumpInt * iPS.W_Normal);
     float3 V = normalize(iPS.camPos - iPS.worldPos); //view vector
     
-    for (uint i = 0; i < numPLights.x + 1; i++)
-    {
-        if (i == 0)
-        {
-            L = normalize(L_DirPos);
-            radiance = L_DirDiffuse.rgb * L_DirInt * matInt;
-        }
-        else
-        {
-            L = normalize(PL[i - 1].L_PLPos - iPS.worldPos);
-            float1 distance = length(PL[i - 1].L_PLPos - iPS.worldPos);
-            float1 attenuation = 1.0 / (distance * distance);
-            radiance = PL[i - 1].L_PLDiffuse.rgb * attenuation * PL[i - 1].L_PLInt.x * M_MatIntensity * matInt;
-        }
+        L = normalize(L_DirPos);
+        radiance = L_DirDiffuse.rgb * L_DirInt * matInt;
+        
         float3 H = normalize(V + L); //half vector between view and light
     
         //Cook-Torrance BRDF
@@ -79,7 +84,6 @@ float4 main(PSInput iPS) : SV_TARGET
         float3 Kd = (1.0f - F) * (1.0f - metallic);
     
         Lo += (Kd * albedo / PI + specular) * radiance * NdotL;
-    }
     
     float3 ambient = 0.03f * albedo * M_Ambient.rgb * ao;
     color = ambient + Lo;

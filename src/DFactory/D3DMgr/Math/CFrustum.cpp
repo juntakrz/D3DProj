@@ -4,7 +4,6 @@
 // static declarations
 DirectX::BoundingFrustum CFrustum::m_BFrustum;
 XMVECTOR CFrustum::m_planes[6];
-bool CFrustum::m_cullingEnabled = true;
 
 void CFrustum::CalcPlanes(CXMMATRIX transform, const bool& transpose) noexcept
 {
@@ -38,11 +37,6 @@ void CFrustum::CalcPlanes(CXMMATRIX transform, const bool& transpose) noexcept
 const bool& CFrustum::TestSphere(const XMFLOAT3& centerPos, const float& radius) noexcept
 {
 	return true;
-}
-
-void CFrustum::SetFrustumCulling(const bool& enabled) noexcept
-{
-	m_cullingEnabled = enabled;
 }
 
 void CFrustum::CalcFrustum(CXMMATRIX view, CXMMATRIX proj) noexcept

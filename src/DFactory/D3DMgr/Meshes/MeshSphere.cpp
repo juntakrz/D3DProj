@@ -6,12 +6,12 @@ MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 	auto model = CSphere::Create<DF::Vertex>(divisions, invertFaces);
 	model.SetTangentBinormalNormal();
 
+	// calculate mesh bounding box
+	CalcMeshAABBPoints(model.vertices);
+
 	//
 	// CORE BUFFERS
 	//
-
-	// calculate bounding radius
-	CalcMeshRadius(model.vertices, m_radius);
 
 	// create VertexBuffer with vertices
 	m_Binds[Bind::idVertexBuffer] = std::make_unique<Bind::VertexBuffer>(model.vertices);

@@ -37,8 +37,8 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
 		ID3DBlob* pVSByteCode = pVS->GetByteCode();
 		pBinds[Bind::idVertexShader] = std::move(pVS);
-		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
+		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 		pBinds[Bind::idSampler1] = std::make_unique<Bind::Sampler>(10u, 6u);
 		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Null_Texture>(6u);
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_NONE);
@@ -48,20 +48,83 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.back().m_BindMode = RTechnique::BIND_TECHNIQUE;
 		m_Techniques.back().m_Binds = std::move(pBinds);
 
-		m_Techniques.back().m_RB = 4;			// shadow render buffer (unused)
+		m_Techniques.back().m_RB = -1;			// shadow render buffer (unused)
 		m_Techniques.back().m_DSB = 3;			// shadow depth
 
 		m_Techniques.back().m_Camera = "camLight";
 
 		// write to stencil buffer with this pass
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Stencil::Off;
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::Default;
 
 		// tells renderer to use it in a special cascade shadow pass, requires orthogonal camera and shadow depth buffer
 		m_Techniques.back().m_IsCShadowTechnique = true;
 
 		currentPass++;
 	}
+
 	// PASS 1
+	// occlusion query testing
+	{
+		fInitBinds();
+
+		VS = "VS_Default_OT";
+
+		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
+		ID3DBlob* pVSByteCode = pVS->GetByteCode();
+		pBinds[Bind::idVertexShader] = std::move(pVS);
+		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
+
+		std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		};
+		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(ied, pVSByteCode);
+		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Null_Texture>(6u);
+		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
+
+		m_Techniques.emplace_back(RTechnique());
+		m_Techniques.back().m_Id = 1 << currentPass;
+		m_Techniques.back().m_BindMode = RTechnique::BIND_TECHNIQUE;
+		m_Techniques.back().m_Binds = std::move(pBinds);
+
+		//m_Techniques.back().m_RB = 3;			// render buffer (unused)
+		//m_Techniques.back().m_DSB = 2;		// render depth
+
+		m_Techniques.back().m_RB = -1;
+		m_Techniques.back().m_DSB = 1;
+
+		m_Techniques.back().m_Camera = "$active_camera";
+
+		// write to stencil buffer with this pass
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::Default;
+
+		currentPass++;
+	}
+
+	// PASS 2
+	// renders meshes to background
+	{
+		fInitBinds();
+
+		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
+
+		m_Techniques.emplace_back(RTechnique());
+		m_Techniques.back().m_Id = 1 << currentPass;
+		m_Techniques.back().m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
+		m_Techniques.back().m_Binds = std::move(pBinds);
+
+		m_Techniques.back().m_RB = 1;
+		m_Techniques.back().m_DSB = 1;
+
+		m_Techniques.back().m_Camera = "$active_camera";
+
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::DepthOff;
+
+		currentPass++;
+	}
+
+	// PASS 3
 	// use rendering using mesh own binds
 	{
 		fInitBinds();
@@ -87,11 +150,11 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.back().m_DSB = 1;			// render depth
 
 		// depth stencil state writes to off
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Stencil::Off;
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::Default;
 
 		currentPass++;
 	}
-	// PASS 2
+	// PASS 4
 	// use rendering using mesh own binds for 'blur' render buffer
 	{
 		fInitBinds();
@@ -118,11 +181,57 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 
 		currentPass++;
 	}
-	// PASS 3
+	// PASS 5 FOREGROUND
+	// 
+
+	fInitBinds();
+
+	pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
+
+	m_Techniques.emplace_back(RTechnique());
+	m_Techniques.back().m_Id = 1 << currentPass;
+	m_Techniques.back().m_BindMode = RTechnique::BIND_TECHNIQUE;
+	m_Techniques.back().m_Binds = std::move(pBinds);
+
+	m_Techniques.back().m_Camera = "$active_camera";
+
+	m_Techniques.back().m_RB = -1;			// fxBlur buffer
+	m_Techniques.back().m_DSB = 1;			// render depth
+
+	// no change for depth state
+	m_Techniques.back().m_depthState = -1;
+
+	currentPass++;
+
+	// PASS 6
+	// debug show bounding meshes
+
+	fInitBinds();
+
+	pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK, D3D11_FILL_WIREFRAME);
+
+	m_Techniques.emplace_back(RTechnique());
+	m_Techniques.back().m_Id = 1 << currentPass;
+	m_Techniques.back().m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
+	m_Techniques.back().m_Binds = std::move(pBinds);
+
+	m_Techniques.back().m_Camera = "$active_camera";
+
+	m_Techniques.back().m_RB = 1;			// render buffer
+	m_Techniques.back().m_DSB = -1;			// render depth
+
+	// no change for depth state
+	m_Techniques.back().m_depthState = -1;
+
+	currentPass++;
+	
+	// PASS 7
 	// write mask without actually drawing to render buffer
 	{
 		fInitBinds();
 		VS = "VS_Default";
+
+		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK, D3D11_FILL_SOLID);
 
 		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
 		ID3DBlob* pVSByteCode = pVS->GetByteCode();
@@ -142,11 +251,11 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.back().m_Camera = "$active_camera";
 
 		// write to stencil buffer with this pass
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Stencil::Write;
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::StencilWrite;
 
 		currentPass++;
 	}
-	// PASS 4
+	// PASS 8
 	// masking pass
 	{
 		fInitBinds();
@@ -170,7 +279,7 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		m_Techniques.back().m_DSB = 1;			// render depth
 
 		// mask this pass with what's in stencil buffer currently
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Stencil::Mask;
+		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::StencilMask;
 
 		currentPass++;
 	}

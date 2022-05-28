@@ -183,13 +183,13 @@
     <ClCompile Include="src\DFactory\D3DMgr\RenderSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\RenderQ\RPass.cpp">
+    <ClCompile Include="src\DFactory\RenderGraph\RPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\RenderQ\RTechnique.cpp">
+    <ClCompile Include="src\DFactory\RenderGraph\RTechnique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\RenderQ\RenderQ.cpp">
+    <ClCompile Include="src\DFactory\RenderGraph\RenderGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Stencil.cpp">
@@ -208,6 +208,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFactory\D3DMgr\Math\CFrustum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\DFactory_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\DFModelMgr_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\DFModelMgr_Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshAABB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshCore_Query.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\IBind\Bind_GeometryShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -392,13 +413,13 @@
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\RenderQ\RenderQ.h">
+    <ClInclude Include="src\DFactory\RenderGraph\RenderGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\RenderQ\RTechnique.h">
+    <ClInclude Include="src\DFactory\RenderGraph\RTechnique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\RenderQ\RPass.h">
+    <ClInclude Include="src\DFactory\RenderGraph\RPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h">
@@ -408,6 +429,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\D3DMgr\Math\CFrustum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshAABB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_GeometryShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -426,7 +456,7 @@
     <None Include="src\DFactory\D3DMgr\dxerr\DXTrace.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="shaders\include\HPS_PBS.hlsli" />
+    <None Include="shaders\include\HPS_PBS_Func.hlsli" />
     <None Include="shaders\include\HVS_Transform.hlsli" />
     <None Include="shaders\include\HPS_PBS_H.hlsli" />
   </ItemGroup>
@@ -438,8 +468,8 @@
   <ItemGroup>
     <FxCompile Include="shaders\VS_Default.hlsl" />
     <FxCompile Include="shaders\PS_Default.hlsl" />
-    <FxCompile Include="shaders\VS_BasicTexture.hlsl" />
-    <FxCompile Include="shaders\PS_BasicTexture.hlsl" />
+    <FxCompile Include="shaders\VS_FlatTexture.hlsl" />
+    <FxCompile Include="shaders\PS_FlatTexture.hlsl" />
     <FxCompile Include="shaders\PS_Atmosphere.hlsl" />
     <FxCompile Include="shaders\VS_Atmosphere.hlsl" />
     <FxCompile Include="shaders\PS_Standard_L.hlsl" />
@@ -462,5 +492,11 @@
     <FxCompile Include="shaders\surface\PS_SurfaceDepth.hlsl" />
     <FxCompile Include="shaders\PS_Shadow.hlsl" />
     <FxCompile Include="shaders\VS_PBS_Shadow.hlsl" />
+    <FxCompile Include="shaders\PS_PBS_NoHDR_L.hlsl" />
+    <FxCompile Include="shaders\VS_BB_Flat.hlsl" />
+    <FxCompile Include="shaders\PS_BB_FlatBlend.hlsl" />
+    <FxCompile Include="shaders\VS_Wireframe.hlsl" />
+    <FxCompile Include="shaders\PS_Wireframe.hlsl" />
+    <FxCompile Include="shaders\VS_Default_OT.hlsl" />
   </ItemGroup>
 </Project>

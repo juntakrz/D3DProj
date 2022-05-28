@@ -1,21 +1,21 @@
 #include "include//HPS_PBS_H.hlsli"
-#include "include//HPS_PBS.hlsli"
+#include "include//HPS_PBS_Func.hlsli"
 
 struct PSInput
 {
-    float3 camPos : POSITION0;
+    float3 camPos   : POSITION0;
     float3 worldPos : POSITION1;
     float3 W_Normal : NORMAL0;
-    float2 tex : TEXCOORD0;
-    float3 tangent : TANGENT;
+    float2 tex      : TEXCOORD0;
+    float3 tangent  : TANGENT;
     float3 binormal : BINORMAL;
 };
 
-Texture2D texDiffuse : register(t0);
-Texture2D texNormal : register(t1);
-Texture2D texMetallic : register(t2);
-Texture2D texRoughness : register(t3);
-Texture2D texAO : register(t4);
+Texture2D texDiffuse    : register(t0);
+Texture2D texNormal     : register(t1);
+Texture2D texMetallic   : register(t2);
+Texture2D texRoughness  : register(t3);
+Texture2D texAO         : register(t4);
 SamplerState smplr;
 
 float4 main(PSInput iPS) : SV_TARGET
@@ -50,10 +50,10 @@ float4 main(PSInput iPS) : SV_TARGET
         }
         else
         {
-            L = normalize(L_PLPos[i - 1] - iPS.worldPos);
-            float1 distance = length(L_PLPos[i - 1] - iPS.worldPos);
+            L = normalize(PL[i - 1].L_PLPos - iPS.worldPos);
+            float1 distance = length(PL[i - 1].L_PLPos - iPS.worldPos);
             float1 attenuation = 1.0 / (distance * distance);
-            radiance = L_PLDiffuse[i - 1].rgb * attenuation * L_PLInt[i - 1].x;
+            radiance = PL[i - 1].L_PLDiffuse.rgb * attenuation * PL[i - 1].L_PLInt.x * M_MatIntensity;
         }
         float3 H = normalize(V + L);        //half vector between view and light
     

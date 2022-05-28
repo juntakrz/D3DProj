@@ -34,7 +34,7 @@ private:
 	COMPTR<ID3D11ShaderResourceView>	m_pBufCopy_SR;
 
 	// states
-	COMPTR<ID3D11DepthStencilState>		m_pDSStates[3];
+	COMPTR<ID3D11DepthStencilState>		m_pDSStates[4];
 	COMPTR<ID3D11BlendState>			m_pBlendState;
 
 	//dynamically allocated RTV pointers
@@ -131,6 +131,12 @@ public:
 		const char* GetType() const noexcept;
 	};
 
+public:
+	// experimental predicate code
+	COMPTR<ID3D11Predicate> m_pPredicate = nullptr;
+	D3D11_QUERY_DESC qPred{ D3D11_QUERY_OCCLUSION_PREDICATE, D3D11_QUERY_MISC_PREDICATEHINT };
+	//
+
 	D3DMgr(HWND hWnd);
 	~D3DMgr();
 	D3DMgr(const D3DMgr&) = delete;
@@ -140,7 +146,8 @@ public:
 	void DisableImGui() noexcept;
 	bool IsImGuiEnabled() const noexcept;
 
-	void			SetViewportSize(const uint16_t width, const uint16_t height) noexcept;
+	void			SetResolution(const uint16_t width, const uint16_t height) noexcept;
+	const XMFLOAT2& GetResolution() const noexcept;
 	const float&	GetAspectRatio() const noexcept;
 
 	void			SetShowDepth(bool show) noexcept;

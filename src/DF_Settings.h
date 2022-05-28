@@ -30,7 +30,7 @@
 #endif
 
 #ifndef CWND_MSGLOOPFPS
-#define CWND_MSGLOOPFPS 144
+#define CWND_MSGLOOPFPS 180
 #endif
 
 #ifndef IDI_APPICON

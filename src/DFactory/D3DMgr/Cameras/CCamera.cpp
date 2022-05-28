@@ -4,7 +4,7 @@
 CCamera::CCamera(const float posX, const float posY, const float posZ) noexcept
 	: m_pos({ posX, posY, posZ })
 {
-	SetAsPerspective(1.0f, DF::D3DM->GetAspectRatio(), 0.05f, 5000.05f);
+	SetAsPerspective(1.0f, DF::D3DM->GetAspectRatio(), 0.05f, 400.05f);
 	m_orthoData = { 16.0f, 9.0f, 0.05f, 120.0f };
 }
 
@@ -69,7 +69,7 @@ void CCamera::DisableLookAt() noexcept
 	m_lookAt = false;
 }
 
-void CCamera::LockToCamera(CCamera* pCam) noexcept
+void CCamera::LockToCameraTarget(CCamera* pCam) noexcept
 {
 	if (pCam)
 	{
@@ -89,11 +89,16 @@ void CCamera::LookAt(std::string objectId) noexcept
 	m_targetId = objectId;
 }
 
-const XMFLOAT3& CCamera::GetFocus() const noexcept
+const XMFLOAT3A& CCamera::GetFocus() const noexcept
 {
-	XMFLOAT3 focus;
-	XMStoreFloat3(&focus, m_vecFocus);
+	XMFLOAT3A focus;
+	XMStoreFloat3A(&focus, m_vecFocus);
 	return focus;
+}
+
+const XMVECTOR& CCamera::GetFocusVector() const noexcept
+{
+	return m_vecFocus;
 }
 
 void CCamera::SetAsPerspective() noexcept
@@ -127,7 +132,7 @@ void CCamera::SetPos(float posX, float posY, float posZ) noexcept
 	m_initPos = m_pos;
 }
 
-void CCamera::SetPos(XMFLOAT3 pos) noexcept
+void CCamera::SetPos(const XMFLOAT3A& pos) noexcept
 {
 	m_pos = pos;
 	m_initPos = pos;
@@ -148,9 +153,14 @@ void CCamera::SetRotation(float pitchRad, float yawRad) noexcept
 	m_rot.y = -GMath::WrapAngle(yawRad);
 }
 
-const XMFLOAT3& CCamera::GetPos() const noexcept
+const XMFLOAT3A& CCamera::GetPos() const noexcept
 {
 	return m_pos;
+}
+
+const XMVECTOR& CCamera::GetUpVector() const noexcept
+{
+	return m_vecUp;
 }
 
 void CCamera::SetMovementDelta(float delta) noexcept
@@ -199,7 +209,7 @@ void CCamera::Rotate(float pitch, float yaw, float roll) noexcept
 	m_rot.z = roll;
 }
 
-void CCamera::Rotate(const XMFLOAT3& rotation) noexcept
+void CCamera::Rotate(const XMFLOAT3A& rotation) noexcept
 {
 	m_rot = rotation;
 }
@@ -213,7 +223,7 @@ void CCamera::RotateAdd(float pitch, float yaw, float roll) noexcept
 	m_rot.z += roll;
 }
 
-void CCamera::RotateAdd(const XMFLOAT3& rotation) noexcept
+void CCamera::RotateAdd(const XMFLOAT3A& rotation) noexcept
 {
 	m_rot.x + rotation.x > DirectX::XM_PIDIV2 - 0.01f ? m_rot.x = DirectX::XM_PIDIV2 - 0.01f :
 		m_rot.x + rotation.x < -DirectX::XM_PIDIV2 + 0.01f ? m_rot.x = -DirectX::XM_PIDIV2 + 0.01f : m_rot.x += rotation.x;

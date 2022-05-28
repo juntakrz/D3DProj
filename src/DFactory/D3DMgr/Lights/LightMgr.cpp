@@ -2,7 +2,7 @@
 
 uint16_t LightMgr::GetMaxPLights() const noexcept
 {
-	return m_maxPLights;
+	return DF::maxPointLights;
 }
 
 void LightMgr::ShowControls() noexcept
@@ -22,7 +22,7 @@ void LightMgr::ShowControls() noexcept
 }
 
 void LightMgr::Reset() noexcept {
-	plData.pos[m_selPLight] = {0.0f, 0.0f, 0.0f};
+	plData.PL[m_selPLight].pos = {0.0f, 0.0f, 0.0f};
 }
 
 void LightMgr::Draw() const noexcept {
@@ -44,15 +44,15 @@ void LightMgr::Bind(const DirectX::XMMATRIX& camView, MeshCore* mesh) noexcept {
 
 	FXMVECTOR modelPos = XMLoadFloat3(mesh->GetXMPos());
 
-	for (uint16_t i = 0; i < m_PLights.size() && addedPLights < m_maxPLights; i++) {
+	for (uint16_t i = 0; i < m_PLights.size() && addedPLights < DF::maxPointLights; i++) {
 		
 		lightPos = XMLoadFloat3(m_PLights[i].pMesh->GetXMPos());
 		XMStoreFloat2(&distanceToModel, XMVector3Length(lightPos - modelPos));
 		if (distanceToModel.x < m_PLights[i].intensity * 16.0f)
 		{
-			plData.pos[addedPLights] = *m_PLights[i].pMesh->GetXMPos();
-			plData.diffuse[addedPLights] = m_PLights[i].color;
-			plData.intensity[addedPLights].x = m_PLights[i].intensity;
+			plData.PL[addedPLights].pos = *m_PLights[i].pMesh->GetXMPos();
+			plData.PL[addedPLights].diffuse = m_PLights[i].color;
+			plData.PL[addedPLights].intensity.x = m_PLights[i].intensity;
 			addedPLights++;
 		}
 	}
