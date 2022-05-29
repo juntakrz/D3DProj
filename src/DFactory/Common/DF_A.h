@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../D3DMgr/D3DMgr.h"
-
 class DFactory;
 
 namespace DF
@@ -14,6 +13,6 @@ namespace DF
 
 	struct
 	{
-		uint8_t depthView = 3u;
+		std::string depthView = "dsCSM";
 	} DEBUG;
 }

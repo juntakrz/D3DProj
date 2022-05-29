@@ -44,6 +44,9 @@ void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
 {
 	for (uint32_t i = 0; i < m_pMeshes.size(); i++)
 	{
+		if (m_pMeshes[i]->GetTechniqueIds() == 32)
+			std::string x;
+
 		// generate job using technique flags
 		(i < m_pAABBs.size() && m_pAABBs[i])
 			? (m_pMeshes[i]->m_QueryResult > 0) ? renderMgr->GenerateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds()) : void()
@@ -53,7 +56,7 @@ void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
 		(i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->GenerateQueryJob(m_pMeshes[i], m_pAABBs[i]) : void();
 
 		// if debug-showing AABBs enabled - show them in a special pass
-		(true) ? (i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->GenerateJob(m_pAABBs[i], DF::fxAABBShow) : void() : void();
+		(true) ? (i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->GenerateJob(m_pAABBs[i], DF::Layer::AABBShow) : void() : void();
 	}
 
 	/*
@@ -65,7 +68,7 @@ void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
 	// show AABBs in a special dedicated pass when enabled
 	for (const auto& pAABB : m_pAABBs)
 	{
-		(pAABB) ? renderMgr->GenerateJob(pAABB, DF::fxAABBShow) : void();
+		(pAABB) ? renderMgr->GenerateJob(pAABB, DF::Layer::AABBShow) : void();
 	}*/
 
 	for (const auto& pNode : m_pChildNodes)

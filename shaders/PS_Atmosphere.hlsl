@@ -49,7 +49,9 @@ float4 main(PSInput iPS) : SV_TARGET
         specular = pow(saturate(dot(vecRefl, -iPS.viewDir)), M_SpecPower) * M_SpecIntensity;
     }
     
+    //globalDiffuse.a = (globalDiffuse.r + globalDiffuse.g + globalDiffuse.b) / 3.0;
+    
     //final color
-    return float4((globalDiffuse.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a * 1.2f);
+    return float4((globalDiffuse.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a * 1.14);
 
 }

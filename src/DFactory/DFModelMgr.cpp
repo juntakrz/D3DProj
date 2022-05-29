@@ -13,10 +13,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 	for (const auto& it : m_Models)
 	{
 		if (it.name == name) return;
-	}
 
-	for (const auto& it : m_Models)
-	{
 		if (newID == it.id)
 		{
 			newID++;
@@ -140,7 +137,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		newMesh.meshid = 1;
 		newMesh.meshMat = pMatMgr->Mat(0).name;
 		newMesh.meshName = "Point" + std::to_string(newMesh.meshid);
-		newMesh.pMesh = std::make_unique<MeshPoint>(0, 1.0f);
+		newMesh.pMesh = std::make_unique<MeshPoint>(0);
 
 		newModel.id = newID;
 		newModel.name = name;

@@ -30,22 +30,7 @@ void RPass::DrawAABBs() noexcept
 	// change depth stencil state if defined
 	(m_pTech->m_depthState > -1) ? DF::D3DM->SetDepthStencilState(m_pTech->m_depthState) : void();
 
-	// render all AABBs to depth buffer
-	// then render same AABBs and compare if any are fully occluded and mark their corresponding mesh as occluded
-
-	/*
-	for (auto& it : m_Jobs)
-	{
-		// bind core mesh buffers
-		it.pMesh->BindCore();
-		it.pMesh->Binds()->at(Bind::idTransform)->Bind();
-
-		// issue draw call
-		it.pMesh->DrawIndexed();
-	}
-
-	UINT result = 0;*/
-
+	// render all AABBs to depth buffer and get query results
 	switch (DF::isCullingEnabled)
 	{
 	case true:
@@ -206,4 +191,61 @@ void RPass::DrawCSM() noexcept
 
 	// bind CSM view proj vertex buffer
 	DF::Engine->LightM->DLVSBufferBind();
+}
+
+void RPass::DrawSprites(const std::string& DS_SRV) noexcept
+{
+	// get technique data
+	m_pTech = &m_pTechDB->m_Techniques[m_Id];
+
+	// set appropriate render targets
+	DF::D3DM->RTBind(m_pTech->m_RB, m_pTech->m_DSB);
+
+	// disable depth buffer
+	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Mode::DepthOff);
+
+	// switch to technique-defined camera, if available
+	// or switch to camera tied to special id, if defined
+	(m_pTech->m_Camera != "")
+		? (m_pTech->m_Camera == "$active_camera")
+		? DF::D3DM->SetCamera(DF::Engine->Camera(DF::Engine->vars.activeCamera))
+		: DF::D3DM->SetCamera(DF::Engine->Camera(m_pTech->m_Camera))
+		: void();
+
+	// bind technique binds once
+	m_pTech->BindTechnique();
+
+	// retrieve sampler from the pixel shader... but need to do it in a better way
+	COMPTR<ID3D11SamplerState> pSState;
+
+	D3D11_SAMPLER_DESC samplerDesc{};
+	samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MinLOD = 0.0f;
+	samplerDesc.MaxLOD = 0.0f;
+	samplerDesc.MaxAnisotropy = 0.0f;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+
+	DF::Device()->CreateSamplerState(&samplerDesc, &pSState);
+	
+	DF::Context()->GSSetSamplers(1u, 1u, pSState.GetAddressOf());
+	DF::D3DM->Context();
+	
+	DF::Context()->GSSetShaderResources(0u, 1u, DF::D3DM->GetDepthTarget(DS_SRV)->pDS_SRV.GetAddressOf());
+
+	// run sprite rendering jobs
+	for (auto& it : m_Jobs)
+	{
+		it.pMesh->BindCore();		// overriden in MeshPoint to bind vertex buffer only
+		it.pMesh->BindLocal();
+		it.pMesh->DrawIndexed();	// this is a point and has no indices, so DrawIndexed() is overriden with Draw()
+	}
+
+	// clear geometry shader
+	DF::Context()->GSSetShader(nullptr, nullptr, NULL);
+
+	// enable depth buffer
+	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Mode::Default);
 }

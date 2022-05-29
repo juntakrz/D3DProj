@@ -39,7 +39,7 @@ private:
 	uint8_t m_BindMode = BIND_TECHNIQUE;					// bind mode of the pass
 	std::string m_Camera = "";								// camera that this technique will use for rendering, empty for no change
 	bool m_BindLights = false;								// generate light data for mesh, required only for direct rendering passes
-	int8_t m_RB = -2, m_DSB = -2;							// render and depth buffers to switch to before rendering, -1 for null target, -2 to not switch
+	std::string m_RB = "", m_DSB = "";						// render and depth buffers to switch to before processing pass
 	int8_t m_depthState = -1;								// depth state for the current pass, -1 for no change
 	std::vector<std::unique_ptr<Bind::IBind>> m_Binds;		// technique binds
 	bool m_IsCShadowTechnique = false;						// requires orthogonal camera and proper shadow depth buffer provided

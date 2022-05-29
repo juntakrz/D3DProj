@@ -3,6 +3,7 @@
 namespace Bind
 {
 	GeometryShader::GeometryShader(const std::string& filePath) noexcept
+		: m_FilePath(filePath.begin(), filePath.end())
 	{
 		D3D_DXGIDEBUG(*DF::D3DM);
 

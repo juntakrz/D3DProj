@@ -27,7 +27,7 @@ MeshCube::MeshCube(uint16_t matId, uint16_t paramA, uint16_t paramB)
 	/*	//////////	*/
 
 	// load color texture
-	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(MatMgr.TextureGet(0));
+	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(MatMgr.TextureGet("default//default.dds"));
 
 	m_Binds[Bind::idSampler0] = std::make_unique<Bind::Sampler>();
 

@@ -19,9 +19,11 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.pD3DMgr->SetResolution(_SInstance.pWndMgr->GetWindowSize().first, _SInstance.pWndMgr->GetWindowSize().second);
 
 	// create 'main' and 'aux' render surfaces
-	_SInstance.pD3DMgr->CreateRenderSurface("main", 1.0f);
-	_SInstance.pD3DMgr->CreateRenderSurface("aux", 1.0f);
-	_SInstance.pD3DMgr->RenderSurfaces(1)->SetShaders("surface//VS_Surface", "surface//PS_Surface_Blur8");
+	_SInstance.pD3DMgr->CreateRenderSurface("sfcMain", 1.0f);
+	_SInstance.pD3DMgr->CreateRenderSurface("sfcBlur", 1.0f);
+	_SInstance.pD3DMgr->CreateRenderSurface("sfcDepth", 1.0f);
+	_SInstance.pD3DMgr->Surface("sfcBlur")->SetShaders("surface//VS_Surface", "surface//PS_Surface_BlurGauss");
+	_SInstance.pD3DMgr->Surface("sfcDepth")->SetShaders("surface//VS_Surface", "surface//PS_SurfaceDepth");
 
 	// init light manager
 	_SInstance.LightM = &LightMgr::Get();
@@ -51,7 +53,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.material.spec_metal = 0.0f;
 	DFMatDesc.material.pow_roughness = 0.5f;
-	DFMatDesc.effects = DF::fxStandard;
+	DFMatDesc.effects = DF::Layer::Standard;
 	_SInstance.MatM->MatAdd(&DFMatDesc);
 
 	//create and add default RTT material

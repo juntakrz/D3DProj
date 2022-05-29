@@ -101,11 +101,11 @@ public:
 	uint32_t GetTechniqueIds() const noexcept;
 
 	// binds and draw calls
-	void BindCore() const noexcept;									// bind core mesh buffers
-	void BindLocal() const noexcept;								// bind other mesh buffers
+	virtual void	BindCore() const noexcept;						// bind core mesh buffers
+	void			BindLocal() const noexcept;						// bind other mesh buffers
+	virtual void	DrawIndexed() noexcept;							// mesh draw call
 	std::vector<std::unique_ptr<Bind::IBind>>* Binds() noexcept;	// get standard mesh binds
-	const Bind::IndexBuffer* GetIndexBuffer() const noexcept;	
-	void DrawIndexed() noexcept;									// mesh draw call
+	const Bind::IndexBuffer* GetIndexBuffer() const noexcept;
 
 	virtual DirectX::XMMATRIX GetXMTransform() const noexcept;
 	void XMUpdate(FXMMATRIX transform) noexcept;

@@ -13,5 +13,5 @@ MeshImport::MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds, const s
 	// create transform buffer
 	m_Binds[Bind::idTransform] = std::make_unique<Bind::TransformConstBuffer>(*this);
 
-	m_TechniqueIds = DF::fxStandard;
+	m_TechniqueIds = DF::Layer::Standard;
 }

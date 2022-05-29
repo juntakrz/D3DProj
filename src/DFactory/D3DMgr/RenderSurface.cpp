@@ -62,28 +62,9 @@ void RenderSurface::SetShaders(const std::string& VS, const std::string& PS) noe
 	smplDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
 	smplDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
 	smplDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	smplDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 
 	DF::Device()->CreateSamplerState(&smplDesc, &m_pSampler);
-}
-
-const bool& RenderSurface::SetAsDepthView() noexcept
-{
-	if (!m_isDepthView)
-	{
-		SetShaders(m_VSRender, m_PSDepth);
-		m_isDepthView = true;
-	}
-	return m_isDepthView;
-}
-
-const bool& RenderSurface::SetAsRenderView() noexcept
-{
-	if (m_isDepthView)
-	{
-		SetShaders(m_VSRender, m_PSRender);
-		m_isDepthView = false;
-	}
-	return m_isDepthView;
 }
 
 void RenderSurface::Bind(ID3D11ShaderResourceView* pSRV) noexcept
@@ -97,6 +78,7 @@ void RenderSurface::Bind(ID3D11ShaderResourceView* pSRV) noexcept
 	DF::Context()->IASetInputLayout(m_pLayout.Get());
 	DF::Context()->PSSetSamplers(0u, 1u, m_pSampler.GetAddressOf());
 	DF::Context()->VSSetShader(m_pVS.Get(), nullptr, 0u);
+	DF::Context()->GSSetShader(nullptr, nullptr, 0);
 	DF::Context()->PSSetShader(m_pPS.Get(), nullptr, 0u);
 
 	// bind texture to render from

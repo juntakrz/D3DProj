@@ -195,7 +195,7 @@
     <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Stencil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RS.cpp">
+    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Surface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr_DL.cpp">
@@ -229,6 +229,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\Util\GPUConstBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -440,6 +443,9 @@
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DFactory\Util\GPUConstBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\c-logo-icon.ico">
@@ -498,5 +504,14 @@
     <FxCompile Include="shaders\VS_Wireframe.hlsl" />
     <FxCompile Include="shaders\PS_Wireframe.hlsl" />
     <FxCompile Include="shaders\VS_Default_OT.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_LensEffect.hlsl" />
+    <FxCompile Include="shaders\VS_PtSprite.hlsl" />
+    <FxCompile Include="shaders\VS_QuadFlare.hlsl" />
+    <FxCompile Include="shaders\PS_QuadFlare.hlsl" />
+    <FxCompile Include="shaders\PS_PtSprite.hlsl" />
+    <FxCompile Include="shaders\GS_PtSprite.hlsl" />
+    <FxCompile Include="shaders\GS_QuadFlare.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_BlurGauss.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_BlurBox.hlsl" />
   </ItemGroup>
 </Project>
