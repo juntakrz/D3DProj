@@ -53,7 +53,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.material.spec_metal = 0.0f;
 	DFMatDesc.material.pow_roughness = 0.5f;
-	DFMatDesc.effects = DF::Layer::Standard;
+	DFMatDesc.effects = DF::Pass::Standard;
 	_SInstance.MatM->MatAdd(&DFMatDesc);
 
 	//create and add default RTT material
@@ -120,7 +120,7 @@ void DFactory::DrawFrame() noexcept
 	LightM->Draw();
 
 	// render frame
-	RenderM->Render();
+	RenderM->RenderFrame();
 }
 
 void DFactory::UpdateRenderer() noexcept

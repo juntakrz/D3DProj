@@ -12,8 +12,7 @@ namespace Bind
 		ID3DBlob* GetByteCode() const noexcept;
 
 	protected:
-		COMPTR<ID3DBlob> m_pBlob;
-		COMPTR<ID3D11VertexShader> m_pVS;
-		std::wstring m_FilePath;
+		ID3D11VertexShader* m_pVS;
+		std::string m_FilePath;
 	};
 }

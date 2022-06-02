@@ -217,7 +217,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			// try to delete textures if unused by anything else
 			DFMatDesc.manageTextures = true;
 			
-			DFMatDesc.effects = DF::Layer::Standard;
+			DFMatDesc.effects = DF::Pass::Standard;
 
 			pMatMgr->MatAdd(&DFMatDesc);
 			pDFMat = &pMatMgr->Mat(newMesh.meshMat);
@@ -241,14 +241,12 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	pBinds[Bind::idIndexBuffer] = std::make_unique<Bind::IndexBuffer>(indices);
 
 	//create and bind vertex shader
-	std::string VSPath = "shaders//" + pDFMat->shaderVertex + ".shd";
-	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
+	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(pDFMat->shaderVertex);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	pBinds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + pDFMat->shaderPixel + ".shd";
-	pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
+	pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(pDFMat->shaderPixel);
 
 	pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 

@@ -35,14 +35,12 @@ MeshCube::MeshCube(uint16_t matId, uint16_t paramA, uint16_t paramB)
 	AddMaterialBind(matId);
 
 	// create vertex shader
-	std::string VSPath = "shaders//" + MatMgr.Mat(matId).shaderVertex + ".shd";
-	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
+	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(MatMgr.Mat(matId).shaderVertex);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + MatMgr.Mat(matId).shaderPixel + ".shd";
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(MatMgr.Mat(matId).shaderPixel);
 
 	//create and bind InputLayout
 	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);

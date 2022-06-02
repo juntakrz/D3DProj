@@ -1,18 +1,18 @@
 #include "Bind_PixelShader.h"
+#include "../../DFactory.h"
 
 namespace Bind
 {
-	PixelShader::PixelShader(const std::string& filePath) noexcept : m_FilePath(filePath.begin(), filePath.end())
+	PixelShader::PixelShader(const std::string& filePath) noexcept : m_FilePath(filePath)
 	{
 		D3D_DXGIDEBUG(*DF::D3DM);
 
-		D3D_THROW(D3DReadFileToBlob(m_FilePath.c_str(), &m_pBlob));
-		D3D_THROW(GetDevice()->CreatePixelShader(m_pBlob->GetBufferPointer(), m_pBlob->GetBufferSize(), nullptr, &m_pPS));
+		m_pPS = reinterpret_cast<ID3D11PixelShader*>(DF::Engine->MatM->ShaderAdd(filePath));
 	}
 
 	void PixelShader::Bind() noexcept
 	{
-		GetContext()->PSSetShader(m_pPS.Get(), nullptr, NULL);
+		GetContext()->PSSetShader(m_pPS, nullptr, NULL);
 	}
 	void PixelShader::Unbind() noexcept
 	{

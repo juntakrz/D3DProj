@@ -141,7 +141,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.F0 = { 0.25f, 0.23f, 0.00f };
 	DFMatDesc.material.matIntensity = 2.2f;
 	DFMatDesc.material.bumpIntensity = 1.5f;
-	DFMatDesc.effects = DF::Layer::Background;
+	DFMatDesc.effects = DF::Pass::Background;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -154,7 +154,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.matIntensity = 0.9f;
-	DFMatDesc.effects = DF::Layer::Blur;
+	DFMatDesc.effects = DF::Pass::Blur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -165,7 +165,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.pixel = "PS_FlatTexture";
 	DFMatDesc.textures.tex0 = "stars_6k_color.dds";
 	DFMatDesc.material.matIntensity = 0.1f;
-	DFMatDesc.effects = DF::Layer::Background;
+	DFMatDesc.effects = DF::Pass::Background;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -183,7 +183,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.0f, 0.0f, 0.0f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Layer::Standard | DF::Layer::Shadow;
+	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -202,7 +202,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Layer::Standard | DF::Layer::Shadow;
+	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -221,7 +221,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Layer::Blur | DF::Layer::Shadow;
+	DFMatDesc.effects = DF::Pass::Blur | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -240,7 +240,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Layer::Standard | DF::Layer::Shadow;
+	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -249,7 +249,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Sun";
 	DFMatDesc.shaders.vertex = "VS_Default";
 	DFMatDesc.shaders.pixel = "PS_Default";
-	DFMatDesc.effects = DF::Layer::Blur;
+	DFMatDesc.effects = DF::Pass::Blur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -261,7 +261,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.pixel = "PS_QuadFlare";
 	DFMatDesc.textures.tex0 = "Lens//sunFlare.dds";
 	DFMatDesc.textures.tex1 = "Lens//lensDust.dds";		// make it a separate command maybe
-	DFMatDesc.effects = DF::Layer::PointSprites;
+	DFMatDesc.effects = DF::Pass::PointSprites;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -290,7 +290,7 @@ void DFMain::LoadScreen() noexcept
 	//MdlTachi
 	DF.ModelM->Create(DF::idImport, "MdlTachi", true, "tachilp1.obj");
 	DF.ModelM->SetShaders("VS_PBS_Shadow", "PS_PBS_Shadow");
-	DF.ModelM->SetEffect(DF::Layer::Standard | DF::Layer::Shadow);
+	DF.ModelM->SetEffect(DF::Pass::Standard | DF::Pass::Shadow);
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
@@ -329,7 +329,7 @@ void DFMain::LoadScreen() noexcept
 	//MdlPoint
 	DF.ModelM->Create(DF::idPoint, "MdlPoint");
 	DF.ModelM->SetMaterial("Mat_SunP");
-	DF.ModelM->SetEffect(DF::Layer::PointSprites);
+	DF.ModelM->SetEffect(DF::Pass::PointSprites);
 	DF.ModelM->SetPos(-48.0f, 34.0f, -4.0f);
 	//DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
 	DF.ModelM->Model().FollowCamera(true);

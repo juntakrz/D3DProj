@@ -13,8 +13,7 @@ namespace Bind
 		void Unbind() noexcept override;
 
 	protected:
-		COMPTR<ID3DBlob> m_pBlob;
-		COMPTR<ID3D11PixelShader> m_pPS;
-		std::wstring m_FilePath;
+		ID3D11PixelShader* m_pPS;
+		std::string m_FilePath;
 	};
 }

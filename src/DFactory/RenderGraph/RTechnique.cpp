@@ -3,7 +3,7 @@
 
 // RTECHNIQUEDB
 
-void RTechniqueDB::InitDefaultTechniques() noexcept
+void RTechnique::InitTechniques() noexcept
 {
 	// do not initialize again
 	if (m_InitializedDefaults)
@@ -12,7 +12,6 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 	}
 
 	std::string VS, PS;
-	uint8_t currentPass = 0;
 
 	// initialize bind vector and its standard 24 slots
 	std::vector<std::unique_ptr<Bind::IBind>> pBinds;
@@ -28,13 +27,13 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 
 	// CONCEPT: 'Pass X' 'Intended pass use description'
 
-	// PASS 0
+	// PASS: Shadow
 	// renders to shadow depth from dir light's POV
 	{
 		fInitBinds();
 		VS = "VS_Default";
 
-		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
+		auto pVS = std::make_unique<Bind::VertexShader>(VS);
 		ID3DBlob* pVSByteCode = pVS->GetByteCode();
 		pBinds[Bind::idVertexShader] = std::move(pVS);
 		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
@@ -44,33 +43,32 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Null_Texture>(6u);
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_NONE);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::Shadow);
+		m_TechDB[techId] = TechniqueData();
 
-		m_Techniques.back().m_RB = "";			// shadow render buffer (unused)
-		m_Techniques.back().m_DSB = "dsCSM";	// shadow depth
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
-		m_Techniques.back().m_Camera = "camLight";
+		m_TechDB[techId].m_RB = "";			// shadow render buffer (unused)
+		m_TechDB[techId].m_DSB = "dsCSM";	// shadow depth
+
+		m_TechDB[techId].m_Camera = "camLight";
 
 		// write to stencil buffer with this pass
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::Default;
+		m_TechDB[techId].m_depthState = DF::DS_Mode::Default;
 
-		// tells renderer to use it in a special cascade shadow pass, requires orthogonal camera and shadow depth buffer
-		m_Techniques.back().m_IsCShadowTechnique = true;
-
-		currentPass++;
+		// mark technique as suitable for cascade shadow mapping pass
+		m_TechDB[techId].m_IsCSM = true;
 	}
 
-	// PASS 1
+	// PASS: Occlusion
 	// occlusion query testing
 	{
 		fInitBinds();
 
 		VS = "VS_Default_OT";
 
-		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
+		auto pVS = std::make_unique<Bind::VertexShader>(VS);
 		ID3DBlob* pVSByteCode = pVS->GetByteCode();
 		pBinds[Bind::idVertexShader] = std::move(pVS);
 		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
@@ -85,42 +83,40 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Null_Texture>(6u);
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::Occlusion);
+		m_TechDB[techId] = TechniqueData();
 
-		m_Techniques.back().m_RB = "";
-		m_Techniques.back().m_DSB = "dsMain";
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
-		m_Techniques.back().m_Camera = "$active_camera";
+		m_TechDB[techId].m_RB = "";
+		m_TechDB[techId].m_DSB = "dsMain";
+
+		m_TechDB[techId].m_Camera = "$active_camera";
 
 		// write to stencil buffer with this pass
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::Default;
-
-		currentPass++;
+		m_TechDB[techId].m_depthState = (uint8_t)DF::DS_Mode::Default;
 	}
 
-	// PASS 2
+	// PASS: Background
 	// renders meshes to background
 	{
 		fInitBinds();
 
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::Background);
+		m_TechDB[techId] = TechniqueData();
 
-		m_Techniques.back().m_RB = "rtMain";
-		m_Techniques.back().m_DSB = "dsMain";
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
-		m_Techniques.back().m_Camera = "$active_camera";
+		m_TechDB[techId].m_RB = "rtMain";
+		m_TechDB[techId].m_DSB = "dsMain";
 
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::DepthOff;
+		m_TechDB[techId].m_Camera = "$active_camera";
 
-		currentPass++;
+		m_TechDB[techId].m_depthState = DF::DS_Mode::DOff_SOff;
 	}
 
 	// PASS 3
@@ -129,29 +125,28 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		fInitBinds();
 
 		// create a bind to cascade shadow map
-		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Texture>(DF::D3DM->GetDepthTarget("dsCSM")->pDS_SRV.Get(), 6u);
+		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Texture>(DF::D3DM->GetDepthTarget("dsCSM")->pDepthSRV.Get(), 6u);
 
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::Standard);
+		m_TechDB[techId] = TechniqueData();
+
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
 		// set player camera for this and next passes until changed
-		m_Techniques.back().m_Camera = "$active_camera";
+		m_TechDB[techId].m_Camera = "$active_camera";
 
 		// generate light data for mesh
-		m_Techniques.back().m_BindLights = true;
+		m_TechDB[techId].m_BindLights = true;
 
 		// set render buffer and depth buffer for rendering to
-		m_Techniques.back().m_RB = "rtMain";		// main buffer
-		m_Techniques.back().m_DSB = "dsMain";		// main depth
+		m_TechDB[techId].m_RB = "rtMain";		// main buffer
+		m_TechDB[techId].m_DSB = "dsMain";		// main depth
 
 		// depth stencil state writes to off
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::Default;
-
-		currentPass++;
+		m_TechDB[techId].m_depthState = DF::DS_Mode::Default;
 	}
 	// PASS 4
 	// use rendering using mesh own binds for 'blur' render buffer
@@ -159,26 +154,26 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		fInitBinds();
 
 		// create a bind to cascade shadow map
-		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Texture>(DF::D3DM->GetDepthTarget("dsCSM")->pDS_SRV.Get(), 6u);
+		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Texture>(DF::D3DM->GetDepthTarget("dsCSM")->pDepthSRV.Get(), 6u);
 
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::Blur);
+		m_TechDB[techId] = TechniqueData();
+
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
 		// generate light data for mesh
-		m_Techniques.back().m_BindLights = true;
+		m_TechDB[techId].m_BindLights = true;
 
 		// use same depth buffer from previous pass, but render to 'fxBlur' render buffer
-		m_Techniques.back().m_RB = "rtBlur";	// fxBlur buffer
-		m_Techniques.back().m_DSB = "dsMain";	// main depth
+		m_TechDB[techId].m_RB = "rtBlur";	// fxBlur buffer
+		m_TechDB[techId].m_DSB = "dsMain";	// main depth
 
 		// no change for depth state
-		m_Techniques.back().m_depthState = -1;
-
-		currentPass++;
+		m_TechDB[techId].m_depthState = -1;
+		//m_TechDB[techId].m_depthState = DF::DS_Mode::DOn_SWrite;
 	}
 	// PASS 5 SPRITE LAYER
 	//
@@ -187,18 +182,20 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 
 		pBinds[Bind::idTopology] = std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::PointSprites);
+		m_TechDB[techId] = TechniqueData();
+
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
 		// set player camera for this and next passes until changed
-		m_Techniques.back().m_Camera = "$active_camera";
+		m_TechDB[techId].m_Camera = "$active_camera";
 
 		// set render buffer and depth buffer for rendering to
-		m_Techniques.back().m_RB = "rtMain";	// main buffer
-		m_Techniques.back().m_DSB = "dsMain";	// main depth
+		m_TechDB[techId].m_RB = "rtMain";	// main buffer
+		m_TechDB[techId].m_DSB = "dsMain";	// main depth
 
-		currentPass++;
+		// depth stencil state writes to off
+		m_TechDB[techId].m_depthState = DF::DS_Mode::Default;
 	}
 
 	// PASS 6
@@ -208,20 +205,19 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK, D3D11_FILL_WIREFRAME);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::AABBShow);
+		m_TechDB[techId] = TechniqueData();
 
-		m_Techniques.back().m_Camera = "$active_camera";
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_MESH_AND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
-		m_Techniques.back().m_RB = "rtMain";	// main buffer
-		m_Techniques.back().m_DSB = "dsMain";	// main depth
+		m_TechDB[techId].m_Camera = "$active_camera";
+
+		m_TechDB[techId].m_RB = "rtMain";	// main buffer
+		m_TechDB[techId].m_DSB = "dsMain";	// main depth
 
 		// no change for depth state
-		m_Techniques.back().m_depthState = -1;
-
-		currentPass++;
+		m_TechDB[techId].m_depthState = -1;
 	}
 	// PASS 7
 	// write mask without actually drawing to render buffer
@@ -231,28 +227,26 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_BACK, D3D11_FILL_SOLID);
 
-		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
+		auto pVS = std::make_unique<Bind::VertexShader>(VS);
 		ID3DBlob* pVSByteCode = pVS->GetByteCode();
 		pBinds[Bind::idVertexShader] = std::move(pVS);
 		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
 		pBinds[Bind::idGeometryShader] = std::make_unique <Bind::Null_GeometryShader>();
 
-		//m_FXBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::Masking);
+		m_TechDB[techId] = TechniqueData();
 
-		m_Techniques.back().m_RB = "rtMain";	// main buffer
-		m_Techniques.back().m_DSB = "dsMain";	// main depth
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
 
-		m_Techniques.back().m_Camera = "$active_camera";
+		m_TechDB[techId].m_RB = "rtMain";	// main buffer
+		m_TechDB[techId].m_DSB = "dsMain";	// main depth
+
+		m_TechDB[techId].m_Camera = "$active_camera";
 
 		// write to stencil buffer with this pass
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::StencilWrite;
-
-		currentPass++;
+		m_TechDB[techId].m_depthState = DF::DS_Mode::DOff_SWrite;
 	}
 	// PASS 8
 	// masking pass
@@ -261,43 +255,37 @@ void RTechniqueDB::InitDefaultTechniques() noexcept
 		VS = "VS_Outline_s2";
 		PS = "PS_Outline_s2";
 
-		auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + VS + ".shd");
+		auto pVS = std::make_unique<Bind::VertexShader>(VS);
 		ID3DBlob* pVSByteCode = pVS->GetByteCode();
 		pBinds[Bind::idVertexShader] = std::move(pVS);
-		pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + PS + ".shd");
+		pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PS);
 		pBinds[Bind::idGeometryShader] = std::make_unique <Bind::Null_GeometryShader>();
 		//m_FXBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
 
 		pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 
-		m_Techniques.emplace_back(RTechnique());
-		m_Techniques.back().m_Id = 1 << currentPass;
-		m_Techniques.back().m_BindMode = RTechnique::BIND_TECHNIQUE;
-		m_Techniques.back().m_Binds = std::move(pBinds);
+		auto techId = DF::Pass::IdToString(DF::Pass::Outline);
+		m_TechDB[techId] = TechniqueData();
 
-		m_Techniques.back().m_RB = "rtMain";	// main buffer
-		m_Techniques.back().m_DSB = "dsMain";	// main depth
+		m_TechDB[techId].m_BindMode = RTechnique::BIND_TECHNIQUE;
+		m_TechDB[techId].m_Binds = std::move(pBinds);
+
+		m_TechDB[techId].m_RB = "rtMain";	// main buffer
+		m_TechDB[techId].m_DSB = "dsMain";	// main depth
 
 		// mask this pass with what's in stencil buffer currently
-		m_Techniques.back().m_depthState = (uint8_t)DF::DS_Mode::StencilMask;
-
-		currentPass++;
+		m_TechDB[techId].m_depthState = DF::DS_Mode::DOff_SRead;
 	}
 	// mark default techniques as being initialized
 	m_InitializedDefaults = true;
 }
 
-size_t RTechniqueDB::Size() const noexcept
-{
-	return m_Techniques.size();
-}
-
-RTechniqueDB::CascadeShadowMapData& RTechniqueDB::CSMData() noexcept
+RTechnique::CascadeShadowMapData& RTechnique::CSMData() noexcept
 {
 	return CSM_Data;
 }
 
-RTechniqueDB::CascadeShadowMapData::CascadeShadowMapData() noexcept
+RTechnique::CascadeShadowMapData::CascadeShadowMapData() noexcept
 {
 	{
 		float coreZ = DF::CSM::maxZ / DF::CSM::cascades;

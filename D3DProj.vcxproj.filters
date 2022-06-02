@@ -183,9 +183,6 @@
     <ClCompile Include="src\DFactory\D3DMgr\RenderSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\RenderGraph\RPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\DFactory\RenderGraph\RTechnique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -232,6 +229,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DFactory\Util\GPUConstBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\RenderGraph\RenderGraph_Pass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\Util\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\DFMaterial_Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -422,9 +428,6 @@
     <ClInclude Include="src\DFactory\RenderGraph\RTechnique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\RenderGraph\RPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -513,5 +516,6 @@
     <FxCompile Include="shaders\GS_QuadFlare.hlsl" />
     <FxCompile Include="shaders\surface\PS_Surface_BlurGauss.hlsl" />
     <FxCompile Include="shaders\surface\PS_Surface_BlurBox.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_HiPass.hlsl" />
   </ItemGroup>
 </Project>

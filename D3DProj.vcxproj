@@ -176,6 +176,7 @@
     <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr_PL.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshImport.cpp" />
     <ClCompile Include="src\DFactory\DFactory_UI.cpp" />
+    <ClCompile Include="src\DFactory\DFMaterial_Shader.cpp" />
     <ClCompile Include="src\DFactory\DFMaterial_Texture.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Import.cpp" />
@@ -183,12 +184,13 @@
     <ClCompile Include="src\DFactory\DFModelMgr_Node.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Transform.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_UI.cpp" />
-    <ClCompile Include="src\DFactory\RenderGraph\RPass.cpp" />
+    <ClCompile Include="src\DFactory\RenderGraph\RenderGraph_Pass.cpp" />
     <ClCompile Include="src\DFactory\RenderGraph\RTechnique.cpp" />
     <ClCompile Include="src\DFactory\RenderGraph\RenderGraph.cpp" />
     <ClCompile Include="src\DFactory\Util\DDSTextureLoader11.cpp" />
     <ClCompile Include="src\DFactory\Common\DF_A.cpp" />
     <ClCompile Include="src\DFactory\Util\GPUConstBuffer.cpp" />
+    <ClCompile Include="src\DFactory\Util\Util.cpp" />
     <ClCompile Include="src\DFMain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -290,7 +292,6 @@
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshPoint.h" />
     <ClInclude Include="src\DFactory\D3DMgr\RenderSurface.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h" />
-    <ClInclude Include="src\DFactory\RenderGraph\RPass.h" />
     <ClInclude Include="src\DFactory\RenderGraph\RenderGraph.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h" />
     <ClInclude Include="src\DFactory\RenderGraph\RTechnique.h" />
@@ -525,6 +526,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\surface\PS_Surface_HiPass.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\surface\PS_Surface_LensEffect.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

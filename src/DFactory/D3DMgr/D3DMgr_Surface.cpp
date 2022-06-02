@@ -20,7 +20,7 @@ void D3DMgr::RenderBufferToSurface(const std::string& rtTarget, const std::strin
 
 void D3DMgr::RenderDepthToSurface(const std::string& dsTarget, const std::string& surface) noexcept
 {
-	Surface(surface)->Bind(depthTargets.at(dsTarget)->pDS_SRV.Get());
+	Surface(surface)->Bind(depthTargets.at(dsTarget)->pDepthSRV.Get());
 	Surface(surface)->Draw();
 	Surface(surface)->Unbind();
 }
