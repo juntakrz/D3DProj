@@ -141,7 +141,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.F0 = { 0.25f, 0.23f, 0.00f };
 	DFMatDesc.material.matIntensity = 2.2f;
 	DFMatDesc.material.bumpIntensity = 1.5f;
-	DFMatDesc.effects = DF::fxBackground;
+	DFMatDesc.effects = DF::Layer::Background;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -154,7 +154,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.matIntensity = 0.9f;
-	DFMatDesc.effects = DF::fxBlur;
+	DFMatDesc.effects = DF::Layer::Blur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -165,7 +165,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.pixel = "PS_FlatTexture";
 	DFMatDesc.textures.tex0 = "stars_6k_color.dds";
 	DFMatDesc.material.matIntensity = 0.1f;
-	DFMatDesc.effects = DF::fxBackground;
+	DFMatDesc.effects = DF::Layer::Background;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -183,7 +183,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.0f, 0.0f, 0.0f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::fxStandard | DF::fxShadow;
+	DFMatDesc.effects = DF::Layer::Standard | DF::Layer::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -202,7 +202,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::fxStandard | DF::fxShadow;
+	DFMatDesc.effects = DF::Layer::Standard | DF::Layer::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -221,7 +221,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::fxBlur | DF::fxShadow;
+	DFMatDesc.effects = DF::Layer::Blur | DF::Layer::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -240,26 +240,28 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::fxStandard | DF::fxShadow;
+	DFMatDesc.effects = DF::Layer::Standard | DF::Layer::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
 	//Mat_Sun
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Sun";
-	DFMatDesc.shaders.vertex = "VS_BB_Flat";
-	DFMatDesc.shaders.pixel = "PS_BB_FlatBlend";
-	DFMatDesc.textures.tex0 = "default//sun01.dds";
-	DFMatDesc.effects = DF::fxBackground;
+	DFMatDesc.shaders.vertex = "VS_Default";
+	DFMatDesc.shaders.pixel = "PS_Default";
+	DFMatDesc.effects = DF::Layer::Blur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
-	//Mat_OTest
+	//Mat_SunP
 	DFMatDesc = {};
-	DFMatDesc.name = "Mat_OTest";
-	DFMatDesc.shaders.vertex = "VS_Default";
-	DFMatDesc.shaders.pixel = "PS_Default";
-	DFMatDesc.effects = DF::fxBackground;
+	DFMatDesc.name = "Mat_SunP";
+	DFMatDesc.shaders.vertex = "VS_QuadFlare";
+	DFMatDesc.shaders.geometry = "GS_QuadFlare";
+	DFMatDesc.shaders.pixel = "PS_QuadFlare";
+	DFMatDesc.textures.tex0 = "Lens//sunFlare.dds";
+	DFMatDesc.textures.tex1 = "Lens//lensDust.dds";		// make it a separate command maybe
+	DFMatDesc.effects = DF::Layer::PointSprites;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -267,11 +269,11 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Create(DF::idSkySphere, "MdlStars");
 	DF.ModelM->SetMaterial("Mat_Stars");
 	DF.ModelM->SetScaling(400.0f, 400.0f, 400.0f);
-	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
+	DF.ModelM->SetRotation(0.25f, 2.2f, -0.5f);
 	DF.ModelM->Model().FollowCamera(true);
 	
 	//MdlMars
-	DF.ModelM->Create(DF::idSphere, "MdlMars", false, 64);
+	DF.ModelM->Create(DF::idSphere, "MdlMars", false, 48);
 	DF.ModelM->SetMaterial("Mat_MarsPBS");
 	DF.ModelM->SetPos(60.0f, -160.0f, 400.0f);
 	DF.ModelM->SetScaling(260.0f, 260.0f, 260.0f);
@@ -279,9 +281,8 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->Model().FollowCamera(true);
 	
 	//MdlMarsAtmo
-	DF.ModelM->Create(DF::idSphere, "MdlMarsAtmo", true, 64);
+	DF.ModelM->Create(DF::idSphere, "MdlMarsAtmo", true, 48);
 	DF.ModelM->SetPos(60.0f, -160.0f, 400.0f);
-	//DF.ModelM->SetEffect(DF::fxOutline, true, 0); // not implemented yet
 	DF.ModelM->SetScaling(265.0f, 265.0f, 265.0f);
 	DF.ModelM->SetMaterial("Mat_Atmo");
 	DF.ModelM->Model().FollowCamera(true);
@@ -289,7 +290,7 @@ void DFMain::LoadScreen() noexcept
 	//MdlTachi
 	DF.ModelM->Create(DF::idImport, "MdlTachi", true, "tachilp1.obj");
 	DF.ModelM->SetShaders("VS_PBS_Shadow", "PS_PBS_Shadow");
-	DF.ModelM->SetEffect(DF::fxStandard | DF::fxShadow);
+	DF.ModelM->SetEffect(DF::Layer::Standard | DF::Layer::Shadow);
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 8.0f);
 	DF.ModelM->SetRotation(-0.6f, -0.4f, -0.3f);
@@ -302,23 +303,24 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
 	DF.ModelM->SetRotation(0.8f, 1.2f, 0.0f);
 	//*/
+	
 	//MdlSphere1
-	DF.ModelM->Create(DF::idSphere, "MdlSphere1");
+	DF.ModelM->Create(DF::idSphere, "MdlSphere1", true, 16);
 	DF.ModelM->SetMaterial("Mat_PBSGold");
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(0.0f, 0.0f, 2.0f);
 	
 	//MdlSphere0
-	DF.ModelM->Create(DF::idSphere, "MdlSphere0");
+	DF.ModelM->Create(DF::idSphere, "MdlSphere0", true, 16);
 	DF.ModelM->SetMaterial("Mat_PBSSteel");
-	//DF.ModelM->SetEffect(DF::fxOutline, true, 0);
+	//DF.ModelM->SetEffect(DF::Layer::Outline, true, 0);
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(-0.7f, 0.0f, 2.0f);
-	
+
 	//MdlSphere2
-	DF.ModelM->Create(DF::idSphere, "MdlSphere2");
+	DF.ModelM->Create(DF::idSphere, "MdlSphere2", true, 16);
 	DF.ModelM->SetMaterial("Mat_PBSMetal");
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
@@ -326,22 +328,19 @@ void DFMain::LoadScreen() noexcept
 	
 	//MdlPoint
 	DF.ModelM->Create(DF::idPoint, "MdlPoint");
-	DF.ModelM->SetMaterial();
-	DF.ModelM->SetPos(0.0f, 0.0f, 3.0f);
+	DF.ModelM->SetMaterial("Mat_SunP");
+	DF.ModelM->SetEffect(DF::Layer::PointSprites);
+	DF.ModelM->SetPos(-48.0f, 34.0f, -4.0f);
+	//DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
+	DF.ModelM->Model().FollowCamera(true);
 	
 	//MdlSun
-	DF.ModelM->Create(DF::idPlane, "MdlSun", false);
-	DF.ModelM->Model().SetPos(DF.LightM->DLGetPosA());
+	DF.ModelM->Create(DF::idSphere, "MdlSun", false, 12);
+	DF.ModelM->Model().SetPos(-52.8f, 37.4f, -4.4f);
 	DF.ModelM->SetMaterial("Mat_Sun");
 	DF.ModelM->Model().FollowCamera(true);
-	DF.ModelM->SetScaling(3.0f, 3.0f, 1.0f);
+	DF.ModelM->SetScaling(1.2f, 1.2f, 1.2f);
 
-	//MdlOTest
-	DF.ModelM->Create(DF::idSphere, "MdlOTest", false);
-	DF.ModelM->Model().SetPos(DF.LightM->DLGetPosA());
-	DF.ModelM->SetScaling(0.04f, 0.04f, 0.04f);
-	DF.ModelM->Model().FollowCamera(true);
-	DF.ModelM->SetMaterial("Mat_OTest");
 	//*/
 	/*
 	//MdlTestPlaneNoMip
@@ -362,7 +361,7 @@ void DFMain::LoadScreen() noexcept
 	//DF.LightM->DLSetPos({ -24.0f, 17.0f, 0.0f });
 	DF.LightM->DLSetPos({ -12.0f, 8.5f, -1.0f });
 	//DF.LightM->DLSetPos({ 0.0f, 0.0f, -1.0f });
-	/*
+	
 	DF.LightM->PLAdd("Light1", 0.17f, 0.515f, 8.55f);
 	//DF.LightM->PL().pMesh->SetPos(0.0f, 0.0f, 0.0f);
 	//DF.LightM->PL().pMesh->SetRotationZ(0.05f);
@@ -377,7 +376,7 @@ void DFMain::LoadScreen() noexcept
 	DF.LightM->PLAdd("Light3", 0.62f, -1.1f, 6.4f);
 	DF.LightM->PL().intensity = 0.2f;
 	DF.LightM->PL().color = { 0.0f, 0.25f, 1.0f, 1.0f };
-	*/
+	
 	//
 	
 	DF.LightM->PLAdd("Light4", -0.7f, 0.25f, 2.0f);
@@ -391,7 +390,7 @@ void DFMain::LoadScreen() noexcept
 	DF.LightM->PLAdd("Light6", -1.05f, -0.5f, 2.0f);
 	DF.LightM->PL().intensity = 0.05f;
 	DF.LightM->PL().color = { 1.02f, 0.02f, 0.02f, 1.0f };
-
+	
 	DF.ModelM->Select(0);
 	DF.ModelM->Delete();
 	DF.MatM->MatDelete(1);
@@ -410,7 +409,8 @@ void DFMain::LoadScreen() noexcept
 	DF.Camera()->SetAsOrthographic(8.0f, 4.5f, 0.001f, 100.0f);
 	DF.Camera()->LockToCameraTarget(DF.Camera("camMain"));
 
-	//DF.UpdateRenderer();
+	// enabling lens dirt effect when rendering to final surface
+	DF::D3DM->Surface("sfcMain")->SetShaders("surface//VS_Surface", "surface//PS_Surface_LensEffect");
 }
 
 void DFMain::CreateMaterials() noexcept

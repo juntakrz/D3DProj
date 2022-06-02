@@ -24,6 +24,7 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 	newMat.id = index;
 	newMat.name = pDesc->name;
 	newMat.shaderPixel = pDesc->shaders.pixel;
+	newMat.shaderGeometry = pDesc->shaders.geometry;
 	newMat.shaderVertex = pDesc->shaders.vertex;
 
 	pDesc->textures.tex0 != "" ?
@@ -134,9 +135,9 @@ void DFMaterial::MatDelete(uint16_t index) noexcept {
 			
 			if (it->manageTextures) {
 
-				for (uint32_t i = 0; i < sizeof(it->idTex) / sizeof(uint32_t); i++) {
+				for (uint32_t i = 0; i < DF::maxTextures; i++) {
 
-					(it->idTex[i] > 0) ? TextureDelete(it->idTex[i]) : 0;
+					(it->idTex[i] != "") ? TextureDelete(it->idTex[i]) : 0;
 				}
 			}
 			m_Materials.erase(m_Materials.begin() + it_n);
@@ -158,7 +159,7 @@ void DFMaterial::MatDelete(std::string name) noexcept
 
 				for (uint32_t i = 0; i < sizeof(it->idTex) / sizeof(uint32_t); i++) {
 
-					(it->idTex[i] > 0) ? TextureDelete(it->idTex[i]) : 0;
+					(it->idTex[i] != "") ? TextureDelete(it->idTex[i]) : 0;
 				}
 			}
 			m_Materials.erase(m_Materials.begin() + it_n);
@@ -189,8 +190,8 @@ void DFMaterial::DEBUG_ShowMaterialIndex(uint16_t begin, uint16_t end) const noe
 		if (index >= begin)
 		{
 			sstr << "[" << index << ": " << it->id << "] " << it->name << ": ";
-			for (uint32_t i = 0; i < sizeof(it->idTex) / sizeof(uint32_t); i++) {
-				sstr << TextureGetName(it->idTex[i]) << ", ";
+			for (uint32_t i = 0; i < 6; i++) {
+				sstr << it->idTex[i].c_str() << ", ";
 			}
 
 			sstr << "\n";
@@ -217,7 +218,7 @@ void DFMaterial::DEBUG_ShowTextureIndex(uint32_t begin, uint32_t end) const noex
 		}
 
 		if (index >= begin) {
-			sstr << "[" << index << ": " << it.id << "] " << it.name << ": " << it.filePath << "\n";
+			sstr << "[" << index << "]: " << it.second.name << ": " << it.second.filePath << "\n";
 		}
 
 		index++;

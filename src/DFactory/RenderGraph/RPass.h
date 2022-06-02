@@ -30,9 +30,18 @@ public:
 	void PassJobAdd(RPassJob&& job) noexcept;
 
 	// execute jobs
+
+	// occlusion query pass, tests meshes or AABBs against meshes to perform/skip draw calls
 	void DrawAABBs() noexcept;
+
+	// generic draw pass
 	void Draw() noexcept;
-	void DrawCSM() noexcept;			// special cascade shadows pass, requires appropriate technique
+
+	// cascade shadow mapping pass, relies on an appropriate technique
+	void DrawCSM() noexcept;
+
+	// special sprite layer that uses GS to expand points to quads, optionally requires depth buffer
+	void DrawSprites(const std::string& DS_SRV) noexcept;
 	
 private:
 	size_t m_Id;						// pass Id, which should be the same for technique steps

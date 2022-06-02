@@ -117,7 +117,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			}
 			else	//if imported model has no color textures = use the default checkerboard one
 			{
-				pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(pMatMgr->TextureGet(0), 0u);
+				pBinds[Bind::idTexture0] = std::make_unique<Bind::Texture>(pMatMgr->TextureGet("default//default.dds"), 0u);
 			}
 
 			if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0)
@@ -217,7 +217,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			// try to delete textures if unused by anything else
 			DFMatDesc.manageTextures = true;
 			
-			DFMatDesc.effects = DF::fxStandard;
+			DFMatDesc.effects = DF::Layer::Standard;
 
 			pMatMgr->MatAdd(&DFMatDesc);
 			pDFMat = &pMatMgr->Mat(newMesh.meshMat);
@@ -227,9 +227,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			pDFMat = &pMatMgr->Mat(matName);
 			newMesh.meshMat = matName;
 
-			uint8_t arrSize = sizeof(pDFMat->idTex) / sizeof(uint32_t);
-
-			for (uint16_t i = 0; i < arrSize; i++) {
+			for (uint16_t i = 0; i < 6; i++) {
 				pBinds[Bind::idTexture0 + i] = std::make_unique<Bind::Texture>(
 					pMatMgr->TextureGet(pDFMat->idTex[i]), i
 					);

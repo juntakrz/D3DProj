@@ -16,7 +16,7 @@ class DFMaterial
 		std::string name;
 
 		std::string shaderVertex, shaderPixel, shaderGeometry;
-		uint32_t idTex[6] = { 0, 0, 0, 0, 0, 0 };
+		std::string idTex[6] = { "", "", "", "", "", ""};
 
 		XMFLOAT4 ambientColor;
 		XMFLOAT3A F0;
@@ -40,15 +40,15 @@ class DFMaterial
 
 	struct DFTexture
 	{
-		uint32_t id;
 		std::string name;
 		std::string filePath;
 		std::shared_ptr<ID3D11ShaderResourceView*> pSRV = nullptr;
 		ID3D11RenderTargetView* pRTV = nullptr;		//used by render to textures
+		ID3D11Texture2D* pTex = nullptr;
 	};
 
 	std::vector<std::unique_ptr<Material>> m_Materials;
-	std::vector<DFTexture> m_DFTextures;
+	std::unordered_map<std::string, DFTexture> m_DFTextures;
 
 public:
 
@@ -77,7 +77,7 @@ public:
 			float bumpIntensity = 1.0f;
 		} material;
 
-		uint32_t effects = DF::fxStandard;
+		uint32_t effects = DF::Layer::Standard;
 	};
 
 	DFMaterial() {};
@@ -98,18 +98,17 @@ public:
 	void MatDelete(uint16_t index) noexcept;
 	void MatDelete(std::string name) noexcept;
 
-	uint32_t TextureAdd(std::string filePath) noexcept;
-	uint32_t TextureAdd(std::string name, std::string filePath) noexcept;
-	uint32_t TextureAddRT(std::string name, UINT width, UINT height) noexcept;
+	std::string TextureAdd(std::string filePath) noexcept;
+	std::string TextureAdd(std::string name, std::string filePath) noexcept;
+	std::string TextureAddRT(std::string name, UINT width, UINT height) noexcept;
 
-	std::shared_ptr<ID3D11ShaderResourceView*> TextureGet(uint16_t index) const noexcept;
-	std::shared_ptr<ID3D11ShaderResourceView*> TextureGet(std::string name) const noexcept;
-	std::string TextureGetName(uint32_t index) const noexcept;
-	uint32_t TextureGetIndex(std::string name) const noexcept;
-	bool TextureExists(uint32_t index) const noexcept;
-	bool TextureIsRT(uint32_t index) const noexcept;
-	bool TextureDelete(uint32_t index) noexcept;
+	std::shared_ptr<ID3D11ShaderResourceView*> TextureGet(const std::string& name) const noexcept;
+	bool TextureExists(const std::string& name) const noexcept;
+	bool TextureIsRT(const std::string& name) const noexcept;
 	bool TextureDelete(std::string name) noexcept;
+
+	bool BindTextureToPS(const std::string& texture, const UINT& slot, const UINT& num = 1) noexcept;	// bind texture as a PS resource
+	bool BindTextureToGS(const std::string& texture, const UINT& slot, const UINT& num = 1) noexcept;	// bind texture as a GS resource
 
 	void DEBUG_ShowMaterialIndex(uint16_t begin = 0, uint16_t end = 65535) const noexcept;
 	void DEBUG_ShowTextureIndex(uint32_t begin = 0, uint32_t end = 99999) const noexcept;

@@ -15,7 +15,7 @@ void MeshCore::BindCore() const noexcept
 {
 	m_Binds[Bind::idVertexBuffer]->Bind();
 	m_Binds[Bind::idIndexBuffer]->Bind();
-	m_Binds[Bind::idTopology]->Bind();
+	m_Binds[Bind::idTopology]->Bind();		//TODO: set topology per pass as it almost never changes
 }
 
 void MeshCore::BindLocal() const noexcept
@@ -74,7 +74,7 @@ void MeshCore::SetMaterial(std::string name) noexcept
 	matCBuffer.F0 = mat.F0;
 
 	// update binds
-	for (uint8_t i = 0; i < sizeof(mat.idTex) / sizeof(uint32_t); i++)
+	for (uint8_t i = 0; i < 6; i++)
 	{
 		m_Binds[Bind::idTexture0 + i] =
 			std::make_unique<Bind::Texture>(MatMgr.TextureGet(mat.idTex[i]), i);
@@ -83,6 +83,12 @@ void MeshCore::SetMaterial(std::string name) noexcept
 	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + mat.shaderVertex + ".shd");
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
+
+	if (mat.shaderGeometry != "")
+	{
+		m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::GeometryShader>("shaders//" + mat.shaderGeometry + ".shd");
+	}
+
 	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + mat.shaderPixel + ".shd");
 
 	m_Binds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);

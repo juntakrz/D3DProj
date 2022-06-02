@@ -12,15 +12,9 @@
 #include "RenderSurface.h"
 #include "../Common/DF_Const.h"
 
-namespace Bind
-{
-	class IBind;
-}
-
 class D3DMgr
 {
 private:
-	friend Bind::IBind;
 	friend class MeshCore;
 
 	// core
@@ -29,7 +23,7 @@ private:
 	COMPTR<ID3D11Device>				m_pDevice;
 	COMPTR<ID3D11DeviceContext>			m_pContext;
 
-	// render copy shader resource
+	// render copy shader resource for render-to-texture effects (needs better impl)
 	COMPTR<ID3D11Texture2D>				m_pBufCopy_Tex;
 	COMPTR<ID3D11ShaderResourceView>	m_pBufCopy_SR;
 
@@ -46,7 +40,7 @@ private:
 		COMPTR<ID3D11RenderTargetView>		pRTV;
 		COMPTR<ID3D11ShaderResourceView>	pSRV;
 		D3D11_VIEWPORT vp;
-		std::string name = "ERROR";
+		std::string name;
 		uint16_t width = 0;
 		uint16_t height = 0;
 	};
@@ -56,16 +50,10 @@ private:
 		COMPTR<ID3D11Texture2D>				pDSTex;
 		COMPTR<ID3D11DepthStencilView>		pDSV;
 		COMPTR<ID3D11ShaderResourceView>	pDS_SRV;
-		std::string name = "ERROR";
+		std::string name;
 		uint16_t width = 0;
 		uint16_t height = 0;
 		bool isShaderResource = false;
-	};
-
-	struct SurfaceTarget
-	{
-		std::string name = "ERROR";
-		std::unique_ptr<RenderSurface> pRS = nullptr;
 	};
 
 	ID3D11RenderTargetView* nullRTV = nullptr;
@@ -75,17 +63,16 @@ private:
 	bool m_imguiEnabled = CWND_IMGUIENABLED;
 	bool m_ShowDepth = false;
 	bool m_IsHDR = false;
-	float m_ClearColor[6][4];
 	float m_VWidth = CWND_DEFAULTWIDTH, m_VHeight = CWND_DEFAULTHEIGHT;
 	float m_AspectRatio = m_VWidth / m_VHeight;
 
 	class CCamera* m_pCamera;
-	std::vector<RenderTarget> renderTargets;
-	std::vector<DSTarget> depthTargets;
-	std::vector<SurfaceTarget> surfaceTargets;
+
+	std::unordered_map<std::string, std::unique_ptr<RenderTarget>> renderTargets;
+	std::unordered_map<std::string, std::unique_ptr<DSTarget>> depthTargets;
+	std::unordered_map<std::string, std::unique_ptr<RenderSurface>> surfaceTargets;
 
 	// initialize scripts
-	void InitClearColors() noexcept;
 	void CreateRenderSR(bool isHDR) noexcept;		//create render buffer copy resource
 	void CreateStencilStates() noexcept;
 	void RTInitBuffers(bool isHDR) noexcept;
@@ -94,8 +81,9 @@ public:
 #ifdef _DEBUG
 	CDXGIDebug dxgiDebug;
 #endif
-	//initial RTV, number of RTVs
-	int m_RTId = 0, m_DSId = 0, m_RTNum = 1;
+	//initial RTV, DSV, number of RTVs
+	std::string m_RTId = "", m_DSId = "";
+	uint8_t m_RTNum = 1;
 
 	class Exception : public CException
 	{
@@ -158,13 +146,11 @@ public:
 	void EndFrame();
 
 	//clear buffer only (optionally corresponding depth buffer)
-	void Clear(uint8_t rtIndex = 0, bool clearDepthBuffer = true, int8_t dsIndex = -1) noexcept;
-	void Clear(const DF::RBuffers& rtIndex);
-	void Clear(const DF::RBuffers& rtIndex, const DF::DSBuffers& dsIndex) noexcept;
-	void Clear(const float red, const float green, const float blue, uint8_t rtIndex = 0, bool clearDepthBuffer = true, int8_t dsIndex = -1) noexcept;
-	void SetClearColor(const float red, const float green, const float blue, uint8_t index = 0) noexcept;
+	void Clear(const std::string& renderTarget, const std::string& depthTarget = "") noexcept;
+	void Clear(const std::string& renderTarget, const std::string& depthTarget, const XMFLOAT4& color) noexcept;
 
-	void ClearDSBuffer(uint8_t index) noexcept;
+	// clear depth stencil buffer
+	void ClearDSBuffer(const std::string& name) noexcept;
 
 	void SetDepthStencilState(const uint8_t state) noexcept;
 
@@ -183,48 +169,47 @@ public:
 
 	/* * * * * * D3DMgr_RT.cpp * */
 
-	// creates render buffer and returns its new index
-	uint8_t	CreateRenderBuffer(int16_t width = -1, int16_t height = -1, bool isHDR = false) noexcept;
+	// creates render buffer
+	bool	CreateRenderTarget(std::string name, int16_t width = -1, int16_t height = -1, bool isHDR = false) noexcept;
 
-	// creates depth-stencil buffer using given render buffer and returns its index
-	int8_t	CreateDepthBuffer(uint8_t rtIndex, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
+	// creates depth-stencil buffer based on a provided render buffer
+	bool	CreateDepthTarget(std::string name, std::string srcTarget, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
 
 	// creates standalone depth-stencil buffer
-	int8_t	CreateDepthBuffer(int16_t width, int16_t height, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
+	bool	CreateDepthTarget(std::string name, int16_t width, int16_t height, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
 
-	// create compatible render target
-	uint8_t CreateCompatibleBuffer(uint8_t index, bool isDepthBuffer, bool createRenderView) noexcept;
+	// create a copy of a provided buffer
+	bool	CreateCompatibleTarget(std::string name, std::string srcTarget, bool isDepthTarget, bool createView) noexcept;
 
-	// binds render target view and depth stencil view (same if used first overload)
-	void	RTBind(const int8_t& rtIndex, const int8_t& dsIndex, const int8_t& num = 1) noexcept;
-	void	RTBind(const DF::RBuffers& rtIndex, const DF::DSBuffers& dsIndex, const uint8_t& num = 1) noexcept;
+	// binds render target view and depth stencil view (no error prevention for speed, define targets with care)
+	void	RTBind(const std::string& renderTarget, const std::string& depthTarget, const uint8_t& num = 1) noexcept;
 
-	// copies render target buffer
-	void	RTCopyBuffer(uint8_t indexFrom, uint8_t indexTo, bool isDepthBuffer) noexcept;
+	// copies render target buffer (no error prevention for speed, define targets with care)
+	void	RTCopyTarget(const std::string& srcTarget, const std::string& destTarget, bool isDepthBuffer) noexcept;
 
-	std::vector<RenderTarget>*	RenderTargets() noexcept;
-	std::vector<DSTarget>*		DepthTargets() noexcept;
-	ID3D11RenderTargetView*		RTGetRTV(uint8_t index) noexcept;
-	ID3D11DepthStencilView*		RTGetDSV(uint8_t index) noexcept;
+	// following methods are not checked for errors, require correct defintions
+	RenderTarget*				GetRenderTarget(const std::string& name) noexcept;
+	DSTarget*					GetDepthTarget(const std::string& name) noexcept;
+	ID3D11RenderTargetView*		GetRTView(const std::string& name) noexcept;
+	ID3D11DepthStencilView*		GetDSView(const std::string& name) noexcept;
 
 	//external render targets, RTV and DSV are related by the same index
 	void RTSet(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, uint8_t num = 1) noexcept;
-	void RTRemove(uint8_t index) noexcept;
+	bool RTRemove(const std::string& name) noexcept;	// deletes render or depth target by its name
 
 	/* * * * * * * * * * * * * * */
 
 	/* * * * * * D3DMgr_RS.cpp * */
 
 	// create rendering surface
-	uint8_t						CreateRenderSurface(std::string name, float scale = 1.0f) noexcept;
+	bool						CreateRenderSurface(std::string name, float scale = 1.0f) noexcept;
 
 	// access surface targets
-	std::vector<SurfaceTarget>* RenderSurfaces() noexcept;
-	RenderSurface*				RenderSurfaces(uint8_t index) noexcept;
+	RenderSurface*				Surface(const std::string& name) noexcept;
 
 	// render to surface targets
-	void						RenderBufferToSurface(uint8_t surfaceIndex, DF::RBuffers rtIndex) noexcept;
-	void						RenderDepthToSurface(uint8_t surfaceIndex, DF::DSBuffers dsIndex) noexcept;
+	void						RenderBufferToSurface(const std::string& rtTarget, const std::string& surface) noexcept;
+	void						RenderDepthToSurface(const std::string& dsTarget, const std::string& surface) noexcept;
 
 	/* * * * * * * * * * * * * * */
 };

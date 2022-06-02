@@ -9,20 +9,16 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
     // init values
     float2 texCoord = tex;
     
-    // get texture pixel step
-    /*uint2 renderRes;
-    tex2D.GetDimensions(renderRes.x, renderRes.y);
-    const float2 pixelStep = { 1.0 / renderRes.x, 1.0 / renderRes.y };*/
-    
     // performance saving approximation
     static const float2 pixelStep = { 0.0007, 0.0012 };
     
-    // accumulated color
+    // init colors
     float4 accColor = { 0.0, 0.0, 0.0, 0.0 };
     
     // sample neighboring pixels
     /* sample intensity = 1.0 - loop step * multiplier
-    */   
+    */
+    
     for (int1 y = -r; y <= r; y++)
     {
         for (int1 x = -r; x <= r; x++)

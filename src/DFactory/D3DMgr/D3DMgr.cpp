@@ -3,6 +3,9 @@
 
 D3DMgr::D3DMgr(HWND hWnd)
 {
+	std::string rtName = "rtBack";
+	std::string dsName = "dsBack";
+
 	//create swap chain description
 	DXGI_SWAP_CHAIN_DESC SwapDesc = {};
 	SwapDesc.BufferDesc.Width = m_VWidth;
@@ -29,8 +32,10 @@ D3DMgr::D3DMgr(HWND hWnd)
 	//required Direct3D feature levels
 	const D3D_FEATURE_LEVEL d3dFeatureLvl[] =
 	{
+		D3D_FEATURE_LEVEL_12_1,
+		D3D_FEATURE_LEVEL_12_0,
 		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_11_0
 	};
 
 	D3D_THROW(D3D11CreateDeviceAndSwapChain(
@@ -48,24 +53,24 @@ D3DMgr::D3DMgr(HWND hWnd)
 		&m_pContext
 	));
 
-	// initialize render target and depth buffer vectors
-	renderTargets.push_back(RenderTarget{ nullptr, nullptr, nullptr });
-	depthTargets.push_back(DSTarget{ nullptr, nullptr });
+	// initialize back render target and depth buffer
+	renderTargets[rtName] = std::make_unique<RenderTarget>();
+	depthTargets[dsName] = std::make_unique<DSTarget>();
 
 	// store resource resolutions for reference
-	renderTargets.back().name = "rtBackBuffer";
-	renderTargets.back().width = m_VWidth;
-	renderTargets.back().height = m_VHeight;
-	depthTargets.back().name = "dsBackBuffer";
-	depthTargets.back().width = m_VWidth;
-	depthTargets.back().height = m_VHeight;
+	renderTargets.at(rtName)->name = rtName;
+	renderTargets.at(rtName)->width = m_VWidth;
+	renderTargets.at(rtName)->height = m_VHeight;
+	depthTargets.at(dsName)->name = dsName;
+	depthTargets.at(dsName)->width = m_VWidth;
+	depthTargets.at(dsName)->height = m_VHeight;
 
 	// get swap chain buffer and put it into the render target vector
-	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &renderTargets.back().pTex));
+	D3D_THROW_INFO(m_pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &renderTargets.at(rtName)->pTex));
 
 	// create the default render target view and assign it
 	D3D_THROW_INFO(m_pDevice->CreateRenderTargetView(
-		renderTargets.back().pTex.Get(), nullptr, &renderTargets.back().pRTV)
+		renderTargets.at(rtName)->pTex.Get(), nullptr, &renderTargets.at(rtName)->pRTV)
 	);
 
 	// create depth stencil texture
@@ -80,7 +85,7 @@ D3DMgr::D3DMgr(HWND hWnd)
 	stencilDesc.SampleDesc.Count = 1u;
 	stencilDesc.SampleDesc.Quality = 0u;
 
-	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &depthTargets.back().pDSTex));
+	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &depthTargets.at(dsName)->pDSTex));
 
 	// create depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {};
@@ -89,13 +94,13 @@ D3DMgr::D3DMgr(HWND hWnd)
 	dsvd.Texture2D.MipSlice = 0u;
 	
 	D3D_THROW_INFO(m_pDevice->CreateDepthStencilView(
-		depthTargets.back().pDSTex.Get(), &dsvd, &depthTargets.back().pDSV)
+		depthTargets.at(dsName)->pDSTex.Get(), &dsvd, &depthTargets.at(dsName)->pDSV)
 	);
 
 	// bind initial render target and depth stencil view to OM (output merger)
-	m_pContext->OMSetRenderTargets(1u, renderTargets.back().pRTV.GetAddressOf(), depthTargets.back().pDSV.Get());
-	m_RTId = 0;		// reference values
-	m_DSId = 0;
+	m_pContext->OMSetRenderTargets(1u, renderTargets.at(rtName)->pRTV.GetAddressOf(), depthTargets.at(dsName)->pDSV.Get());
+	m_RTId = rtName;		// reference values
+	m_DSId = dsName;
 	m_RTNum = 1;
 
 	//rasterizer test
@@ -139,12 +144,9 @@ D3DMgr::D3DMgr(HWND hWnd)
 	vp.TopLeftY = 0.f;
 	m_pContext->RSSetViewports(1u, &vp);	//amount of viewports, pointer to array of viewports
 
-	renderTargets.back().vp = std::move(vp);
+	renderTargets.at(rtName)->vp = std::move(vp);
 
 	// Initializations
-
-	// init 'clear' colors
-	InitClearColors();
 
 	// create stencil states
 	CreateStencilStates();
@@ -167,17 +169,6 @@ D3DMgr::D3DMgr(HWND hWnd)
 D3DMgr::~D3DMgr()
 {
 	ImGui_ImplDX11_Shutdown();
-}
-
-void D3DMgr::InitClearColors() noexcept
-{
-	for (uint8_t i = 0; i < 6; i++)
-	{
-		m_ClearColor[i][0] = 0.0f;
-		m_ClearColor[i][1] = 0.0f;
-		m_ClearColor[i][2] = 0.0f;
-		(i == 0) ? m_ClearColor[i][3] = 1.0f : m_ClearColor[i][3] = 0.0f;
-	}
 }
 
 void D3DMgr::EnableImGui() noexcept
@@ -231,7 +222,7 @@ void D3DMgr::BeginFrame() noexcept
 	/* NEW FRAME */
 	
 	// bind render target 1 and depth buffer 1 - primary rendering targets, which will be used on a main surface
-	RTBind(DF::RBuffers::Render, DF::DSBuffers::Render, 1u);
+	RTBind("rtMain", "dsMain", 1u);
 
 	// start new imGui frame
 	if (m_imguiEnabled)
@@ -244,19 +235,20 @@ void D3DMgr::BeginFrame() noexcept
 	// CLEAR FRAME BUFFERS
 	// 
 	// clear back buffer and its depth buffer
-	Clear();
+	Clear("rtBack", "dsBack");
 
 	// clear 'render' buffer and its depth buffer
-	Clear(DF::RBuffers::Render, DF::DSBuffers::Render);
+	Clear("rtMain", "dsMain");
 
 	// clear 'blur' buffer only
-	Clear(DF::RBuffers::Blur);
+	Clear("rtBlur");
 
 	// clear 'downsample' buffers
-	Clear(DF::RBuffers::Resample, DF::DSBuffers::Resample);
+	Clear("rtDSample2", "dsDSample2");
+	Clear("rtDSample4", "dsDSample4");
 
 	// clear CSM depth buffer
-	ClearDSBuffer(3u);
+	ClearDSBuffer("dsCSM");
 }
 
 void D3DMgr::EndFrame()
@@ -286,57 +278,39 @@ void D3DMgr::EndFrame()
 
 // // //
 
-void D3DMgr::Clear(uint8_t rtIndex, bool clearDepthBuffer, int8_t dsIndex) noexcept
+void D3DMgr::Clear(const std::string& renderTarget, const std::string& depthTarget) noexcept
 {
-	m_pContext->ClearRenderTargetView(renderTargets[rtIndex].pRTV.Get(), m_ClearColor[rtIndex]);
-	if (clearDepthBuffer)
+	// clear primary targets with opaque color and all other with transparent
+	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0 };
+	(renderTarget != "rtBack" || renderTarget != "rtMain") ? clearColor[3] = 0.0f : 0;
+
+	m_pContext->ClearRenderTargetView(renderTargets.at(renderTarget)->pRTV.Get(), clearColor);
+
+	// if depth target is defined - clear it too
+	if (depthTarget != "")
 	{
-		// if depth stencil buffer index is -1 - clear the same index as render target
-		(dsIndex < 0) ? dsIndex = rtIndex : 0;
-		m_pContext->ClearDepthStencilView(depthTargets[dsIndex].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+		m_pContext->ClearDepthStencilView(depthTargets.at(depthTarget)->pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	}
 }
 
-void D3DMgr::Clear(const DF::RBuffers& rtIndex)
+void D3DMgr::Clear(const std::string& renderTarget, const std::string& depthTarget, const XMFLOAT4& color) noexcept
 {
-	Clear((uint8_t)rtIndex, false);
-}
+	float clearColor[4];
+	memcpy(clearColor, &color, sizeof(float) * 4);
 
-void D3DMgr::Clear(const DF::RBuffers& rtIndex, const DF::DSBuffers& dsIndex) noexcept
-{
-	Clear((uint8_t)rtIndex, true, (uint8_t)dsIndex);
-}
+	m_pContext->ClearRenderTargetView(renderTargets.at(renderTarget)->pRTV.Get(), clearColor);
 
-void D3DMgr::Clear(const float red, const float green, const float blue, uint8_t rtIndex, bool clearDepthBuffer, int8_t dsIndex) noexcept
-{
-	const float color[4] = { red, green, blue, 1.0f };
-
-	m_pContext->ClearRenderTargetView(renderTargets[rtIndex].pRTV.Get(), color);
-	if (clearDepthBuffer)
+	// if depth target is defined - clear it too
+	if (depthTarget != "")
 	{
-		// if depth stencil buffer index is -1 - clear the same index as render target
-		(dsIndex < 0) ? dsIndex = rtIndex : 0;
-		m_pContext->ClearDepthStencilView(depthTargets[dsIndex].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+		m_pContext->ClearDepthStencilView(depthTargets.at(depthTarget)->pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	}
 
 }
 
-void D3DMgr::SetClearColor(const float red, const float green, const float blue, uint8_t index) noexcept
-{
-	if (index < maxRT - 1)
-	{
-		m_ClearColor[index][0] = red;
-		m_ClearColor[index][1] = green;
-		m_ClearColor[index][2] = blue;
-		m_ClearColor[index][3] = 1.0f;
-	}
-}
-
-void D3DMgr::ClearDSBuffer(uint8_t index) noexcept
+void D3DMgr::ClearDSBuffer(const std::string& name) noexcept
 {	
-	(index > -1 && index < depthTargets.size())
-		? m_pContext->ClearDepthStencilView(depthTargets[index].pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u)
-		: void();
+	m_pContext->ClearDepthStencilView(depthTargets.at(name)->pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 }
 
 void D3DMgr::RenderWireframe(bool enable) noexcept

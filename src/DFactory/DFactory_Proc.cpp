@@ -100,6 +100,7 @@ void DFactory::CProc::ProcessFunctions() noexcept
 				pDF->debug.int64bit--;
 				break;
 			}
+			/*
 			case '1':
 			{
 				DF::Engine->CameraActivate("camMain");
@@ -114,15 +115,17 @@ void DFactory::CProc::ProcessFunctions() noexcept
 			{
 				pDF->ModelM->Select(4);
 				pDF->ModelM->Delete();
-				pDF->MatM->MatDelete(11);
-				pDF->MatM->MatDelete(12);
 				pDF->MatM->MatDelete(13);
-			}
+				pDF->MatM->MatDelete(14);
+				pDF->MatM->MatDelete(15);
+				break;
+			}*/
 			}
 		}
 	}
-
+	/*
 	pKbd->IsKeyDown('8') ? pDF->MatM->DEBUG_ShowMaterialIndex() : void();
 	pKbd->IsKeyDown('9') ? pDF->MatM->DEBUG_ShowTextureIndex() : void();
 	pKbd->IsKeyDown('0') ? pDF->ModelM->DEBUG_ShowModelList() : void();
+	*/
 }

@@ -164,7 +164,7 @@
     <ClCompile Include="src\DFactory\Common\DF_Const.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\IBind\Bind_GeometryShader.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Math\CFrustum.cpp" />
-    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_RS.cpp" />
+    <ClCompile Include="src\DFactory\D3DMgr\D3DMgr_Surface.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\IBind\Bind_Rasterizer.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr_DL.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshAABB.cpp" />
@@ -188,6 +188,7 @@
     <ClCompile Include="src\DFactory\RenderGraph\RenderGraph.cpp" />
     <ClCompile Include="src\DFactory\Util\DDSTextureLoader11.cpp" />
     <ClCompile Include="src\DFactory\Common\DF_A.cpp" />
+    <ClCompile Include="src\DFactory\Util\GPUConstBuffer.cpp" />
     <ClCompile Include="src\DFMain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -298,6 +299,7 @@
     <ClInclude Include="src\DFactory\Common\DF_Const.h" />
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshImport.h" />
     <ClInclude Include="src\DFactory\DFModelMgr.h" />
+    <ClInclude Include="src\DFactory\Util\GPUConstBuffer.h" />
     <ClInclude Include="src\DFMain.h" />
     <ClInclude Include="src\DF_Includes.h" />
     <ClInclude Include="src\DFactory\WndMgr\CException.h" />
@@ -365,6 +367,14 @@
     <ResourceCompile Include="D3DProj.rc" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="shaders\GS_PtSprite.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\GS_QuadFlare.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+    </FxCompile>
     <FxCompile Include="shaders\PS_FlatTexture.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -383,6 +393,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\PS_PtSprite.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\PS_QuadFlare.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\PS_Shadow.hlsl">
@@ -492,6 +510,30 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
     </FxCompile>
+    <FxCompile Include="shaders\surface\PS_Surface_BlurBox.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\surface\PS_Surface_BlurGauss.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\surface\PS_Surface_LensEffect.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/surface/%(Filename).shd</ObjectFileOutput>
+    </FxCompile>
     <FxCompile Include="shaders\VS_BB_Flat.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -535,6 +577,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\VS_PtSprite.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\VS_QuadFlare.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\VS_Shadow.hlsl">

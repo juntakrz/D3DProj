@@ -7,7 +7,7 @@ namespace Bind
 	enum BindID
 	{
 		idVertexBuffer, idIndexBuffer, idTopology,		// core binds
-		idVertexShader, idPixelShader, idGeometryShader,
+		idVertexShader, idGeometryShader, idPixelShader,
 		idSampler0, idSampler1, idRasterizer,
 		idTexture0, idTexture1, idTexture2, idTexture3, idTexture4, idTexture5, idTextureDepth,
 		idConstVertexBuf0, idConstPixelBuf0,
@@ -33,40 +33,49 @@ namespace DF
 	//
 	// RENDER TECHNIQUES
 	//
-	enum FXID
+	struct Layer
 	{
-		// mark bits that will run this mesh through corresponding passes
-		fxNone			=  0,					// exclude from rendering
-		fxShadow		=  1 << 0,				// pass 0
-		fxOcclusion		=  1 << 1,				// pass 1
-		fxBackground	=  1 << 2,				// pass 2
-		fxStandard		=  1 << 3,				// pass 3
-		fxBlur			=  1 << 4,				// pass 4
-		fxForeground	=  1 << 5,				// pass 5
-		fxAABBShow		=  1 << 6,				// pass 6
-		fxMask			=  1 << 7,				// pass 7
-		fxOutline		= (1 << 7) + (1 << 8)	// pass 7 and 8
+		enum FXID
+		{
+			// mark bits that will run this mesh through corresponding passes
+			None			= 0,					// exclude from rendering
+			Shadow			= 1 << 0,				// pass 0
+			Occlusion		= 1 << 1,				// pass 1
+			Background		= 1 << 2,				// pass 2
+			Standard		= 1 << 3,				// pass 3
+			Blur			= 1 << 4,				// pass 4
+			PointSprites	= 1 << 5,				// pass 5
+			AABBShow		= 1 << 6,				// pass 6
+			Masking			= 1 << 7,				// pass 7
+			Outline			= (1 << 7) + (1 << 8)	// pass 7 and 8
+		};
 	};
 
 	//
 	// BUFFERS ENUM
 	//
-	enum class RBuffers		// render buffer enumeration
+	struct RB		// render buffer enumeration
 	{
-		None =		-1,
-		Back =		 0,
-		Render =	 1,
-		Blur =		 2,
-		Resample =	 3
+		enum rbuffers
+		{
+			None = -1,
+			Back = 0,
+			Render = 1,
+			Blur = 2,
+			Resample = 3
+		};
 	};
 
-	enum class DSBuffers	// depth stencil buffer enumeration
+	struct DSB		// depth stencil buffer enumeration
 	{
-		None =		-1,
-		Back =		 0,
-		Render =	 1,
-		Resample =	 2,
-		Shadow =	 3
+		enum dsbuffers
+		{
+			None = -1,
+			Back = 0,
+			Render = 1,
+			Resample = 2,
+			Shadow = 3
+		};
 	};
 
 	//
@@ -90,13 +99,10 @@ namespace DF
 	DXGI_FORMAT GetDepthFormatColor(const DS_Usage& usage) noexcept;
 
 	//
-	// LIGHTING VARIABLES
+	// GLOBAL VARIABLES
 	//
 	constexpr uint8_t maxPointLights = 8u;
-
-	//
-	// CULLING VARIABLES
-	//
+	constexpr uint8_t maxTextures = 6u;
 	extern bool isCullingEnabled;
 
 	//

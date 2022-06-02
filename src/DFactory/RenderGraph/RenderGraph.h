@@ -1,6 +1,8 @@
 #pragma once
 
 #include "RPass.h"
+#include "../DFactory.h"
+#include "../Util/GPUConstBuffer.h"
 
 // RENDER QUEUE MANAGER
 
@@ -24,4 +26,5 @@ public:
 private:
 	// store passes and techniques
 	std::vector<RPass> m_Passes;
+	std::unordered_map<std::string, CBuffer> m_globalCBuffers;
 };

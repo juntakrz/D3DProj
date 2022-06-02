@@ -28,7 +28,7 @@ MeshPlane::MeshPlane(uint16_t matId, uint16_t divisionsX, uint16_t divisionsY)
 	/*	//////////	*/
 
 	// load color texture
-	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(MatMgr.TextureGet(0));
+	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(MatMgr.TextureGet("default//default.dds"));
 
 	m_Binds[Bind::idSampler0] = std::make_unique<Bind::Sampler>();
 
