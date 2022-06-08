@@ -14,4 +14,6 @@ MeshImport::MeshImport(std::vector<std::unique_ptr<Bind::IBind>> pBinds, const s
 	m_Binds[Bind::idTransform] = std::make_unique<Bind::TransformConstBuffer>(*this);
 
 	m_TechniqueIds = DF::Pass::Standard;
+
+	m_isPredicateEnabled = true;
 }

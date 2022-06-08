@@ -10,7 +10,7 @@ namespace DF
 }
 
 // 2D surface used for post processing
-class RenderSurface
+class CRenderSurface
 {
 	// surface mesh data
 	std::vector<XMFLOAT4> vertices;	// 0 = x, 1 = y, 2 = u, 3 = v
@@ -22,10 +22,10 @@ class RenderSurface
 
 	// Direct3D bindables
 	COMPTR<ID3D11Buffer>		m_pVertexBuffer;
-	COMPTR<ID3D11VertexShader>	m_pVS;
-	COMPTR<ID3D11PixelShader>	m_pPS;
-	COMPTR<ID3DBlob>			m_pVSBlob;
-	COMPTR<ID3DBlob>			m_pPSBlob;
+	ID3D11VertexShader*			m_pVS;
+	ID3D11PixelShader*			m_pPS;
+	ID3DBlob*					m_pVSBlob;
+	ID3DBlob*					m_pPSBlob;
 	COMPTR<ID3D11InputLayout>	m_pLayout;
 	COMPTR<ID3D11SamplerState>	m_pSampler;
 
@@ -38,13 +38,13 @@ class RenderSurface
 	std::string m_PS;
 
 public:
-	RenderSurface(float scale = 1.0f, std::string VS = "surface//VS_Surface", std::string PS = "surface//PS_Surface") noexcept;
-	RenderSurface(const RenderSurface&) = default;
-	~RenderSurface() = default;
+	CRenderSurface(float scale = 1.0f, std::string VS = "surface/VS_Surface", std::string PS = "surface/PS_Surface") noexcept;
+	CRenderSurface(const CRenderSurface&) = default;
+	~CRenderSurface() = default;
 
 	void SetShaders(const std::string& VS, const std::string& PS) noexcept;
 
-	void Bind(ID3D11ShaderResourceView* pSRV) noexcept;
+	void Bind(ID3D11ShaderResourceView* pSRV = nullptr) noexcept;
 	void Unbind() noexcept;
 	void Draw() noexcept;
 };

@@ -305,16 +305,17 @@ void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 
 	// create aux render buffer for blur pass
 	CreateRenderTarget("rtBlur", m_VWidth, m_VHeight, isHDR);
+	CreateDepthTarget("dsBlur", "rtBlur", DF::DS_SRVMode::Depth);
+
+	// create layer mixing render target and its copy
+	CreateCompatibleTarget("rtMix", "rtMain", false, true);
+	CreateCompatibleTarget("rtMixCopy", "rtMix", false, true);
 
 	// create downsampled render and depth buffer for post processing
 	CreateRenderTarget("rtDSample2", m_VWidth / 2, m_VHeight / 2, isHDR);
 	CreateDepthTarget("dsDSample2", "rtDSample2");
 
-	CreateRenderTarget("rtDSample4", m_VWidth / 4, m_VHeight / 4, isHDR);
-	CreateDepthTarget("dsDSample4", "rtDSample4");
-
 	CreateCompatibleTarget("rtDS2Copy", "rtDSample2", false, true);
-	CreateCompatibleTarget("rtDS4Copy", "rtDSample4", false, true);
 
 	// create depth buffer for shadows
 	CreateDepthTarget("dsCSM", DF::CSM::bufferSize * DF::CSM::cascades, DF::CSM::bufferSize, true, DF::DS_Usage::DepthShadow);
@@ -323,7 +324,7 @@ void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 	CreateCompatibleTarget("dsMainCopy", "dsMain", true, false);
 }
 
-void D3DMgr::RTBind(const std::string& renderTarget, const std::string& depthTarget, const uint8_t& num) noexcept
+void D3DMgr::RTBind(const std::string& renderTarget, const std::string& depthTarget, const uint8_t& num)
 {
 	// no error prevention for speed, define targets with care
 	D3D_THROW_INFO(m_pContext->OMSetRenderTargets(
@@ -432,7 +433,7 @@ bool D3DMgr::RTRemove(const std::string& name) noexcept
 	return false;
 }
 
-bool D3DMgr::RTSetAsShaderResource(const std::string& id, const uint8_t& shaderType, const uint8_t& slot) noexcept
+bool D3DMgr::RTSetAsShaderResource(const char* id, const uint8_t& shaderType, const uint8_t& slot) noexcept
 {
 	if (renderTargets.find(id) != renderTargets.end())
 	{
@@ -472,6 +473,26 @@ bool D3DMgr::RTSetAsShaderResource(const std::string& id, const uint8_t& shaderT
 	}
 
 	return false;
+}
+
+void D3DMgr::RTClearShaderResource(const uint8_t& shaderType, const uint8_t& slot) noexcept
+{
+	ID3D11ShaderResourceView* pNullSRV = nullptr;
+
+	switch (shaderType)
+	{
+	case(DF::ShaderType::GS):
+	{
+		
+		Context()->GSSetShaderResources(slot, 1u, &pNullSRV);
+		return;
+	}
+	case(DF::ShaderType::PS):
+	{
+		Context()->PSSetShaderResources(slot, 1u, &pNullSRV);
+		return;
+	}
+	}
 }
 
 void D3DMgr::CreateRenderSR(bool HDR) noexcept

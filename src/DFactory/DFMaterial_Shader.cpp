@@ -2,8 +2,18 @@
 
 void* DFMaterial::ShaderAdd(const std::string& filePath) noexcept
 {
+	// correct naming check below, maybe needs a better implementation?
+	std::string path = filePath;
+
+	// if shader name contains path/subfolder to shader - recursively strip it
+	if (filePath[0] != 'V' && filePath[0] != 'G' && filePath[0] != 'P')
+	{
+		std::istringstream iss(filePath);
+		while (std::getline(iss, path, '/')) {};
+	}
+
 	// determine which type of shader it is by the first letter (requires correct/strict shader naming)
-	switch (filePath[0])
+	switch (path[0])
 	{
 	case 'V':		// vertex shader
 	{
@@ -17,7 +27,7 @@ void* DFMaterial::ShaderAdd(const std::string& filePath) noexcept
 		DFShader* pShader = &m_Shaders.at(filePath);
 
 		// convert to a full path
-		std::wstring wpath = L"shaders//" + std::wstring(filePath.begin(), filePath.end()) + L".shd";
+		std::wstring wpath = L"shaders/" + std::wstring(filePath.begin(), filePath.end()) + L".shd";
 
 		// write shader to blob
 		D3DReadFileToBlob(wpath.c_str(), &pShader->pSData);
@@ -39,7 +49,7 @@ void* DFMaterial::ShaderAdd(const std::string& filePath) noexcept
 		DFShader* pShader = &m_Shaders.at(filePath);
 
 		// convert to a full path
-		std::wstring wpath = L"shaders//" + std::wstring(filePath.begin(), filePath.end()) + L".shd";
+		std::wstring wpath = L"shaders/" + std::wstring(filePath.begin(), filePath.end()) + L".shd";
 
 		// write shader to blob
 		D3DReadFileToBlob(wpath.c_str(), &pShader->pSData);
@@ -61,7 +71,7 @@ void* DFMaterial::ShaderAdd(const std::string& filePath) noexcept
 		DFShader* pShader = &m_Shaders.at(filePath);
 
 		// convert to a full path
-		std::wstring wpath = L"shaders//" + std::wstring(filePath.begin(), filePath.end()) + L".shd";
+		std::wstring wpath = L"shaders/" + std::wstring(filePath.begin(), filePath.end()) + L".shd";
 
 		// write shader to blob
 		D3DReadFileToBlob(wpath.c_str(), &pShader->pSData);
@@ -77,7 +87,18 @@ void* DFMaterial::ShaderAdd(const std::string& filePath) noexcept
 void* DFMaterial::ShaderGet(const std::string& id) const noexcept
 {
 	// determine which type of shader it is by the first letter (requires correct/strict shader naming)
-	switch (id[0])
+	// id is the same thing as filePath from the previous method
+	
+	std::string filteredId(id);
+
+	// if shader name contains path/subfolder to shader - recursively strip it
+	if (id[0] != 'V' && id[0] != 'G' && id[0] != 'P')
+	{
+		std::istringstream iss(id);
+		while (std::getline(iss, filteredId, '/')) {};
+	}
+
+	switch (filteredId[0])
 	{
 	case 'V':		// vertex shader
 	{

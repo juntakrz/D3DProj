@@ -17,6 +17,8 @@ private:
 	template <class T>
 	friend class MeshBase;
 
+	friend class RenderGraph;
+
 	virtual const std::vector<std::unique_ptr<Bind::IBind>>& GetStaticBinds() const noexcept = 0;
 
 protected:
@@ -45,6 +47,7 @@ protected:
 
 	// GPU occlusion query data
 	COMPTR<ID3D11Query> m_pQuery = nullptr;
+	//COMPTR<ID3D11Predicate> m_pPredicate = nullptr;
 	D3D11_QUERY_DESC m_qPDesc{ D3D11_QUERY_OCCLUSION_PREDICATE };
 	const uint8_t m_queryDelay = 2;
 	uint8_t m_framesElapsed = 0;		// frames since the last query
@@ -65,8 +68,8 @@ public:
 	uint32_t m_TechniqueIds;				// technique ids in bit format, applied to this mesh
 
 	bool m_isAABB = false;					// is this mesh bounding mesh
-	//UINT64 m_QueryResult = 100;				// GPU occlusion query result
-	BOOL m_QueryResult = true;
+	bool m_isPredicateEnabled = false;
+	BOOL m_QueryResult = true;				// GPU occlusion query result
 
 protected:
 	void AddMaterialBind(uint16_t matIndex) noexcept;	
@@ -93,6 +96,10 @@ public:
 		}
 
 		DF::D3DM->Device()->CreateQuery(&m_qPDesc, &m_pQuery);
+		/*D3D11_QUERY_DESC m_DescPredicate;
+		m_DescPredicate.Query = D3D11_QUERY_OCCLUSION_PREDICATE;
+		m_DescPredicate.MiscFlags = D3D11_QUERY_MISC_PREDICATEHINT;
+		DF::D3DM->Device()->CreatePredicate(&m_DescPredicate, &m_pPredicate);*/
 	};
 	MeshCore(const MeshCore&) = delete;
 	~MeshCore() = default;

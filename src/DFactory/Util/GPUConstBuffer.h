@@ -13,6 +13,30 @@ class CBuffer
 	COMPTR<ID3D11Buffer> m_pBuffer;
 
 public:
+	// generate cbuffer using a vector
+	template<typename T>
+	void GenerateBuffer(std::vector<T>&& in_data)
+	{
+		// check if number of elements add up to multiples of 4 floats (16 bytes) and if not - add required padding
+		int mod = 4 - (in_data.size() % 4);
+		int paddedSize = sizeof(float) * (in_data.size() + mod);
+
+		D3D11_BUFFER_DESC bd = {};
+		bd.Usage = D3D11_USAGE_DYNAMIC;
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bd.MiscFlags = 0u;
+		bd.ByteWidth = paddedSize;
+		bd.StructureByteStride = 0u;
+
+		D3D11_SUBRESOURCE_DATA sd = {};
+		sd.pSysMem = in_data.data();
+
+		DF::Device()->CreateBuffer(&bd, &sd, &m_pBuffer);
+
+		m_floatBuffer = std::move(in_data);
+	}
+
 	// when a single variable is left - uses this method to finish it up and create buffer
 	template<typename T>
 	void GenerateBuffer(T&& var) noexcept
@@ -20,7 +44,7 @@ public:
 		m_floatBuffer.emplace_back(std::move(var));
 
 		// check if number of elements add up to multiples of 4 floats (16 bytes) and if not - add required padding
-		int mod = (m_floatBuffer.size() < 4) ? -1 * (m_floatBuffer.size() % 4) + 4 : m_floatBuffer.size() % 4;
+		int mod = 4 - (m_floatBuffer.size() % 4);
 		int paddedSize = sizeof(float) * (m_floatBuffer.size() + mod);
 		for (int i = 0; i < mod; i++)
 		{
@@ -41,7 +65,7 @@ public:
 		DF::Device()->CreateBuffer(&bd, &sd, &m_pBuffer);
 	}
 
-	// generates pixel shader cbuffer with provided float stream, padding must be done manually
+	// generates shader cbuffer with provided float stream, padding must be done manually
 	template<typename T, typename ...Vars>
 	void GenerateBuffer(T&& var, Vars&& ...vars)
 	{

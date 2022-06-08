@@ -67,11 +67,14 @@ void RTechnique::InitTechniques() noexcept
 		fInitBinds();
 
 		VS = "VS_Default_OT";
+		PS = "PS_Default";
+		//VS = "VS_Default";
 
 		auto pVS = std::make_unique<Bind::VertexShader>(VS);
 		ID3DBlob* pVSByteCode = pVS->GetByteCode();
 		pBinds[Bind::idVertexShader] = std::move(pVS);
 		pBinds[Bind::idPixelShader] = std::make_unique<Bind::Null_PixelShader>();
+		//pBinds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PS);
 		//pBinds[Bind::idGeometryShader] = std::make_unique <Bind::Null_GeometryShader>();
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
@@ -89,7 +92,7 @@ void RTechnique::InitTechniques() noexcept
 		m_TechDB[techId].m_BindMode = RTechnique::BIND_TECHNIQUE;
 		m_TechDB[techId].m_Binds = std::move(pBinds);
 
-		m_TechDB[techId].m_RB = "";
+		m_TechDB[techId].m_RB = ""; // ""
 		m_TechDB[techId].m_DSB = "dsMain";
 
 		m_TechDB[techId].m_Camera = "$active_camera";
@@ -119,7 +122,7 @@ void RTechnique::InitTechniques() noexcept
 		m_TechDB[techId].m_depthState = DF::DS_Mode::DOff_SOff;
 	}
 
-	// PASS 3
+	// PASS: Standard
 	// use rendering using mesh own binds
 	{
 		fInitBinds();
@@ -148,7 +151,7 @@ void RTechnique::InitTechniques() noexcept
 		// depth stencil state writes to off
 		m_TechDB[techId].m_depthState = DF::DS_Mode::Default;
 	}
-	// PASS 4
+	// PASS: Blur
 	// use rendering using mesh own binds for 'blur' render buffer
 	{
 		fInitBinds();
@@ -169,7 +172,7 @@ void RTechnique::InitTechniques() noexcept
 
 		// use same depth buffer from previous pass, but render to 'fxBlur' render buffer
 		m_TechDB[techId].m_RB = "rtBlur";	// fxBlur buffer
-		m_TechDB[techId].m_DSB = "dsMain";	// main depth
+		m_TechDB[techId].m_DSB = "dsBlur";	// main depth
 
 		// no change for depth state
 		m_TechDB[techId].m_depthState = -1;
@@ -180,6 +183,7 @@ void RTechnique::InitTechniques() noexcept
 	{
 		fInitBinds();
 
+		pBinds[Bind::idSampler1] = std::make_unique<Bind::Sampler>(Bind::Sampler::Comparison, 1u, DF::ShaderType::GS);
 		pBinds[Bind::idTopology] = std::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 		auto techId = DF::Pass::IdToString(DF::Pass::PointSprites);
@@ -191,7 +195,7 @@ void RTechnique::InitTechniques() noexcept
 		m_TechDB[techId].m_Camera = "$active_camera";
 
 		// set render buffer and depth buffer for rendering to
-		m_TechDB[techId].m_RB = "rtMain";	// main buffer
+		m_TechDB[techId].m_RB = "rtMix";	// main buffer
 		m_TechDB[techId].m_DSB = "dsMain";	// main depth
 
 		// depth stencil state writes to off

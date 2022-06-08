@@ -25,6 +25,13 @@ bool RenderGraph::Pass(const char* technique) noexcept
 
 	for (auto& it : *pJobs)
 	{
+		/*
+		if (it.pMesh->m_isPredicateEnabled)
+		{
+			DF::Context()->SetPredication(it.pMesh->m_pPredicate.Get(), FALSE);
+		}
+		*/
+
 		// bind core mesh buffers
 		it.pMesh->BindCore();
 
@@ -54,6 +61,11 @@ bool RenderGraph::Pass(const char* technique) noexcept
 
 		// issue draw call
 		it.pMesh->DrawIndexed();
+		/*
+		if (it.pMesh->m_isPredicateEnabled)
+		{
+			DF::Context()->SetPredication(NULL, FALSE);
+		}*/
 	}
 
 	return true;
@@ -169,12 +181,14 @@ bool RenderGraph::PassQuery(const char* technique) noexcept
 
 			// begin occlusion query
 			it.pMesh->BeginQuery();
+			//DF::Context()->Begin(it.pMesh->m_pPredicate.Get());
 
 			// issue draw call
 			it.pMesh->DrawIndexed();
 
 			// end and write the result to primary mesh
 			it.pMesh->EndQuery();
+			//DF::Context()->End(it.pMesh->m_pPredicate.Get());
 
 			it.pMesh->GetQueryResult(it.pMesh);
 		}
@@ -200,6 +214,9 @@ bool RenderGraph::PassSprites(const char* technique, const char* depthSRV) noexc
 	// get technique data
 	auto m_pTech = &techMgr->m_TechDB.at(technique);
 
+	// clear render target
+	DF::D3DM->Clear(m_pTech->m_RB, m_pTech->m_DSB);
+
 	// set appropriate render targets
 	DF::D3DM->RTBind(m_pTech->m_RB, m_pTech->m_DSB);
 
@@ -216,24 +233,6 @@ bool RenderGraph::PassSprites(const char* technique, const char* depthSRV) noexc
 
 	// bind technique binds once
 	m_pTech->BindTechnique();
-
-	// retrieve sampler from the pixel shader... but need to do it in a better way
-	COMPTR<ID3D11SamplerState> pSState;
-
-	D3D11_SAMPLER_DESC samplerDesc{};
-	samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.MinLOD = 0.0f;
-	samplerDesc.MaxLOD = 0.0f;
-	samplerDesc.MaxAnisotropy = 0.0f;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
-
-	DF::Device()->CreateSamplerState(&samplerDesc, &pSState);
-
-	DF::Context()->GSSetSamplers(1u, 1u, pSState.GetAddressOf());
-	DF::D3DM->Context();
 
 	DF::Context()->GSSetShaderResources(0u, 1u, DF::D3DM->GetDepthTarget(depthSRV)->pDepthSRV.GetAddressOf());
 
@@ -253,5 +252,81 @@ bool RenderGraph::PassSprites(const char* technique, const char* depthSRV) noexc
 	// enable depth buffer
 	DF::D3DM->SetDepthStencilState((uint8_t)DF::DS_Mode::Default);
 
+	// combine rtMix with sprites and rtMixCopy with all previous layers
+	DF::D3DM->RTBind("rtMain", "dsMain");
+	DF::D3DM->RTSetAsShaderResource("rtMixCopy", DF::ShaderType::PS, 0u);
+	DF::D3DM->RTSetAsShaderResource("rtMix", DF::ShaderType::PS, 1u);
+	DF::D3DM->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_MixAdditive");
+	DF::D3DM->RenderSurface("sfcMix");
+
 	return true;
+}
+
+bool RenderGraph::PostBlur(const char* in_RT, const char* out_RT, const char* out_DS, const uint8_t& stages) noexcept
+{
+
+	if (stages > 0) {			// BLUR PASS #1 (downsample 2x)
+
+		// bind gauss kernel and coefficients buffer to PS register 2
+		DCB("GaussCoef").BindToPS(2u);
+
+		DF::D3DM->Clear("rtDSample2", "dsDSample2");
+
+		// bind 'downsample' render and depth buffers with equal resolution
+		DF::D3DM->RTBind("rtDSample2", "dsDSample2");
+
+		// set horizontal direction for gauss blur
+		DCB("ScanH").BindToPS(0u);
+
+		// render to downscaled 2x surface that has blur shaders using fxBlur buffer
+		DF::D3DM->RenderBufferToSurface(in_RT, "sfcBlur");
+
+		// make a copy of a buffer to render it again
+		DF::D3DM->RTCopyTarget("rtDSample2", "rtDS2Copy", false);
+
+		// clear buffers so rendering of alpha won't be additive
+		DF::D3DM->Clear("rtDSample2", "dsDSample2");
+
+		// set vertical direction for gauss blur
+		DCB("ScanV").BindToPS(0u);
+
+		// render 'downsample' buffer to 'blur' surface
+		DF::D3DM->RenderBufferToSurface("rtDS2Copy", "sfcBlur");
+
+		DF::D3DM->Clear(out_RT, out_DS);
+
+		// bind 'render' buffer and corresponding depth buffer
+		DF::D3DM->RTBind(out_RT, out_DS);
+
+		DF::D3DM->RTSetAsShaderResource("rtDSample2", DF::ShaderType::PS, 1u);
+		DF::D3DM->RTSetAsShaderResource("dsMainCopy", DF::ShaderType::PS, 2u);
+		DF::D3DM->RTSetAsShaderResource("dsBlur", DF::ShaderType::PS, 3u);
+
+		DF::D3DM->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
+
+		DF::D3DM->RenderBufferToSurface("rtMain", "sfcMix");
+
+		return true;
+	}
+
+	DF::D3DM->RTBind("rtMain", "dsMain");
+	DF::D3DM->RenderBufferToSurface("rtBlur", "sfcMain");
+
+	return false;		// didn't do blur passes
+}
+
+void RenderGraph::MergeDepthBuffers(const char* idA, const char* idB, const char* dsTarget, const char* surface) noexcept
+{
+	// unbind buffers if bound
+	(DF::D3DM->m_DSId == idA || DF::D3DM->m_DSId == idB) ? DF::Context()->OMSetRenderTargets(0u, nullptr, nullptr) : void();
+
+	// bind depth buffer B as texture
+	DF::D3DM->RTSetAsShaderResource(idB, DF::ShaderType::PS, 1u);
+
+	// bind mixing target and depth
+	DF::D3DM->ClearDSBuffer(dsTarget);
+	DF::D3DM->RTBind("", dsTarget);
+
+	// render depth buffer A to surface with previously set depth buffer B
+	DF::D3DM->RenderDepthToSurface(idA, "sfcMix");
 }

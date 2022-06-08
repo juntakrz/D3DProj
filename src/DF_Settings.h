@@ -95,9 +95,3 @@
 #endif
 
 #define NOMINMAX*/
-
-typedef float float32;
-typedef double float64;
-
-constexpr float PI32 = 22.0f / 7.0f;
-constexpr double PI64 = 22.0 / 7.0;

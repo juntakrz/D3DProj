@@ -22,8 +22,10 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.pD3DMgr->CreateRenderSurface("sfcMain", 1.0f);
 	_SInstance.pD3DMgr->CreateRenderSurface("sfcBlur", 1.0f);
 	_SInstance.pD3DMgr->CreateRenderSurface("sfcDepth", 1.0f);
-	_SInstance.pD3DMgr->Surface("sfcBlur")->SetShaders("surface//VS_Surface", "surface//PS_Surface_BlurGauss");
-	_SInstance.pD3DMgr->Surface("sfcDepth")->SetShaders("surface//VS_Surface", "surface//PS_SurfaceDepth");
+	_SInstance.pD3DMgr->CreateRenderSurface("sfcMix", 1.0f);
+	_SInstance.pD3DMgr->Surface("sfcBlur")->SetShaders("surface/VS_Surface", "surface/PS_Surface_BlurGauss");
+	_SInstance.pD3DMgr->Surface("sfcDepth")->SetShaders("surface/VS_Surface", "surface/PS_SurfaceDepth");
+	_SInstance.pD3DMgr->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
 
 	// init light manager
 	_SInstance.LightM = &LightMgr::Get();
@@ -40,7 +42,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.CameraBindVS();
 
 	// init rendering manager
-	_SInstance.RenderM = new RenderGraph;
+	_SInstance.RenderM = &RenderGraph::Get();
 	_SInstance.ModelM->pRenderMgr = _SInstance.RenderM;
 
 	//create and add default material
@@ -48,7 +50,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc.name = "Mat_Default";
 	DFMatDesc.shaders.vertex = "VS_FlatTexture";
 	DFMatDesc.shaders.pixel = "PS_FlatTexture";
-	DFMatDesc.textures.tex0 = "default//default.dds";
+	DFMatDesc.textures.tex0 = "default/default.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.material.spec_metal = 0.0f;
@@ -68,7 +70,7 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 
 	// load primary ImGui font
 	//_SInstance.m_imFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 14.0f);
-	_SInstance.m_imFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("res//font1.ttf", 16.0f);
+	_SInstance.m_imFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/font1.ttf", 16.0f);
 
 	// disable ImGui INI file
 	ImGui::GetIO().IniFilename = NULL;
