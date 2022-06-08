@@ -2,7 +2,7 @@
 
 void D3DMgr::CreateStencilStates() noexcept
 {
-	for (uint8_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 5; i++)
 	{
 		D3D11_DEPTH_STENCIL_DESC DSDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
 
@@ -10,7 +10,15 @@ void D3DMgr::CreateStencilStates() noexcept
 
 		switch (i)
 		{
-		case (uint8_t)DF::DS_Mode::StencilWrite:
+		case DF::DS_Mode::DOn_SWrite:
+		{
+			DSDesc.StencilEnable = true;
+			DSDesc.StencilWriteMask = 0xFF;
+			DSDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+			DSDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+			break;
+		}
+		case DF::DS_Mode::DOff_SWrite:
 		{
 			DSDesc.DepthEnable = false;
 			DSDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -20,7 +28,7 @@ void D3DMgr::CreateStencilStates() noexcept
 			DSDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
 			break;
 		}
-		case (uint8_t)DF::DS_Mode::StencilMask:
+		case DF::DS_Mode::DOff_SRead:
 		{
 			DSDesc.DepthEnable = false;
 			DSDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -30,7 +38,7 @@ void D3DMgr::CreateStencilStates() noexcept
 			DSDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			break;
 		}
-		case (uint8_t)DF::DS_Mode::DepthOff:
+		case DF::DS_Mode::DOff_SOff:
 		{
 			DSDesc.DepthEnable = false;
 			break;

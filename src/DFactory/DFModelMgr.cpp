@@ -202,7 +202,7 @@ void DFModelMgr::Delete() noexcept
 
 void DFModelMgr::UpdateRenderer() noexcept
 {
-	pRenderMgr->ResetRenderPasses();
+	pRenderMgr->ResetJobs();
 
 	for (const auto& it : m_Models)
 	{

@@ -1,6 +1,11 @@
-Texture2D texDiffuse : register(t0);
-Texture2D texLens : register(t1);
-SamplerState smplr;
+cbuffer variables       : register(b0)
+{
+    float1 mix;
+};
+
+Texture2D texDiffuse    : register(t0);
+Texture2D texLens       : register(t1);
+SamplerState smplr      : register(s0);
 
 float4 main(float2 tex : TEXCOORD) : SV_TARGET
 {
@@ -13,7 +18,7 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
     float1 alpha = texDiffuse.Sample(smplr, tex).a;
     
     // add lens dirt to final output
-    color += float3(red, green, blue) * color * 0.75;
+    color += float3(red, green, blue) * color * mix;
         
     return float4(color, alpha);
 }

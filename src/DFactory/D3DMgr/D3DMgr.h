@@ -28,7 +28,7 @@ private:
 	COMPTR<ID3D11ShaderResourceView>	m_pBufCopy_SR;
 
 	// states
-	COMPTR<ID3D11DepthStencilState>		m_pDSStates[4];
+	COMPTR<ID3D11DepthStencilState>		m_pDSStates[5];
 	COMPTR<ID3D11BlendState>			m_pBlendState;
 
 	//dynamically allocated RTV pointers
@@ -49,7 +49,8 @@ private:
 	{
 		COMPTR<ID3D11Texture2D>				pDSTex;
 		COMPTR<ID3D11DepthStencilView>		pDSV;
-		COMPTR<ID3D11ShaderResourceView>	pDS_SRV;
+		COMPTR<ID3D11ShaderResourceView>	pDepthSRV;
+		COMPTR<ID3D11ShaderResourceView>	pStencilSRV;
 		std::string name;
 		uint16_t width = 0;
 		uint16_t height = 0;
@@ -173,10 +174,10 @@ public:
 	bool	CreateRenderTarget(std::string name, int16_t width = -1, int16_t height = -1, bool isHDR = false) noexcept;
 
 	// creates depth-stencil buffer based on a provided render buffer
-	bool	CreateDepthTarget(std::string name, std::string srcTarget, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
+	bool	CreateDepthTarget(std::string name, std::string srcTarget, uint8_t SRVMode = DF::DS_SRVMode::None, uint8_t usage = DF::DS_Usage::DepthStencil) noexcept;
 
 	// creates standalone depth-stencil buffer
-	bool	CreateDepthTarget(std::string name, int16_t width, int16_t height, bool isShaderResource = false, DF::DS_Usage usage = DF::DS_Usage::DepthStencil) noexcept;
+	bool	CreateDepthTarget(std::string name, int16_t width, int16_t height, uint8_t SRVMode = DF::DS_SRVMode::None, uint8_t usage = DF::DS_Usage::DepthStencil) noexcept;
 
 	// create a copy of a provided buffer
 	bool	CreateCompatibleTarget(std::string name, std::string srcTarget, bool isDepthTarget, bool createView) noexcept;
@@ -196,6 +197,8 @@ public:
 	//external render targets, RTV and DSV are related by the same index
 	void RTSet(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, uint8_t num = 1) noexcept;
 	bool RTRemove(const std::string& name) noexcept;	// deletes render or depth target by its name
+
+	bool RTSetAsShaderResource(const std::string& id, const uint8_t& shaderType, const uint8_t& slot) noexcept;
 
 	/* * * * * * * * * * * * * * */
 

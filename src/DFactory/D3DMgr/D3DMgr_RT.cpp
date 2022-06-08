@@ -62,7 +62,7 @@ bool D3DMgr::CreateRenderTarget(std::string name, int16_t width, int16_t height,
 	return true;
 }
 
-bool D3DMgr::CreateDepthTarget(std::string name, std::string srcTarget, bool isShaderResource, DF::DS_Usage usage) noexcept
+bool D3DMgr::CreateDepthTarget(std::string name, std::string srcTarget, uint8_t SRVMode, uint8_t usage) noexcept
 {
 	// check if provided render target exists
 	if (renderTargets.find(srcTarget) == renderTargets.end())
@@ -97,7 +97,7 @@ bool D3DMgr::CreateDepthTarget(std::string name, std::string srcTarget, bool isS
 	stencilDesc.SampleDesc.Count = 1u;
 	stencilDesc.SampleDesc.Quality = 0u;
 	stencilDesc.Format = DF::GetDepthFormatTypeless(usage);
-	stencilDesc.BindFlags = (isShaderResource)
+	stencilDesc.BindFlags = (SRVMode)
 		? D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE : D3D11_BIND_DEPTH_STENCIL;
 
 	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &depthTargets.at(name)->pDSTex));
@@ -115,7 +115,7 @@ bool D3DMgr::CreateDepthTarget(std::string name, std::string srcTarget, bool isS
 	depthTargets.at(name)->width = width;
 	depthTargets.at(name)->height = height;
 
-	if (isShaderResource)
+	if (SRVMode)	// if SRV mode is Depth or DepthStencil - create SRV for depth
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
 		SRVDesc.Format = DF::GetDepthFormatColor(usage);
@@ -123,13 +123,23 @@ bool D3DMgr::CreateDepthTarget(std::string name, std::string srcTarget, bool isS
 		SRVDesc.Texture2D.MipLevels = 1;
 		SRVDesc.Texture2D.MostDetailedMip = 0;
 
-		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &SRVDesc, &depthTargets.at(name)->pDS_SRV);
+		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &SRVDesc, &depthTargets.at(name)->pDepthSRV);
+	}
+	if (SRVMode == DF::DS_SRVMode::DepthStencil)	// if SRV mode is DepthStencil - create SRV for stencil
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
+		SRVDesc.Format = DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		SRVDesc.Texture2D.MipLevels = 1;
+		SRVDesc.Texture2D.MostDetailedMip = 0;
+
+		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &SRVDesc, &depthTargets.at(name)->pStencilSRV);
 	}
 
 	return true;
 }
 
-bool D3DMgr::CreateDepthTarget(std::string name, int16_t width, int16_t height, bool isShaderResource, DF::DS_Usage usage) noexcept
+bool D3DMgr::CreateDepthTarget(std::string name, int16_t width, int16_t height, uint8_t SRVMode, uint8_t usage) noexcept
 {
 	// check if the depth target with the same name already exists
 	if (!depthTargets.try_emplace(name, std::make_unique<DSTarget>()).second)
@@ -151,7 +161,7 @@ bool D3DMgr::CreateDepthTarget(std::string name, int16_t width, int16_t height, 
 	stencilDesc.SampleDesc.Count = 1u;
 	stencilDesc.SampleDesc.Quality = 0u;
 	stencilDesc.Format = DF::GetDepthFormatTypeless(usage);
-	stencilDesc.BindFlags = (isShaderResource)
+	stencilDesc.BindFlags = (SRVMode)
 		? D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE : D3D11_BIND_DEPTH_STENCIL;
 
 	D3D_THROW_INFO(m_pDevice->CreateTexture2D(&stencilDesc, nullptr, &depthTargets.at(name)->pDSTex));
@@ -169,7 +179,7 @@ bool D3DMgr::CreateDepthTarget(std::string name, int16_t width, int16_t height, 
 	depthTargets.at(name)->width = width;
 	depthTargets.at(name)->height = height;
 
-	if (isShaderResource)
+	if (SRVMode)	// if SRV mode is Depth or DepthStencil - create SRV for depth
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
 		SRVDesc.Format = DF::GetDepthFormatColor(usage);
@@ -177,7 +187,17 @@ bool D3DMgr::CreateDepthTarget(std::string name, int16_t width, int16_t height, 
 		SRVDesc.Texture2D.MipLevels = 1;
 		SRVDesc.Texture2D.MostDetailedMip = 0;
 
-		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &SRVDesc, &depthTargets.at(name)->pDS_SRV);
+		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &SRVDesc, &depthTargets.at(name)->pDepthSRV);
+	}
+	if (SRVMode == DF::DS_SRVMode::DepthStencil)	// if SRV mode is DepthStencil - create SRV for stencil
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
+		SRVDesc.Format = DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		SRVDesc.Texture2D.MipLevels = 1;
+		SRVDesc.Texture2D.MostDetailedMip = 0;
+
+		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &SRVDesc, &depthTargets.at(name)->pStencilSRV);
 	}
 	/*
 	// standalone depth buffer provides its own viewport data to RTBind
@@ -221,13 +241,20 @@ bool D3DMgr::CreateCompatibleTarget(std::string name, std::string srcTarget, boo
 		}
 
 		depthTargets.at(srcTarget)->pDSTex->GetDesc(&texDesc);
-		depthTargets.at(srcTarget)->pDS_SRV->GetDesc(&srvDesc);
+		depthTargets.at(srcTarget)->pDepthSRV->GetDesc(&srvDesc);
 		(createView) ? depthTargets.at(srcTarget)->pDSV->GetDesc(&dsvDesc) : void();
 
 		Device()->CreateTexture2D(&texDesc, nullptr, &depthTargets.at(name)->pDSTex);
-		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &srvDesc, &depthTargets.at(name)->pDS_SRV);
+		Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &srvDesc, &depthTargets.at(name)->pDepthSRV);
 		(createView)
 			? Device()->CreateDepthStencilView(depthTargets.at(name)->pDSTex.Get(), &dsvDesc, &depthTargets.at(name)->pDSV) : 0u;
+
+		// if depth target has a stencil shader resource view - create a compatible SRV for it as well
+		if (depthTargets.at(srcTarget)->pStencilSRV)
+		{
+			depthTargets.at(srcTarget)->pStencilSRV->GetDesc(&srvDesc);
+			Device()->CreateShaderResourceView(depthTargets.at(name)->pDSTex.Get(), &srvDesc, &depthTargets.at(name)->pStencilSRV);
+		}
 
 		return true;
 	}
@@ -274,7 +301,7 @@ void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 {
 	// create render and depth buffers
 	CreateRenderTarget("rtMain", m_VWidth, m_VHeight, isHDR);
-	CreateDepthTarget("dsMain", "rtMain", true);
+	CreateDepthTarget("dsMain", "rtMain", DF::DS_SRVMode::Depth);
 
 	// create aux render buffer for blur pass
 	CreateRenderTarget("rtBlur", m_VWidth, m_VHeight, isHDR);
@@ -402,6 +429,48 @@ bool D3DMgr::RTRemove(const std::string& name) noexcept
 	std::string msg = "D3DMgr: target '" + name + "' not found. Unable to delete.\n";
 	OutputDebugStringA(msg.c_str());
 #endif
+	return false;
+}
+
+bool D3DMgr::RTSetAsShaderResource(const std::string& id, const uint8_t& shaderType, const uint8_t& slot) noexcept
+{
+	if (renderTargets.find(id) != renderTargets.end())
+	{
+		switch (shaderType)
+		{
+		case(DF::ShaderType::GS):
+		{
+			(renderTargets.at(id)->pSRV) ? Context()->GSSetShaderResources(slot, 1u, renderTargets.at(id)->pSRV.GetAddressOf()) : void();
+			return true;
+		}
+		case(DF::ShaderType::PS):
+		{
+			(renderTargets.at(id)->pSRV) ? Context()->PSSetShaderResources(slot, 1u, renderTargets.at(id)->pSRV.GetAddressOf()) : void();
+			return true;
+		}
+		}
+	}
+
+	if (depthTargets.find(id) != depthTargets.end())
+	{
+		switch (shaderType)
+		{
+		case(DF::ShaderType::GS):
+		{
+			(depthTargets.at(id)->pDepthSRV) ? Context()->GSSetShaderResources(slot, 1u, depthTargets.at(id)->pDepthSRV.GetAddressOf()) : void();
+			return true;
+		}
+		case(DF::ShaderType::PS):
+		{
+			(depthTargets.at(id)->pDepthSRV) ? Context()->PSSetShaderResources(slot, 1u, depthTargets.at(id)->pDepthSRV.GetAddressOf()) : void();
+
+			// bind stencil view to a next slot if present
+			(depthTargets.at(id)->pStencilSRV) ? Context()->PSSetShaderResources(slot + 1, 1u, depthTargets.at(id)->pStencilSRV.GetAddressOf()) : void();
+			return true;
+		}
+		}
+	}
+
 	return false;
 }
 

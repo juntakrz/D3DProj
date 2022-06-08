@@ -3,7 +3,20 @@
 
 namespace DF
 {
-	DXGI_FORMAT GetDepthFormatTyped(const DS_Usage& usage) noexcept
+	// variable definitions
+	bool isCullingEnabled = true;
+	uint64_t framesRendered = 0;
+
+	namespace CSM
+	{
+		float bufferSize = 2048.0f;
+		float FOVmult = 6.0f;
+		float minZ = 0.01f;
+		float maxZ = 48.0f;
+	}
+
+	// function definitions
+	DXGI_FORMAT GetDepthFormatTyped(const uint8_t& usage) noexcept
 	{
 
 		switch (usage)
@@ -20,7 +33,7 @@ namespace DF
 
 	};
 
-	DXGI_FORMAT GetDepthFormatTypeless(const DS_Usage& usage) noexcept
+	DXGI_FORMAT GetDepthFormatTypeless(const uint8_t& usage) noexcept
 	{
 		switch (usage)
 		{
@@ -35,7 +48,7 @@ namespace DF
 		}
 	}
 
-	DXGI_FORMAT GetDepthFormatColor(const DS_Usage& usage) noexcept
+	DXGI_FORMAT GetDepthFormatColor(const uint8_t& usage) noexcept
 	{
 		switch (usage)
 		{
@@ -50,14 +63,20 @@ namespace DF
 		}
 	}
 
-	namespace CSM
+	const char* Pass::IdToString(const uint32_t& id) noexcept
 	{
-		float bufferSize = 2048.0f;
-		float FOVmult	 = 6.0f;
-		float minZ		 = 0.01f;
-		float maxZ		 = 48.0f;
+		switch (id)
+		{
+		case None:			return "None";
+		case Shadow:		return "Shadow";
+		case Occlusion:		return "Occlusion";
+		case Background:	return "Background";
+		case Standard:		return "Standard";
+		case Blur:			return "Blur";
+		case PointSprites:	return "PointSprites";
+		case AABBShow:		return "AABBShow";
+		case Masking:		return "Masking";
+		case Outline:		return "Outline";
+		}
 	}
-
-	bool isCullingEnabled = true;
-	uint64_t framesRendered = 0;
 }

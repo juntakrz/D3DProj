@@ -1,11 +1,7 @@
 #pragma once
 
-#include "../../pch.h"
-
 namespace Util
 {
-	const std::wstring& ToWString(std::string string)
-	{
-		return std::wstring(string.begin(), string.end());
-	}
+	const std::wstring& ToWString(std::string string);
+	uint64_t FlagPow(const uint64_t& power);
 }

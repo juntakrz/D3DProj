@@ -33,9 +33,9 @@ namespace DF
 	//
 	// RENDER TECHNIQUES
 	//
-	struct Layer
+	struct Pass
 	{
-		enum FXID
+		enum Id
 		{
 			// mark bits that will run this mesh through corresponding passes
 			None			= 0,					// exclude from rendering
@@ -49,61 +49,59 @@ namespace DF
 			Masking			= 1 << 7,				// pass 7
 			Outline			= (1 << 7) + (1 << 8)	// pass 7 and 8
 		};
+
+		static const char* IdToString(const uint32_t& id) noexcept;
 	};
 
 	//
-	// BUFFERS ENUM
+	// SHADER TYPES
 	//
-	struct RB		// render buffer enumeration
+	struct ShaderType
 	{
-		enum rbuffers
+		enum Id
 		{
-			None = -1,
-			Back = 0,
-			Render = 1,
-			Blur = 2,
-			Resample = 3
-		};
-	};
-
-	struct DSB		// depth stencil buffer enumeration
-	{
-		enum dsbuffers
-		{
-			None = -1,
-			Back = 0,
-			Render = 1,
-			Resample = 2,
-			Shadow = 3
+			VS = 0,
+			GS = 1,
+			PS = 2
 		};
 	};
 
 	//
 	// DEPTH STENCIL DATA AND METHODS
 	//
-	enum class DS_Mode
+	struct DS_Mode
 	{
-		Default			= 0,
-		StencilWrite	= 1,
-		StencilMask		= 2,
-		DepthOff		= 3,
+		enum Id
+		{
+			Default		= 0,	// depth on	 stencil off
+			DOn_SWrite	= 1,	// depth on  stencil write
+			DOff_SWrite = 2,	// depth off stencil write
+			DOff_SRead	= 3,	// depth off stencil read
+			DOff_SOff	= 4,	// depth off stencil off
+		};
 	};
 
-	enum class DS_Usage
+	struct DS_SRVMode
 	{
-		DepthStencil = 0, DepthShadow
+		enum Id
+		{
+			None		 = 0,	// no SRV created
+			Depth		 = 1,	// create SRV for depth only
+			DepthStencil = 2,	// create SRV for depth and stencil
+		};
 	};
 
-	DXGI_FORMAT GetDepthFormatTyped(const DS_Usage& usage) noexcept;
-	DXGI_FORMAT GetDepthFormatTypeless(const DS_Usage& usage) noexcept;
-	DXGI_FORMAT GetDepthFormatColor(const DS_Usage& usage) noexcept;
+	struct DS_Usage
+	{
+		enum Id
+		{
+			DepthStencil = 0, DepthShadow
+		};
+	};
 
-	//
-	// GLOBAL VARIABLES
-	//
-	constexpr uint8_t maxPointLights = 8u;
-	constexpr uint8_t maxTextures = 6u;
-	extern bool isCullingEnabled;
+	DXGI_FORMAT GetDepthFormatTyped(const uint8_t& usage) noexcept;
+	DXGI_FORMAT GetDepthFormatTypeless(const uint8_t& usage) noexcept;
+	DXGI_FORMAT GetDepthFormatColor(const uint8_t& usage) noexcept;
 
 	//
 	// CASCADE SHADOW MAPPING
@@ -144,8 +142,11 @@ namespace DF
 	};
 
 	//
-	// METRICS
+	// GLOBAL VARIABLES
 	//
 
+	constexpr uint8_t maxPointLights = 8u;
+	constexpr uint8_t maxTextures = 6u;
+	extern bool isCullingEnabled;
 	extern uint64_t framesRendered;
 }

@@ -8,7 +8,7 @@
 
 class DFactory
 {
-	friend class RPass;		// grant access to vars
+	friend class RenderGraph;	// grant access to vars
 
 	struct
 	{

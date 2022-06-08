@@ -80,16 +80,16 @@ void MeshCore::SetMaterial(std::string name) noexcept
 			std::make_unique<Bind::Texture>(MatMgr.TextureGet(mat.idTex[i]), i);
 	}
 
-	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + mat.shaderVertex + ".shd");
+	auto pVS = std::make_unique<Bind::VertexShader>(mat.shaderVertex);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
 	if (mat.shaderGeometry != "")
 	{
-		m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::GeometryShader>("shaders//" + mat.shaderGeometry + ".shd");
+		m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::GeometryShader>(mat.shaderGeometry);
 	}
 
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + mat.shaderPixel + ".shd");
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(mat.shaderPixel);
 
 	m_Binds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<MaterialPSConstBuffer>>(matCBuffer, 0u);
 
@@ -115,10 +115,10 @@ void MeshCore::SetMaterialRT(std::string name) noexcept
 		m_Binds[i] = nullptr;
 	}
 
-	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + mat.shaderVertex + ".shd");
+	auto pVS = std::make_unique<Bind::VertexShader>(mat.shaderVertex);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + mat.shaderPixel + ".shd");
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(mat.shaderPixel);
 
 	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 }
@@ -126,10 +126,10 @@ void MeshCore::SetMaterialRT(std::string name) noexcept
 void MeshCore::SetShaders(std::string& inVS, std::string& inPS) noexcept
 {
 	// change shaders for the current material
-	auto pVS = std::make_unique<Bind::VertexShader>("shaders//" + inVS + ".shd");
+	auto pVS = std::make_unique<Bind::VertexShader>(inVS);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("shaders//" + inPS + ".shd");
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(inPS);
 
 	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 }

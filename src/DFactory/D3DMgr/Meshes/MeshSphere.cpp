@@ -36,14 +36,12 @@ MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 	AddMaterialBind(matId);
 
 	// create vertex shader
-	std::string VSPath = "shaders//" + MatMgr.Mat(matId).shaderVertex + ".shd";
-	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
+	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(MatMgr.Mat(matId).shaderVertex);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + MatMgr.Mat(matId).shaderPixel + ".shd";
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(MatMgr.Mat(matId).shaderPixel);
 
 	// temporary null geometry shader, should be a single command after sprite pass that uses GS
 	m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::Null_GeometryShader>();

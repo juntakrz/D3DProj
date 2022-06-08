@@ -12,8 +12,7 @@ namespace Bind
 		void Unbind() noexcept override;
 
 	protected:
-		COMPTR<ID3DBlob> m_pBlob;
-		COMPTR<ID3D11GeometryShader> m_pGS;
-		std::wstring m_FilePath;
+		ID3D11GeometryShader* m_pGS;
+		std::string m_FilePath;
 	};
 }

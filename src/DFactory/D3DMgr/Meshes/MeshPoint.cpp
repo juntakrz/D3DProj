@@ -23,17 +23,14 @@ MeshPoint::MeshPoint(uint16_t matId) noexcept
 	AddMaterialBind(matId);
 
 	// create vertex shader
-	std::string VSPath = "shaders//" + VS + ".shd";
-	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
+	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VS);
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
-	std::string GSPath = "shaders//" + GS + ".shd";
-	m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::GeometryShader>(GSPath);
+	m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::GeometryShader>(GS);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//" + PS + ".shd";
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PS);
 
 	//create and bind InputLayout
 	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =

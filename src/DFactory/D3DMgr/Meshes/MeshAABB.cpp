@@ -17,14 +17,12 @@ MeshAABB::MeshAABB(const XMFLOAT3* AABBcoords)
 	m_pIndexBuffer = reinterpret_cast<Bind::IndexBuffer*>(m_Binds[Bind::idIndexBuffer].get());
 
 	//create and bind vertex shader
-	std::string VSPath = "shaders//VS_Wireframe.shd";
-	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>(VSPath);
+	std::unique_ptr<Bind::VertexShader> pVS = std::make_unique<Bind::VertexShader>("VS_Wireframe");
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
 	//create and bind pixel shader
-	std::string PSPath = "shaders//PS_Wireframe.shd";
-	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PSPath);
+	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>("PS_Wireframe");
 
 	//create and bind InputLayout
 	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =

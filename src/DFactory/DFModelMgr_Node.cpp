@@ -49,14 +49,14 @@ void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
 
 		// generate job using technique flags
 		(i < m_pAABBs.size() && m_pAABBs[i])
-			? (m_pMeshes[i]->m_QueryResult > 0) ? renderMgr->GenerateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds()) : void()
-			: renderMgr->GenerateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds());
+			? (m_pMeshes[i]->m_QueryResult > 0) ? renderMgr->CreateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds()) : void()
+			: renderMgr->CreateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds());
 
 		// generate occlusion test query jobs using AABBs if available
-		(i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->GenerateQueryJob(m_pMeshes[i], m_pAABBs[i]) : void();
+		(i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->CreateQueryJob(m_pMeshes[i], m_pAABBs[i]) : void();
 
 		// if debug-showing AABBs enabled - show them in a special pass
-		(true) ? (i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->GenerateJob(m_pAABBs[i], DF::Layer::AABBShow) : void() : void();
+		(true) ? (i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->CreateJob(m_pAABBs[i], DF::Pass::AABBShow) : void() : void();
 	}
 
 	/*

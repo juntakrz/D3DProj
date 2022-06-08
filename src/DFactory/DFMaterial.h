@@ -47,8 +47,17 @@ class DFMaterial
 		ID3D11Texture2D* pTex = nullptr;
 	};
 
+	struct DFShader
+	{
+		COMPTR<ID3D11VertexShader>		pVS	= nullptr;
+		COMPTR<ID3D11GeometryShader>	pGS	= nullptr;
+		COMPTR<ID3D11PixelShader>		pPS	= nullptr;
+		COMPTR<ID3DBlob>				pSData;
+	};
+
 	std::vector<std::unique_ptr<Material>> m_Materials;
 	std::unordered_map<std::string, DFTexture> m_DFTextures;
+	std::unordered_map<std::string, DFShader> m_Shaders;
 
 public:
 
@@ -77,7 +86,7 @@ public:
 			float bumpIntensity = 1.0f;
 		} material;
 
-		uint32_t effects = DF::Layer::Standard;
+		uint32_t effects = DF::Pass::Standard;
 	};
 
 	DFMaterial() {};
@@ -89,6 +98,8 @@ public:
 		return _SInstance;
 	}
 
+	// MATERIALS
+
 	uint16_t MatAdd(DFMATERIAL_DESC* pDesc) noexcept;
 
 	Material& Mat(std::string name) noexcept;
@@ -97,6 +108,8 @@ public:
 	uint16_t MatCount() const noexcept;
 	void MatDelete(uint16_t index) noexcept;
 	void MatDelete(std::string name) noexcept;
+
+	// TEXTURES
 
 	std::string TextureAdd(std::string filePath) noexcept;
 	std::string TextureAdd(std::string name, std::string filePath) noexcept;
@@ -109,6 +122,13 @@ public:
 
 	bool BindTextureToPS(const std::string& texture, const UINT& slot, const UINT& num = 1) noexcept;	// bind texture as a PS resource
 	bool BindTextureToGS(const std::string& texture, const UINT& slot, const UINT& num = 1) noexcept;	// bind texture as a GS resource
+
+	// SHADERS
+
+	void*		ShaderAdd(const std::string& filePath) noexcept;		// it's up to a caller to reinterpret the pointer to shader
+	void*		ShaderGet(const std::string& id) const noexcept;
+	ID3DBlob*	ShaderByteCode(const std::string& id) const noexcept;
+	bool		ShaderDelete(const std::string& id) noexcept;
 
 	void DEBUG_ShowMaterialIndex(uint16_t begin = 0, uint16_t end = 65535) const noexcept;
 	void DEBUG_ShowTextureIndex(uint32_t begin = 0, uint32_t end = 99999) const noexcept;

@@ -12,6 +12,7 @@ class CBuffer
 	bool m_firstCall = true;
 	COMPTR<ID3D11Buffer> m_pBuffer;
 
+public:
 	// when a single variable is left - uses this method to finish it up and create buffer
 	template<typename T>
 	void GenerateBuffer(T&& var) noexcept
@@ -40,7 +41,6 @@ class CBuffer
 		DF::Device()->CreateBuffer(&bd, &sd, &m_pBuffer);
 	}
 
-public:
 	// generates pixel shader cbuffer with provided float stream, padding must be done manually
 	template<typename T, typename ...Vars>
 	void GenerateBuffer(T&& var, Vars&& ...vars)
