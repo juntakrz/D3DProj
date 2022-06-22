@@ -63,7 +63,7 @@ namespace DF
 		}
 	}
 
-	const char* Pass::IdToString(const uint32_t& id) noexcept
+	std::string Pass::IdToString(const uint32_t& id) noexcept
 	{
 		switch (id)
 		{

@@ -43,7 +43,7 @@ void RTechnique::InitTechniques() noexcept
 		pBinds[Bind::idTextureDepth] = std::make_unique<Bind::Null_Texture>(6u);
 		pBinds[Bind::idRasterizer] = std::make_unique<Bind::Rasterizer>(D3D11_CULL_NONE);
 
-		auto techId = DF::Pass::IdToString(DF::Pass::Shadow);
+		std::string techId = DF::Pass::IdToString(DF::Pass::Shadow);
 		m_TechDB[techId] = TechniqueData();
 
 		m_TechDB[techId].m_BindMode = RTechnique::BIND_TECHNIQUE;

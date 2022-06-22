@@ -50,7 +50,7 @@ namespace DF
 			Outline			= (1 << 7) + (1 << 8)	// pass 7 and 8
 		};
 
-		static const char* IdToString(const uint32_t& id) noexcept;
+		static std::string IdToString(const uint32_t& id) noexcept;
 	};
 
 	//
