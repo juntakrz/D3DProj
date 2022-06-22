@@ -13,6 +13,6 @@ namespace DF
 
 	struct
 	{
-		std::string depthView = "dsCSM";
+		const char* depthView = "dsCSM";
 	} DEBUG;
 }

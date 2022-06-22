@@ -2,7 +2,9 @@
 
 namespace Bind
 {
-	Sampler::Sampler(UINT mode, UINT slot) : m_slot(slot)
+	Sampler::Sampler(UINT mode, UINT slot, UINT target)
+		:
+		m_slot(slot), m_target(target)
 	{
 		D3D_DXGIDEBUG(*DF::D3DM);
 
@@ -38,6 +40,8 @@ namespace Bind
 
 	void Sampler::Bind() noexcept
 	{
-		GetContext()->PSSetSamplers(m_slot, 1u, m_pSampler.GetAddressOf());
+		(m_target == DF::ShaderType::PS)
+			? GetContext()->PSSetSamplers(m_slot, 1u, m_pSampler.GetAddressOf())
+			: GetContext()->GSSetSamplers(m_slot, 1u, m_pSampler.GetAddressOf());
 	}
 }

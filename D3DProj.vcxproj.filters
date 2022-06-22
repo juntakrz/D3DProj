@@ -517,5 +517,8 @@
     <FxCompile Include="shaders\surface\PS_Surface_BlurGauss.hlsl" />
     <FxCompile Include="shaders\surface\PS_Surface_BlurBox.hlsl" />
     <FxCompile Include="shaders\surface\PS_Surface_HiPass.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_Mix.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_MixDepth.hlsl" />
+    <FxCompile Include="shaders\surface\PS_Surface_MixAdditive.hlsl" />
   </ItemGroup>
 </Project>

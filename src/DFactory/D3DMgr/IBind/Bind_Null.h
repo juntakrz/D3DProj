@@ -52,6 +52,24 @@ namespace Bind
 			GetContext()->PSSetShaderResources(m_slot, m_numViews, m_pNullSRV);
 		}
 
+		static void Bind(const uint8_t& id, const UINT& slot, const UINT& numViews = 1) noexcept
+		{
+			ID3D11ShaderResourceView* pNullSRV = nullptr;
+			switch (id)
+			{
+			case DF::ShaderType::GS:
+			{
+				GetContext()->GSSetShaderResources(slot, numViews, &pNullSRV);
+				return;
+			}
+			case DF::ShaderType::PS:
+			{
+				GetContext()->PSSetShaderResources(slot, numViews, &pNullSRV);
+				return;
+			}
+			}
+		}
+
 	private:
 		UINT m_slot = 0u;
 		UINT m_numViews = 1u;

@@ -116,10 +116,10 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Mars";
 	DFMatDesc.shaders.vertex = "VS_PBS";
 	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR";
-	DFMatDesc.textures.tex0 = "PBR//mars//mars_4k_albedo.dds";
-	DFMatDesc.textures.tex1 = "PBR//mars//mars_4k_normal.dds";
+	DFMatDesc.textures.tex0 = "PBR/mars/mars_4k_albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR/mars/mars_4k_normal.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.06f, 0.0f, 0.0f };
-	DFMatDesc.material.matIntensity = 2.9f;	//2.9
+	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.material.spec_metal = 0.0f;
 	DFMatDesc.material.pow_roughness = 0.0f;
 
@@ -130,11 +130,11 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_MarsPBS";
 	DFMatDesc.shaders.vertex = "VS_PBS";
 	DFMatDesc.shaders.pixel = "PS_PBS_NoHDR_L";
-	DFMatDesc.textures.tex0 = "PBR//mars//mars_4k_albedo.dds";
-	DFMatDesc.textures.tex1 = "PBR//mars//mars_4k_normal.dds";
-	DFMatDesc.textures.tex2 = "PBR//mars//mars_4k_metallic.dds";
-	DFMatDesc.textures.tex3 = "PBR//mars//mars_4k_roughness.dds";
-	DFMatDesc.textures.tex4 = "PBR//mars//mars_4k_ao.dds";
+	DFMatDesc.textures.tex0 = "PBR/mars/mars_4k_albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR/mars/mars_4k_normal.dds";
+	DFMatDesc.textures.tex2 = "PBR/mars/mars_4k_metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR/mars/mars_4k_roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR/mars/mars_4k_ao.dds";
 	DFMatDesc.material.ambientColor = { 0.06f, 0.03f, 0.0f, 1.0f };
 	DFMatDesc.material.spec_metal = 0.08f;
 	DFMatDesc.material.pow_roughness = 0.8f;
@@ -151,9 +151,9 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.vertex = "VS_Atmosphere";
 	DFMatDesc.shaders.pixel = "PS_Atmosphere";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
-	DFMatDesc.material.spec_metal = 1.0f;
+	DFMatDesc.material.spec_metal = 0.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
-	DFMatDesc.material.matIntensity = 0.9f;
+	DFMatDesc.material.matIntensity = 1.0f;
 	DFMatDesc.effects = DF::Pass::Blur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
@@ -174,10 +174,10 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_PBSMetal";
 	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
 	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
-	DFMatDesc.textures.tex0 = "PBR//iron//rustediron2_basecolor.dds";
-	DFMatDesc.textures.tex1 = "PBR//iron//rustediron2_normal.dds";
-	DFMatDesc.textures.tex2 = "PBR//iron//rustediron2_metallic.dds";
-	DFMatDesc.textures.tex3 = "PBR//iron//rustediron2_roughness.dds";
+	DFMatDesc.textures.tex0 = "PBR/iron/rustediron2_basecolor.dds";
+	DFMatDesc.textures.tex1 = "PBR/iron/rustediron2_normal.dds";
+	DFMatDesc.textures.tex2 = "PBR/iron/rustediron2_metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR/iron/rustediron2_roughness.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.01f, 1.0f };
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
@@ -192,11 +192,11 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_PBSGold";
 	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
 	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
-	DFMatDesc.textures.tex0 = "PBR//gold_ornate//albedo.dds";
-	DFMatDesc.textures.tex1 = "PBR//gold_ornate//normal.dds";
-	DFMatDesc.textures.tex2 = "PBR//gold_ornate//metallic.dds";
-	DFMatDesc.textures.tex3 = "PBR//gold_ornate//roughness.dds";
-	DFMatDesc.textures.tex4 = "PBR//gold_ornate//ao.dds";
+	DFMatDesc.textures.tex0 = "PBR/gold_ornate/albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR/gold_ornate/normal.dds";
+	DFMatDesc.textures.tex2 = "PBR/gold_ornate/metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR/gold_ornate/roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR/gold_ornate/ao.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.01f, 1.0f };
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
@@ -211,17 +211,17 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_PBSSteel";
 	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
 	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
-	DFMatDesc.textures.tex0 = "PBR//steel_plate//albedo.dds";
-	DFMatDesc.textures.tex1 = "PBR//steel_plate//normal.dds";
-	DFMatDesc.textures.tex2 = "PBR//steel_plate//metallic.dds";
-	DFMatDesc.textures.tex3 = "PBR//steel_plate//roughness.dds";
-	DFMatDesc.textures.tex4 = "PBR//steel_plate//ao.dds";
+	DFMatDesc.textures.tex0 = "PBR/steel_plate/albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR/steel_plate/normal.dds";
+	DFMatDesc.textures.tex2 = "PBR/steel_plate/metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR/steel_plate/roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR/steel_plate/ao.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.01f, 1.0f };
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Pass::Blur | DF::Pass::Shadow;
+	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -230,11 +230,11 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Test";
 	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
 	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
-	DFMatDesc.textures.tex0 = "PBR//gold_ornate//albedo.dds";
-	DFMatDesc.textures.tex1 = "PBR//gold_ornate//normal.dds";
-	DFMatDesc.textures.tex2 = "PBR//gold_ornate//metallic.dds";
-	DFMatDesc.textures.tex3 = "PBR//gold_ornate//roughness.dds";
-	DFMatDesc.textures.tex4 = "PBR//gold_ornate//ao.dds";
+	DFMatDesc.textures.tex0 = "PBR/gold_ornate/albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR/gold_ornate/normal.dds";
+	DFMatDesc.textures.tex2 = "PBR/gold_ornate/metallic.dds";
+	DFMatDesc.textures.tex3 = "PBR/gold_ornate/roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR/gold_ornate/ao.dds";
 	DFMatDesc.material.ambientColor = { 0.2f, 0.2f, 0.02f, 1.0f };
 	DFMatDesc.material.spec_metal = 1.0f;
 	DFMatDesc.material.pow_roughness = 1.0f;
@@ -259,8 +259,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.vertex = "VS_QuadFlare";
 	DFMatDesc.shaders.geometry = "GS_QuadFlare";
 	DFMatDesc.shaders.pixel = "PS_QuadFlare";
-	DFMatDesc.textures.tex0 = "Lens//sunFlare.dds";
-	DFMatDesc.textures.tex1 = "Lens//lensDust.dds";		// make it a separate command maybe
+	DFMatDesc.textures.tex0 = "Lens/sunFlare.dds";
+	DFMatDesc.textures.tex1 = "Lens/lensDust.dds";		// make it a separate command maybe
 	DFMatDesc.effects = DF::Pass::PointSprites;
 
 	DF.MatM->MatAdd(&DFMatDesc);
@@ -318,7 +318,7 @@ void DFMain::LoadScreen() noexcept
 	DF.ModelM->SetScaling(0.2f, 0.2f, 0.2f);
 	DF.ModelM->SetRotation(0.0f, 2.2f, -0.4f);
 	DF.ModelM->SetPos(-0.7f, 0.0f, 2.0f);
-
+	
 	//MdlSphere2
 	DF.ModelM->Create(DF::idSphere, "MdlSphere2", true, 16);
 	DF.ModelM->SetMaterial("Mat_PBSMetal");
@@ -408,12 +408,9 @@ void DFMain::LoadScreen() noexcept
 
 	DF.Camera()->SetAsOrthographic(8.0f, 4.5f, 0.001f, 100.0f);
 	DF.Camera()->LockToCameraTarget(DF.Camera("camMain"));
-
-	// enabling lens dirt effect when rendering to final surface
-	DF::D3DM->Surface("sfcMain")->SetShaders("surface//VS_Surface", "surface//PS_Surface_LensEffect");
 }
 
-void DFMain::CreateMaterials() noexcept
+void DFMain::CreateMaterials() noexcept 
 {
 	//
 }

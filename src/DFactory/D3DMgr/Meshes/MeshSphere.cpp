@@ -43,9 +43,6 @@ MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
 	//create and bind pixel shader
 	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(MatMgr.Mat(matId).shaderPixel);
 
-	// temporary null geometry shader, should be a single command after sprite pass that uses GS
-	m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::Null_GeometryShader>();
-
 	//create and bind InputLayout
 	m_Binds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 

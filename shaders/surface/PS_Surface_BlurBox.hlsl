@@ -8,13 +8,13 @@ Texture2D<float> texDepth : register(t1);
 Texture2D<uint2> texStencil : register(t1);
 SamplerState smplr : register(s0);
 
-static const int r = 4; // kernel
+static const int r = 6; // kernel
 static const int divisor = (r * 2 + 1);
 
 float4 main(float2 tex : TEXCOORD) : SV_TARGET
 {
     // performance saving approximation
-    static const float2 pixelStep = { 0.0007, 0.0012 };
+    static const float2 pixelStep = { 0.0021, 0.0036 };
     
     float4 accColor = tex2D.Sample(smplr, tex);
     

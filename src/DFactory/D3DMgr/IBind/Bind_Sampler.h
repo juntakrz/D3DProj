@@ -18,11 +18,12 @@ namespace Bind
 			Comparison  = 10	// used by hardware PCF sampler comparison state
 		};
 
-		Sampler(UINT mode = Mode::Wrap, UINT slot = 0u);
+		Sampler(UINT mode = Mode::Wrap, UINT slot = 0u, UINT target = DF::ShaderType::PS);
 		void Bind() noexcept override;
 
 	protected:
 		COMPTR<ID3D11SamplerState> m_pSampler;
 		UINT m_slot = 0u;
+		UINT m_target = DF::ShaderType::PS;
 	};
 }

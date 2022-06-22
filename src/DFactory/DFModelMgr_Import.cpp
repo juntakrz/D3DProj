@@ -252,7 +252,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	struct PSConstBuffer
 	{
-		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.7f, 1.0f };
+		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.25f, 1.0f };
 		XMFLOAT3A F0 = { 0.1f, 0.1f, 0.1f };
 		float matIntensity = 2.0f;
 		float spec_metal = 1.12f;

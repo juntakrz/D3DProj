@@ -52,6 +52,6 @@ float4 main(PSInput iPS) : SV_TARGET
     //globalDiffuse.a = (globalDiffuse.r + globalDiffuse.g + globalDiffuse.b) / 3.0;
     
     //final color
-    return float4((globalDiffuse.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a * 1.14);
+    return float4((globalDiffuse.rgb + specular.rgb) * colorTex.rgb, globalDiffuse.a);
 
 }

@@ -71,7 +71,7 @@ private:
 
 	std::unordered_map<std::string, std::unique_ptr<RenderTarget>> renderTargets;
 	std::unordered_map<std::string, std::unique_ptr<DSTarget>> depthTargets;
-	std::unordered_map<std::string, std::unique_ptr<RenderSurface>> surfaceTargets;
+	std::unordered_map<std::string, std::unique_ptr<CRenderSurface>> surfaceTargets;
 
 	// initialize scripts
 	void CreateRenderSR(bool isHDR) noexcept;		//create render buffer copy resource
@@ -121,11 +121,6 @@ public:
 	};
 
 public:
-	// experimental predicate code
-	COMPTR<ID3D11Predicate> m_pPredicate = nullptr;
-	D3D11_QUERY_DESC qPred{ D3D11_QUERY_OCCLUSION_PREDICATE, D3D11_QUERY_MISC_PREDICATEHINT };
-	//
-
 	D3DMgr(HWND hWnd);
 	~D3DMgr();
 	D3DMgr(const D3DMgr&) = delete;
@@ -183,7 +178,7 @@ public:
 	bool	CreateCompatibleTarget(std::string name, std::string srcTarget, bool isDepthTarget, bool createView) noexcept;
 
 	// binds render target view and depth stencil view (no error prevention for speed, define targets with care)
-	void	RTBind(const std::string& renderTarget, const std::string& depthTarget, const uint8_t& num = 1) noexcept;
+	void	RTBind(const std::string& renderTarget, const std::string& depthTarget, const uint8_t& num = 1);
 
 	// copies render target buffer (no error prevention for speed, define targets with care)
 	void	RTCopyTarget(const std::string& srcTarget, const std::string& destTarget, bool isDepthBuffer) noexcept;
@@ -198,21 +193,23 @@ public:
 	void RTSet(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, uint8_t num = 1) noexcept;
 	bool RTRemove(const std::string& name) noexcept;	// deletes render or depth target by its name
 
-	bool RTSetAsShaderResource(const std::string& id, const uint8_t& shaderType, const uint8_t& slot) noexcept;
+	bool RTSetAsShaderResource(const char* id, const uint8_t& shaderType, const uint8_t& slot) noexcept;
+	void RTClearShaderResource(const uint8_t& shaderType, const uint8_t& slot) noexcept;
 
 	/* * * * * * * * * * * * * * */
 
 	/* * * * * * D3DMgr_RS.cpp * */
 
 	// create rendering surface
-	bool						CreateRenderSurface(std::string name, float scale = 1.0f) noexcept;
+	bool						CreateRenderSurface(const char* name, float scale = 1.0f) noexcept;
 
 	// access surface targets
-	RenderSurface*				Surface(const std::string& name) noexcept;
+	CRenderSurface*				Surface(const char* name) noexcept;
 
 	// render to surface targets
-	void						RenderBufferToSurface(const std::string& rtTarget, const std::string& surface) noexcept;
-	void						RenderDepthToSurface(const std::string& dsTarget, const std::string& surface) noexcept;
+	void						RenderBufferToSurface(const char* rtTarget, const char* surface) noexcept;
+	void						RenderDepthToSurface(const char* dsTarget, const char* surface) noexcept;
+	void						RenderSurface(const char* surface) noexcept;
 
 	/* * * * * * * * * * * * * * */
 };

@@ -160,10 +160,6 @@ D3DMgr::D3DMgr(HWND hWnd)
 	// initialize imGui here
 	imGuiMgr::Get();
 	ImGui_ImplDX11_Init(m_pDevice.Get(), m_pContext.Get());
-
-	// experimental predicate code
-	Device()->CreatePredicate(&qPred, &m_pPredicate);
-	//
 }
 
 D3DMgr::~D3DMgr()
@@ -241,11 +237,7 @@ void D3DMgr::BeginFrame() noexcept
 	Clear("rtMain", "dsMain");
 
 	// clear 'blur' buffer only
-	Clear("rtBlur");
-
-	// clear 'downsample' buffers
-	Clear("rtDSample2", "dsDSample2");
-	Clear("rtDSample4", "dsDSample4");
+	Clear("rtBlur", "dsBlur");
 
 	// clear CSM depth buffer
 	ClearDSBuffer("dsCSM");

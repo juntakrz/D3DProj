@@ -68,7 +68,7 @@ public:
 	{
 		int64_t int64bit = 0;
 		uint64_t uint64 = 0;
-		float64 float64bit = 0.0f;
+		double float64bit = 0.0f;
 	} debug;
 
 	ImFont* m_imFont = nullptr;

@@ -27,8 +27,6 @@ MeshPoint::MeshPoint(uint16_t matId) noexcept
 	ID3DBlob* pVSByteCode = pVS->GetByteCode();
 	m_Binds[Bind::idVertexShader] = std::move(pVS);
 
-	m_Binds[Bind::idGeometryShader] = std::make_unique<Bind::GeometryShader>(GS);
-
 	//create and bind pixel shader
 	m_Binds[Bind::idPixelShader] = std::make_unique<Bind::PixelShader>(PS);
 
