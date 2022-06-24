@@ -37,7 +37,7 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 
 	pDesc->textures.tex2 != "" ?
 		newMat.idTex[2] = TextureAdd(pDesc->textures.tex2)
-		: newMat.idTex[2] = TextureAdd("default//default_s.dds");
+		: newMat.idTex[2] = TextureAdd("default//default_metallic.dds");
 
 	pDesc->textures.tex3 != "" ?
 		newMat.idTex[3] = TextureAdd(pDesc->textures.tex3)

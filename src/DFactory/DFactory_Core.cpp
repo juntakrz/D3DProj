@@ -23,9 +23,11 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	_SInstance.pD3DMgr->CreateRenderSurface("sfcBlur", 1.0f);
 	_SInstance.pD3DMgr->CreateRenderSurface("sfcDepth", 1.0f);
 	_SInstance.pD3DMgr->CreateRenderSurface("sfcMix", 1.0f);
+	_SInstance.pD3DMgr->CreateRenderSurface("sfcBloom", 1.0f);
 	_SInstance.pD3DMgr->Surface("sfcBlur")->SetShaders("surface/VS_Surface", "surface/PS_Surface_BlurGauss");
 	_SInstance.pD3DMgr->Surface("sfcDepth")->SetShaders("surface/VS_Surface", "surface/PS_SurfaceDepth");
 	_SInstance.pD3DMgr->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
+	_SInstance.pD3DMgr->Surface("sfcBloom")->SetShaders("surface/VS_Surface", "surface/PS_Surface_HiPass");
 
 	// init light manager
 	_SInstance.LightM = &LightMgr::Get();

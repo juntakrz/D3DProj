@@ -225,6 +225,25 @@ void DFMain::LoadScreen() noexcept
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
+	//Mat_PBSBricks
+	DFMatDesc = {};
+	DFMatDesc.name = "Mat_PBSBricks";
+	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
+	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
+	DFMatDesc.textures.tex0 = "PBR/bricks/albedo.dds";
+	DFMatDesc.textures.tex1 = "PBR/bricks/normal.dds";
+	DFMatDesc.textures.tex3 = "PBR/bricks/roughness.dds";
+	DFMatDesc.textures.tex4 = "PBR/bricks/ao.dds";
+	DFMatDesc.material.matIntensity = 5.0f;
+	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.25f, 1.0f };
+	DFMatDesc.material.spec_metal = 2.0f;
+	DFMatDesc.material.pow_roughness = 3.0f;
+	DFMatDesc.material.F0 = { 0.07f, 0.06f, 0.05f };
+	DFMatDesc.material.bumpIntensity = 2.2f;
+	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
+
+	DF.MatM->MatAdd(&DFMatDesc);
+
 	//Mat_Test
 	DFMatDesc = {};
 	DFMatDesc.name = "Mat_Test";
@@ -298,7 +317,7 @@ void DFMain::LoadScreen() noexcept
 	
 	//MdlCube1
 	DF.ModelM->Create(DF::idCube, "MdlCube1");
-	DF.ModelM->SetMaterial("Mat_Test");
+	DF.ModelM->SetMaterial("Mat_PBSBricks");
 	DF.ModelM->SetPos(1.0f, -1.0f, 2.0f);
 	DF.ModelM->SetScaling(1.0f, 1.0f, 1.0f);
 	DF.ModelM->SetRotation(0.8f, 1.2f, 0.0f);

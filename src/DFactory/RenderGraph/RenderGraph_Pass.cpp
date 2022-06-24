@@ -262,57 +262,56 @@ bool RenderGraph::PassSprites(const char* technique, const char* depthSRV) noexc
 	return true;
 }
 
-bool RenderGraph::PostBlur(const char* in_RT, const char* out_RT, const char* out_DS, const uint8_t& stages) noexcept
+bool RenderGraph::PostBlur(const char* in_RT) noexcept
 {
+	// bind gauss kernel and coefficients buffer to PS register 2
+	DCB("GaussCoef").BindToPS(2u);
 
-	if (stages > 0) {			// BLUR PASS #1 (downsample 2x)
+	DF::D3DM->Clear("rtPPBlur", "", true);
 
-		// bind gauss kernel and coefficients buffer to PS register 2
-		DCB("GaussCoef").BindToPS(2u);
+	// bind 'downsample' render and depth buffers with equal resolution
+	DF::D3DM->RTBind("rtPPBlur", "");
 
-		DF::D3DM->Clear("rtDSample2", "dsDSample2");
+	// set horizontal direction for gauss blur
+	DCB("ScanH").BindToPS(0u);
 
-		// bind 'downsample' render and depth buffers with equal resolution
-		DF::D3DM->RTBind("rtDSample2", "dsDSample2");
+	// render to downscaled 2x surface that has blur shaders using fxBlur buffer
+	DF::D3DM->RenderBufferToSurface(in_RT, "sfcBlur");
 
-		// set horizontal direction for gauss blur
-		DCB("ScanH").BindToPS(0u);
+	// make a copy of a buffer to render it again
+	DF::D3DM->RTCopyTarget("rtPPBlur", "rtPPBlurCopy", false);
 
-		// render to downscaled 2x surface that has blur shaders using fxBlur buffer
-		DF::D3DM->RenderBufferToSurface(in_RT, "sfcBlur");
+	// clear buffers so rendering of alpha won't be additive
+	DF::D3DM->Clear("rtPPBlur", "", true);
 
-		// make a copy of a buffer to render it again
-		DF::D3DM->RTCopyTarget("rtDSample2", "rtDS2Copy", false);
+	// set vertical direction for gauss blur
+	DCB("ScanV").BindToPS(0u);
 
-		// clear buffers so rendering of alpha won't be additive
-		DF::D3DM->Clear("rtDSample2", "dsDSample2");
+	// render 'downsample' buffer to 'blur' surface
+	DF::D3DM->RenderBufferToSurface("rtPPBlurCopy", "sfcBlur");
 
-		// set vertical direction for gauss blur
-		DCB("ScanV").BindToPS(0u);
+	return true;
+}
 
-		// render 'downsample' buffer to 'blur' surface
-		DF::D3DM->RenderBufferToSurface("rtDS2Copy", "sfcBlur");
+bool RenderGraph::PostBloom(const char* in_RT) noexcept
+{
+	// prepare render target
+	DF::D3DM->Clear("rtPPBloom");
+	DF::D3DM->RTBind("rtPPBloom", "");
 
-		DF::D3DM->Clear(out_RT, out_DS);
+	DCB("stepBloom").BindToPS(1u);
+	DF::D3DM->RenderBufferToSurface(in_RT, "sfcBloom");
 
-		// bind 'render' buffer and corresponding depth buffer
-		DF::D3DM->RTBind(out_RT, out_DS);
+	PostBlur("rtPPBloom");
 
-		DF::D3DM->RTSetAsShaderResource("rtDSample2", DF::ShaderType::PS, 1u);
-		DF::D3DM->RTSetAsShaderResource("dsMainCopy", DF::ShaderType::PS, 2u);
-		DF::D3DM->RTSetAsShaderResource("dsBlur", DF::ShaderType::PS, 3u);
+	DF::D3DM->RTCopyTarget("rtPPBlur", "rtPPStore2X", false);
 
-		DF::D3DM->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
+	DCB("stepBlur").BindToPS(1u);
+	PostBlur("rtPPStore2X");
+	DF::D3DM->RTCopyTarget("rtPPBlur", "rtPPStore2X", false);
+	PostBlur("rtPPStore2X");
 
-		DF::D3DM->RenderBufferToSurface("rtMain", "sfcMix");
-
-		return true;
-	}
-
-	DF::D3DM->RTBind("rtMain", "dsMain");
-	DF::D3DM->RenderBufferToSurface("rtBlur", "sfcMain");
-
-	return false;		// didn't do blur passes
+	return true;
 }
 
 void RenderGraph::MergeDepthBuffers(const char* idA, const char* idB, const char* dsTarget, const char* surface) noexcept

@@ -10,7 +10,7 @@ namespace DF
 	namespace CSM
 	{
 		float bufferSize = 2048.0f;
-		float FOVmult = 6.0f;
+		float FOVmult = 5.5f;
 		float minZ = 0.01f;
 		float maxZ = 48.0f;
 	}

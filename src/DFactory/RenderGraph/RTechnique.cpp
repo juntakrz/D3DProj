@@ -119,6 +119,8 @@ void RTechnique::InitTechniques() noexcept
 
 		m_TechDB[techId].m_Camera = "$active_camera";
 
+		m_TechDB[techId].m_BindLights = true;
+
 		m_TechDB[techId].m_depthState = DF::DS_Mode::DOff_SOff;
 	}
 
