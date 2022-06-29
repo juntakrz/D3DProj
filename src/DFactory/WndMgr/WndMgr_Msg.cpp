@@ -55,6 +55,14 @@ LRESULT CALLBACK WndMgr::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		!mouse.IsCursorOn() ? LockMouse() : void();
 		break;
 	}
+	case WM_DISPLAYCHANGE:
+	case WM_SIZE:
+	{
+		if (pD3DMgr) {
+			pD3DMgr->m_pSwap->ResizeBuffers(2u, pD3DMgr->GetResolution().x, pD3DMgr->GetResolution().y, DXGI_FORMAT_UNKNOWN, NULL);
+		}
+		break;
+	}
 
 	//CKbd.h KEYBOARD MESSAGES
 	case WM_KEYDOWN:

@@ -1,5 +1,6 @@
-Texture2D tex2D;
-SamplerState smplr;
+Texture2D tex2D         : register(t0);
+Texture2D texLens       : register(t1);
+SamplerState smplr      : register(s0);
 
 float Noise1(float n)
 {
@@ -84,7 +85,8 @@ float4 main(float2 tex : TEXCOORD0, float1 inAlpha : TEXCOORD1, float2 fpos : TE
     float2 coords = fpos + 0.5;
     float4 albedo = float4(color, 1.0) + tex2D.Sample(smplr, coords - tex) * 0.5;
     
-    //float4 albedo = float4(color, 1.0) + tex2D.Sample(smplr, tex) * max(0.2, (1.0 - dist) * 0.45);
+    // add lens dust effect to flare
+    float3 lensColor = texLens.Sample(smplr, tex).rgb * albedo.rgb * 1.5;
     
-    return float4(albedo.rgb, alpha * inAlpha);
+    return float4(albedo.rgb + lensColor, alpha * inAlpha);
 }

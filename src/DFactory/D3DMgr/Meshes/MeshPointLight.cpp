@@ -50,7 +50,7 @@ void MeshPointLight::DisableLightMesh() noexcept
 	m_showMesh = false;
 }
 
-void MeshPointLight::Draw() noexcept
+void MeshPointLight::DrawIndexed() noexcept
 {
 	for (const auto& it : *Binds())
 	{

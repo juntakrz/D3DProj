@@ -16,6 +16,7 @@ class D3DMgr
 {
 private:
 	friend class MeshCore;
+	friend class WndMgr;
 
 	// core
 	D3D_FEATURE_LEVEL					m_d3dFeatureLvl;
@@ -142,7 +143,7 @@ public:
 	void EndFrame();
 
 	//clear buffer only (optionally corresponding depth buffer)
-	void Clear(const std::string& renderTarget, const std::string& depthTarget = "") noexcept;
+	void Clear(const std::string& renderTarget, const std::string& depthTarget = "", const bool isTransparent = false) noexcept;
 	void Clear(const std::string& renderTarget, const std::string& depthTarget, const XMFLOAT4& color) noexcept;
 
 	// clear depth stencil buffer

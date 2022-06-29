@@ -28,7 +28,7 @@ void LightMgr::Reset() noexcept {
 void LightMgr::Draw() const noexcept {
 
 	for (const auto& it : m_PLights) {
-		it.pMesh->Draw();
+		it.pMesh->DrawIndexed();
 	}
 }
 

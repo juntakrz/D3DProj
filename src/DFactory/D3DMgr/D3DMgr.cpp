@@ -14,7 +14,7 @@ D3DMgr::D3DMgr(HWND hWnd)
 	SwapDesc.BufferDesc.RefreshRate.Numerator = 0;
 	SwapDesc.BufferDesc.RefreshRate.Denominator = 0;
 	SwapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	SwapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	SwapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
 	SwapDesc.SampleDesc.Count = 1;
 	SwapDesc.SampleDesc.Quality = 0;
 	SwapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
@@ -22,7 +22,7 @@ D3DMgr::D3DMgr(HWND hWnd)
 	SwapDesc.OutputWindow = hWnd;
 	SwapDesc.Windowed = true;
 	SwapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;	//buffer swapping style
-	SwapDesc.Flags = NULL;
+	SwapDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	UINT rlFlags = 0u;
 #ifdef _DEBUG || _DFDEBUG
@@ -46,12 +46,14 @@ D3DMgr::D3DMgr(HWND hWnd)
 		d3dFeatureLvl,					//a handle to D3D feature levels
 		(UINT)std::size(d3dFeatureLvl),	//number of elements in the above
 		D3D11_SDK_VERSION,
-		&SwapDesc,							//returns swap chain descriptor
+		&SwapDesc,						//returns swap chain descriptor
 		&m_pSwap,						//returns swap chain
 		&m_pDevice,						//returns device
 		&m_d3dFeatureLvl,				//returns current feature level
 		&m_pContext
 	));
+
+	//m_pSwap->SetFullscreenState(true, NULL);
 
 	// initialize back render target and depth buffer
 	renderTargets[rtName] = std::make_unique<RenderTarget>();
@@ -237,7 +239,7 @@ void D3DMgr::BeginFrame() noexcept
 	Clear("rtMain", "dsMain");
 
 	// clear 'blur' buffer only
-	Clear("rtBlur", "dsBlur");
+	Clear("rtBlur", "dsBlur", true);
 
 	// clear CSM depth buffer
 	ClearDSBuffer("dsCSM");
@@ -270,11 +272,10 @@ void D3DMgr::EndFrame()
 
 // // //
 
-void D3DMgr::Clear(const std::string& renderTarget, const std::string& depthTarget) noexcept
+void D3DMgr::Clear(const std::string& renderTarget, const std::string& depthTarget, const bool isTransparent) noexcept
 {
 	// clear primary targets with opaque color and all other with transparent
-	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0 };
-	(renderTarget != "rtBack" || renderTarget != "rtMain") ? clearColor[3] = 0.0f : 0;
+	float clearColor[4] = { 0.0f, 0.0f, 0.0f, (isTransparent) ? 0.0f : 1.0f };
 
 	m_pContext->ClearRenderTargetView(renderTargets.at(renderTarget)->pRTV.Get(), clearColor);
 

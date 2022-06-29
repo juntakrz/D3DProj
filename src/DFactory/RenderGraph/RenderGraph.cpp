@@ -27,10 +27,13 @@ RenderGraph::RenderGraph() noexcept
 	DCB("ScanH").GenerateBuffer(1.0f, 0.0f);
 	DCB("ScanV").GenerateBuffer(0.0f, 1.0f);
 
+	// calculate pixel step for blur shaders
+	DirectX::XMFLOAT2 resolution = XMFLOAT2(1.0f / (DF::D3DM->GetResolution().x * 0.5f), 1.0f / (DF::D3DM->GetResolution().y * 0.5f));
+	DCB("stepBlur").GenerateBuffer(resolution.x, resolution.y);
+	DCB("stepBloom").GenerateBuffer(resolution.x * 6.0f, resolution.y * 3.0f);
+
 	DCB("GaussCoef").GenerateBuffer(std::move(coef));
-	DCB("MainMixBlur").GenerateBuffer(1.00f);		// 0.88
-	DCB("MainMixLens").GenerateBuffer(0.51f);		// 0.71
-	DCB("MainMixBloom").GenerateBuffer(0.91f);
+	DCB("bloomInterpolation").GenerateBuffer(1.65f);
 }
 
 void RenderGraph::RenderFrame() noexcept
@@ -54,8 +57,23 @@ void RenderGraph::RenderFrame() noexcept
 	Pass("Blur");						// draw to 'rtBlur' and 'dsBlur'
 	// copy to an extra depth texture as 'dsMain' will get refilled with combined depth data of 'Main' and 'Blur' layers
 	DF::D3DM->RTCopyTarget("dsMain", "dsMainCopy", true);
-	PostBlur("rtBlur", "rtMix");		// post process blur with input / output stages
+
+	DCB("stepBlur").BindToPS(1u);
+	PostBlur("rtBlur");					// post process blur using defined texture as a source, outputs to rtPPBlur
 	//
+
+	// rewrite it as a buffer mix method
+	DF::D3DM->Clear("rtMix", "");
+
+	DF::D3DM->RTBind("rtMix", "");
+
+	DF::D3DM->RTSetAsShaderResource("rtPPBlur", DF::ShaderType::PS, 1u);
+	DF::D3DM->RTSetAsShaderResource("dsMainCopy", DF::ShaderType::PS, 2u);
+	DF::D3DM->RTSetAsShaderResource("dsBlur", DF::ShaderType::PS, 3u);
+
+	DF::D3DM->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
+
+	DF::D3DM->RenderBufferToSurface("rtMain", "sfcMix");
 
 	// store layer-merged depth buffer in an extra texture for later re-use
 	DF::D3DM->RTCopyTarget("dsMain", "dsMainCopy", true);
@@ -73,14 +91,18 @@ void RenderGraph::RenderFrame() noexcept
 	DF::D3DM->RTCopyTarget("rtMix", "rtMixCopy", false);
 	PassSprites("PointSprites", "dsMainCopy");
 
+	// do bloom post processing with multiple passes on the final image
+	PostBloom("rtMain");
+
 	// bind main back buffer and its depth buffer
 	DF::D3DM->RTBind("rtBack", "dsBack");
 
+	// mix in PP bloom results and lens dust effect
 	// bind lens dirt texture to PS to use in the final surface rendering
-	DF::Engine->MatM->BindTextureToPS("Lens/lensDust.dds", 1u);
-
-	DCB("MainMixLens").BindToPS(0u);
-	DF::D3DM->Surface("sfcMain")->SetShaders("surface/VS_Surface", "surface/PS_Surface_LensEffect");
+	DF::D3DM->RTSetAsShaderResource("rtPPBlur", DF::ShaderType::PS, 1u);
+	DF::Engine->MatM->BindTextureToPS("Lens/lensDust.dds", 2u);
+	DCB("bloomInterpolation").BindToPS(0u);
+	DF::D3DM->Surface("sfcMain")->SetShaders("surface/VS_Surface", "surface/PS_Surface_MixBloom");
 
 	// draw the primary surface using data from render buffer 1 or draw depth data
 	(DF::D3DM->GetShowDepth())

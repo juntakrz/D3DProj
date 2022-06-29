@@ -44,9 +44,6 @@ void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
 {
 	for (uint32_t i = 0; i < m_pMeshes.size(); i++)
 	{
-		if (m_pMeshes[i]->GetTechniqueIds() == 32)
-			std::string x;
-
 		// generate job using technique flags
 		(i < m_pAABBs.size() && m_pAABBs[i])
 			? (m_pMeshes[i]->m_QueryResult > 0) ? renderMgr->CreateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds()) : void()

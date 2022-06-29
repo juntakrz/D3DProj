@@ -21,7 +21,7 @@ public:
 	void EnableLightMesh() noexcept;
 	void DisableLightMesh() noexcept;
 
-	void Draw() noexcept;
+	void DrawIndexed() noexcept;
 
 	void DEBUG_Rotate(float delta = 0.0f) noexcept;
 

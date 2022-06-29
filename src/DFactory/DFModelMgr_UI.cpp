@@ -54,9 +54,6 @@ void DFModelMgr::ShowEditWindow() noexcept
 		ImGui::SameLine();
 		check(ImGui::DragFloat("##Z", &model.transform.translation.z, 0.01f, -100.0f, 100.0f, "%.2f", 1.0f));
 
-		if (modelAdjusted)
-			std::string x;
-
 		if (ImGui::Button("Recall", ImVec2(96, 20)))
 		{
 			model.transform.translation = DFModelM_UIData.tempTranslation;

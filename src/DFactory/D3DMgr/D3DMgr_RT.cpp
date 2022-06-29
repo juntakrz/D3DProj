@@ -311,11 +311,13 @@ void D3DMgr::RTInitBuffers(bool isHDR) noexcept
 	CreateCompatibleTarget("rtMix", "rtMain", false, true);
 	CreateCompatibleTarget("rtMixCopy", "rtMix", false, true);
 
-	// create downsampled render and depth buffer for post processing
-	CreateRenderTarget("rtDSample2", m_VWidth / 2, m_VHeight / 2, isHDR);
-	CreateDepthTarget("dsDSample2", "rtDSample2");
+	// create downsampled render buffer for blur post processing
+	CreateRenderTarget("rtPPBlur", m_VWidth / 2, m_VHeight / 2, isHDR);
+	CreateCompatibleTarget("rtPPBlurCopy", "rtPPBlur", false, true);
 
-	CreateCompatibleTarget("rtDS2Copy", "rtDSample2", false, true);
+	// create downsampled render buffer for bloom post processing
+	CreateRenderTarget("rtPPBloom", m_VWidth / 2, m_VHeight / 2, isHDR);
+	CreateCompatibleTarget("rtPPStore2X", "rtPPBloom", false, true);
 
 	// create depth buffer for shadows
 	CreateDepthTarget("dsCSM", DF::CSM::bufferSize * DF::CSM::cascades, DF::CSM::bufferSize, true, DF::DS_Usage::DepthShadow);

@@ -33,9 +33,11 @@ private:
 	bool PassSprites(const char* technique, const char* depthSRV) noexcept;	// sprite/billboard pass
 
 	/* runs surface blur with one or more downsampling stages, doesn't run if stages are 0 (currently only 1 stage is implemented)
-	takes a texture/buffer to blur and outputs the result to the provided texture/buffer
-	depth texture is optional if it depth data needs to be replaced with a fullscreen quad */
-	bool PostBlur(const char* in_RT, const char* out_RT, const char* out_DS = "", const uint8_t& stages = 1) noexcept;
+	takes a texture/buffer to blur and outputs the result to 'rtPPBlur' */
+	bool PostBlur(const char* in_RT) noexcept;
+
+	/* runs provided texture/buffer through a high pass shader, then blurs the result */
+	bool PostBloom(const char* in_RT) noexcept;
 
 	// merges depth buffers A & B into selected target and depth buffer using set surface
 	void MergeDepthBuffers(const char* idA, const char* idB, const char* dsTarget, const char* surface) noexcept;
