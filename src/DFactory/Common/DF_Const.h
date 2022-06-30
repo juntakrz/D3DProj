@@ -147,6 +147,7 @@ namespace DF
 
 	constexpr uint8_t maxPointLights = 8u;
 	constexpr uint8_t maxTextures = 6u;
+	constexpr float minQueryDepth = 5.0f;
 	extern bool isCullingEnabled;
 	extern uint64_t framesRendered;
 }

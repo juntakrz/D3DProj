@@ -61,7 +61,7 @@ void RenderGraph::RenderFrame() noexcept
 	DCB("stepBlur").BindToPS(1u);
 	PostBlur("rtBlur");					// post process blur using defined texture as a source, outputs to rtPPBlur
 	//
-
+	/* NEEDS TO BE DONE BETTER
 	Pass("AABBShow");
 	COMPTR<ID3D11RasterizerState> pRState;
 	D3D11_RASTERIZER_DESC RDesc{};
@@ -69,6 +69,7 @@ void RenderGraph::RenderFrame() noexcept
 	RDesc.FillMode = D3D11_FILL_SOLID;
 	DF::Device()->CreateRasterizerState(&RDesc, &pRState);
 	DF::Context()->RSSetState(pRState.Get());
+	*/
 	
 	// rewrite it as a buffer mix method
 	DF::D3DM->Clear("rtMix", "");

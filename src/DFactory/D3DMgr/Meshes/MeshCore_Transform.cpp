@@ -2,10 +2,32 @@
 
 void MeshCore::XMUpdate(FXMMATRIX transform) noexcept
 {
-	//receive transform from the node and apply it to the mesh transform
+	// receive transform from the node and apply it to the mesh transform
 	xmMain = transform;
 
 	DirectX::XMStoreFloat3A(&xmPos, DirectX::FXMVECTOR(xmMain.r[3]));
+
+	// calculate distance to camera using the closest AABB coordinate
+	if (m_hasOwnAABB)
+	{
+		XMVECTOR p1 = XMLoadFloat3(&m_AABBcoords[0]);
+		XMVECTOR p2 = XMLoadFloat3(&m_AABBcoords[1]);
+
+		p1 = XMVector3Transform(p1, xmMain);
+		p2 = XMVector3Transform(p2, xmMain);
+
+		XMVECTOR camPos = XMLoadFloat3(&DF::D3DM->Camera()->GetPos());
+
+		XMVECTOR v1 = p1 - camPos;
+		XMVECTOR v2 = p2 - camPos;
+
+		XMFLOAT3 d1, d2;
+
+		XMStoreFloat3(&d1, XMVector3Length(v1));
+		XMStoreFloat3(&d2, XMVector3Length(v2));
+
+		(d2.x < d1.x) ? m_distanceToCamera = d2.x : m_distanceToCamera = d1.x;
+	}
 }
 
 DirectX::XMMATRIX MeshCore::GetXMTransform() const noexcept

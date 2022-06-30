@@ -46,11 +46,14 @@ void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
 	{
 		// generate job using technique flags
 		(i < m_pAABBs.size() && m_pAABBs[i])
-			? (m_pMeshes[i]->m_QueryResult > 0) ? renderMgr->CreateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds()) : void()
+			? (m_pMeshes[i]->m_queryResult > 0) ? renderMgr->CreateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds()) : void()
 			: renderMgr->CreateJob(m_pMeshes[i], m_pMeshes[i]->GetTechniqueIds());
 
 		// generate occlusion test query jobs using AABBs if available
-		(i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->CreateQueryJob(m_pMeshes[i], m_pAABBs[i]) : void();
+		(i < m_pAABBs.size() && m_pAABBs[i] && m_pMeshes[i]->m_distanceToCamera > DF::minQueryDepth) ? renderMgr->CreateQueryJob(m_pMeshes[i], m_pAABBs[i]) : void();
+		
+		// if distance from camera/view to mesh is less than query depth threshold - always draw it
+		(m_pMeshes[i]->m_distanceToCamera < DF::minQueryDepth) ? m_pMeshes[i]->m_queryResult = true : 0;
 
 		// if debug-showing AABBs enabled - show them in a special pass
 		(true) ? (i < m_pAABBs.size() && m_pAABBs[i]) ? renderMgr->CreateJob(m_pAABBs[i], DF::Pass::AABBShow) : void() : void();

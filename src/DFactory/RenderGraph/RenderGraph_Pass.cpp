@@ -200,7 +200,7 @@ bool RenderGraph::PassQuery(const char* technique) noexcept
 
 		for (auto& it : *pJobs)
 		{
-			it.pMesh->m_QueryResult = 100;
+			it.pMesh->m_queryResult = 100;
 		}
 		break;
 	}

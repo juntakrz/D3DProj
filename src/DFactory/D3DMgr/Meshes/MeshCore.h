@@ -67,9 +67,11 @@ public:
 	uint16_t m_MaterialIndex = 0;			// material index used by this mesh with a standard technique
 	uint32_t m_TechniqueIds;				// technique ids in bit format, applied to this mesh
 
-	bool m_isAABB = false;					// is this mesh bounding mesh
+	bool m_isAABB = false;					// is this mesh - a bounding mesh
+	bool m_hasOwnAABB = false;				// does this mesh have a corresponding bounding mesh coords generated
 	bool m_isPredicateEnabled = false;
-	BOOL m_QueryResult = true;				// GPU occlusion query result
+	BOOL m_queryResult = true;				// GPU occlusion query result
+	float m_distanceToCamera = 0.0f;		// distance to camera, used in depth sorting and occlusion querying
 
 protected:
 	void AddMaterialBind(uint16_t matIndex) noexcept;	
