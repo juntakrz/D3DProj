@@ -39,6 +39,9 @@ private:
 	/* runs provided texture/buffer through a high pass shader, then blurs the result */
 	bool PostBloom(const char* in_RT) noexcept;
 
+	/* mixes two render buffers and two depth buffers and outputs them to designated render and depth buffers */
+	void MixLayers(const char* renderTgt, const char* depthTgt, const char* renderRes1, const char* renderRes2, const char* depthRes1, const char* depthRes2) noexcept;
+
 	// merges depth buffers A & B into selected target and depth buffer using set surface
 	void MergeDepthBuffers(const char* idA, const char* idB, const char* dsTarget, const char* surface) noexcept;
 

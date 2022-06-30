@@ -318,6 +318,21 @@ bool RenderGraph::PostBloom(const char* in_RT) noexcept
 	return true;
 }
 
+void RenderGraph::MixLayers(const char* renderTgt, const char* depthTgt, const char* renderRes1, const char* renderRes2, const char* depthRes1, const char* depthRes2) noexcept
+{
+	DF::D3DM->Clear(renderTgt, depthTgt);
+
+	DF::D3DM->RTBind(renderTgt, depthTgt);
+
+	DF::D3DM->RTSetAsShaderResource(renderRes2, DF::ShaderType::PS, 1u);
+	DF::D3DM->RTSetAsShaderResource(depthRes1, DF::ShaderType::PS, 2u);
+	DF::D3DM->RTSetAsShaderResource(depthRes2, DF::ShaderType::PS, 3u);
+
+	DF::D3DM->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
+
+	DF::D3DM->RenderBufferToSurface(renderRes1, "sfcMix");
+}
+
 void RenderGraph::MergeDepthBuffers(const char* idA, const char* idB, const char* dsTarget, const char* surface) noexcept
 {
 	// unbind buffers if bound

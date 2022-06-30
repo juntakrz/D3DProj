@@ -74,18 +74,8 @@ void RenderGraph::RenderFrame() noexcept
 		DF::Context()->RSSetState(pRState.Get());
 		*/
 
-		// rewrite it as a buffer mix method
-		DF::D3DM->Clear("rtMix", "");
-
-		DF::D3DM->RTBind("rtMix", "");
-
-		DF::D3DM->RTSetAsShaderResource("rtPPBlur", DF::ShaderType::PS, 1u);
-		DF::D3DM->RTSetAsShaderResource("dsMainCopy", DF::ShaderType::PS, 2u);
-		DF::D3DM->RTSetAsShaderResource("dsBlur", DF::ShaderType::PS, 3u);
-
-		DF::D3DM->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
-
-		DF::D3DM->RenderBufferToSurface("rtMain", "sfcMix");
+		// mix standard and blur layers to get unified visuals and depth
+		MixLayers("rtMix", "dsMain", "rtMain", "rtPPBlur", "dsMainCopy", "dsBlur");
 
 		// store layer-merged depth buffer in an extra texture for later re-use
 		DF::D3DM->RTCopyTarget("dsMain", "dsMainCopy", true);
