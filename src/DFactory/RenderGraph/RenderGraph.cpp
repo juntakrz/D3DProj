@@ -33,7 +33,7 @@ RenderGraph::RenderGraph() noexcept
 	DCB("stepBloom").GenerateBuffer(resolution.x * 6.0f, resolution.y * 3.0f);
 
 	DCB("GaussCoef").GenerateBuffer(std::move(coef));
-	DCB("bloomInterpolation").GenerateBuffer(1.65f);
+	DCB("bloomPow").GenerateBuffer(1.8f);
 }
 
 void RenderGraph::RenderFrame() noexcept
@@ -101,7 +101,7 @@ void RenderGraph::RenderFrame() noexcept
 	// bind lens dirt texture to PS to use in the final surface rendering
 	DF::D3DM->RTSetAsShaderResource("rtPPBlur", DF::ShaderType::PS, 1u);
 	DF::Engine->MatM->BindTextureToPS("Lens/lensDust.dds", 2u);
-	DCB("bloomInterpolation").BindToPS(0u);
+	DCB("bloomPow").BindToPS(0u);
 	DF::D3DM->Surface("sfcMain")->SetShaders("surface/VS_Surface", "surface/PS_Surface_MixBloom");
 
 	// draw the primary surface using data from render buffer 1 or draw depth data

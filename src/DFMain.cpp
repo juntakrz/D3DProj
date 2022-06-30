@@ -221,7 +221,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
+	DFMatDesc.effects = DF::Pass::Blur | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 

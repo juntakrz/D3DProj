@@ -308,8 +308,8 @@ bool RenderGraph::PostBloom(const char* in_RT) noexcept
 
 	DCB("stepBlur").BindToPS(1u);
 	PostBlur("rtPPStore2X");
-	DF::D3DM->RTCopyTarget("rtPPBlur", "rtPPStore2X", false);
-	PostBlur("rtPPStore2X");
+	//DF::D3DM->RTCopyTarget("rtPPBlur", "rtPPStore2X", false);
+	//PostBlur("rtPPStore2X");
 
 	return true;
 }
