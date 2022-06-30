@@ -98,6 +98,8 @@ void DFMain::LoadScreen() noexcept
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
+	DF::isLoadScreen = true;
+
 	DF.BeginFrame();
 	
 	DF.ModelM->Create(DF::idPlane, "MdlLoadScr", false);
@@ -110,6 +112,8 @@ void DFMain::LoadScreen() noexcept
 	DF.DrawFrame();
 
 	DF.EndFrame();
+
+	DF::isLoadScreen = false;
 	
 	//Mat_Mars
 	DFMatDesc = {};

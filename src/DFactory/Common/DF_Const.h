@@ -150,4 +150,5 @@ namespace DF
 	constexpr float minQueryDepth = 5.0f;
 	extern bool isCullingEnabled;
 	extern uint64_t framesRendered;
+	extern bool isLoadScreen;
 }

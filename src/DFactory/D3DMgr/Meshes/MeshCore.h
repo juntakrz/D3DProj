@@ -49,7 +49,7 @@ protected:
 	COMPTR<ID3D11Query> m_pQuery = nullptr;
 	//COMPTR<ID3D11Predicate> m_pPredicate = nullptr;
 	D3D11_QUERY_DESC m_qPDesc{ D3D11_QUERY_OCCLUSION_PREDICATE };
-	const uint8_t m_queryDelay = 2;
+	const uint8_t m_queryDelay = 2;		// frames in between GPU queries
 	uint8_t m_framesElapsed = 0;		// frames since the last query
 
 	// BUFFERS

@@ -7,26 +7,30 @@ void MeshCore::XMUpdate(FXMMATRIX transform) noexcept
 
 	DirectX::XMStoreFloat3A(&xmPos, DirectX::FXMVECTOR(xmMain.r[3]));
 
-	// calculate distance to camera using the closest AABB coordinate
-	if (m_hasOwnAABB)
+	// calculate distance to camera using either the closest AABB coordinate or mesh origin if it's the nearest
+	//if (m_hasOwnAABB)
 	{
-		XMVECTOR p1 = XMLoadFloat3(&m_AABBcoords[0]);
-		XMVECTOR p2 = XMLoadFloat3(&m_AABBcoords[1]);
+		XMVECTOR p0 = XMLoadFloat3(&m_AABBcoords[0]);
+		XMVECTOR p1 = XMLoadFloat3(&m_AABBcoords[1]);
 
+		p0 = XMVector3Transform(p0, xmMain);
 		p1 = XMVector3Transform(p1, xmMain);
-		p2 = XMVector3Transform(p2, xmMain);
 
 		XMVECTOR camPos = XMLoadFloat3(&DF::D3DM->Camera()->GetPos());
 
+		XMVECTOR v0 = p0 - camPos;
 		XMVECTOR v1 = p1 - camPos;
-		XMVECTOR v2 = p2 - camPos;
+		XMVECTOR vP = xmMain.r[3] - camPos;		// retrieving mesh origin
 
-		XMFLOAT3 d1, d2;
+		XMFLOAT3 d0, d1, dP;
 
+		XMStoreFloat3(&d0, XMVector3Length(v0));
 		XMStoreFloat3(&d1, XMVector3Length(v1));
-		XMStoreFloat3(&d2, XMVector3Length(v2));
+		XMStoreFloat3(&dP, XMVector3Length(vP));
 
-		(d2.x < d1.x) ? m_distanceToCamera = d2.x : m_distanceToCamera = d1.x;
+		m_distanceToCamera = d0.x;
+		m_distanceToCamera = std::min(d1.x, m_distanceToCamera);
+		m_distanceToCamera = std::min(dP.x, m_distanceToCamera);
 	}
 }
 
