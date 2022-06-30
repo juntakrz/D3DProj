@@ -741,6 +741,9 @@
     <None Include="src\include\assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="maps\default.dmap\materials.json" />
+    <None Include="maps\default.dmap\loadscreen.json" />
+    <None Include="maps\default.dmap\models.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc">

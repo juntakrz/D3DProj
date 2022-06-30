@@ -1,0 +1,8 @@
+{
+  "Mat_LoadScr": {
+    "vs": "VS_FlatTexture",
+    "ps": "PS_FlatTexture",
+    "tex0": "img_loadscr.dds",
+    "manageTextures": true
+  }
+}
