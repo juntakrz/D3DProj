@@ -8,6 +8,14 @@ Texture2D texBloom      : register(t1);
 Texture2D texLens       : register(t2);
 SamplerState smplr      : register(s0);
 
+float3 jodieReinhardTonemap(float3 c)
+{
+    float l = dot(c, float3(0.2126, 0.7152, 0.0722));
+    float3 tc = c / (c + 1.0);
+
+    return lerp(c / (l + 1.0), tc, tc);
+}
+
 float4 main(float2 tex : TEXCOORD) : SV_TARGET
 {
     // sample main buffer
@@ -24,7 +32,7 @@ float4 main(float2 tex : TEXCOORD) : SV_TARGET
     float3 lensColor = float3(lensRed, lensGreen, lensBlue) * bloomColor * 8.0;
     
     float3 finalColor = mainColor + bloomColor + lensColor;
-    finalColor = pow(finalColor, 1.0 / 2.2);
+    finalColor = pow(jodieReinhardTonemap(finalColor), 1.0 / 2.2);
     
     return float4(finalColor, 1.0);
 }

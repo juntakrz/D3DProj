@@ -33,7 +33,7 @@ RenderGraph::RenderGraph() noexcept
 	DCB("stepBloom").GenerateBuffer(resolution.x * 6.0f, resolution.y * 3.0f);
 
 	DCB("GaussCoef").GenerateBuffer(std::move(coef));
-	DCB("bloomPow").GenerateBuffer(1.8f);
+	DCB("bloomPow").GenerateBuffer(1.65f);
 }
 
 void RenderGraph::RenderFrame() noexcept
