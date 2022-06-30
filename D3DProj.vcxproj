@@ -78,13 +78,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>$(ProjectDir)\src\assimp\bin;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)\src\assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\src\include\assimp\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)\src\include;$(IncludePath)</IncludePath>
+    <SourcePath>$(VC_SourcePath);$(ProjectDir)\src\include</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)\src\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)\src\assimp\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)\src\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\src\include\assimp\bin;$(LibraryPath)</LibraryPath>
+    <SourcePath>$(VC_SourcePath);$(ProjectDir)\src\include</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -153,7 +155,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -262,13 +264,13 @@
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshCube.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshPlane.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshSphere.cpp" />
-    <ClCompile Include="src\imgui\imgui.cpp" />
-    <ClCompile Include="src\imgui\imgui_demo.cpp" />
-    <ClCompile Include="src\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_win32.cpp" />
-    <ClCompile Include="src\imgui\imgui_tables.cpp" />
-    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\include\imgui\imgui.cpp" />
+    <ClCompile Include="src\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\include\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\include\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
@@ -342,14 +344,97 @@
     <ClInclude Include="src\DFactory\D3DMgr\Primitives\CPlane.h" />
     <ClInclude Include="src\DFactory\D3DMgr\Primitives\CSphere.h" />
     <ClInclude Include="src\DFactory\D3DMgr\Primitives\CTriangleIndex.h" />
-    <ClInclude Include="src\imgui\imconfig.h" />
-    <ClInclude Include="src\imgui\imgui.h" />
-    <ClInclude Include="src\imgui\imgui_impl_dx11.h" />
-    <ClInclude Include="src\imgui\imgui_impl_win32.h" />
-    <ClInclude Include="src\imgui\imgui_internal.h" />
-    <ClInclude Include="src\imgui\imstb_rectpack.h" />
-    <ClInclude Include="src\imgui\imstb_textedit.h" />
-    <ClInclude Include="src\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\include\assimp\aabb.h" />
+    <ClInclude Include="src\include\assimp\ai_assert.h" />
+    <ClInclude Include="src\include\assimp\anim.h" />
+    <ClInclude Include="src\include\assimp\Base64.hpp" />
+    <ClInclude Include="src\include\assimp\BaseImporter.h" />
+    <ClInclude Include="src\include\assimp\Bitmap.h" />
+    <ClInclude Include="src\include\assimp\BlobIOSystem.h" />
+    <ClInclude Include="src\include\assimp\ByteSwapper.h" />
+    <ClInclude Include="src\include\assimp\camera.h" />
+    <ClInclude Include="src\include\assimp\cexport.h" />
+    <ClInclude Include="src\include\assimp\cfileio.h" />
+    <ClInclude Include="src\include\assimp\cimport.h" />
+    <ClInclude Include="src\include\assimp\ColladaMetaData.h" />
+    <ClInclude Include="src\include\assimp\color4.h" />
+    <ClInclude Include="src\include\assimp\commonMetaData.h" />
+    <ClInclude Include="src\include\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="src\include\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="src\include\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="src\include\assimp\config.h" />
+    <ClInclude Include="src\include\assimp\CreateAnimMesh.h" />
+    <ClInclude Include="src\include\assimp\DefaultIOStream.h" />
+    <ClInclude Include="src\include\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="src\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="src\include\assimp\defs.h" />
+    <ClInclude Include="src\include\assimp\Exceptional.h" />
+    <ClInclude Include="src\include\assimp\Exporter.hpp" />
+    <ClInclude Include="src\include\assimp\fast_atof.h" />
+    <ClInclude Include="src\include\assimp\GenericProperty.h" />
+    <ClInclude Include="src\include\assimp\GltfMaterial.h" />
+    <ClInclude Include="src\include\assimp\Hash.h" />
+    <ClInclude Include="src\include\assimp\Importer.hpp" />
+    <ClInclude Include="src\include\assimp\importerdesc.h" />
+    <ClInclude Include="src\include\assimp\IOStream.hpp" />
+    <ClInclude Include="src\include\assimp\IOStreamBuffer.h" />
+    <ClInclude Include="src\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="src\include\assimp\light.h" />
+    <ClInclude Include="src\include\assimp\LineSplitter.h" />
+    <ClInclude Include="src\include\assimp\LogAux.h" />
+    <ClInclude Include="src\include\assimp\Logger.hpp" />
+    <ClInclude Include="src\include\assimp\LogStream.hpp" />
+    <ClInclude Include="src\include\assimp\material.h" />
+    <ClInclude Include="src\include\assimp\MathFunctions.h" />
+    <ClInclude Include="src\include\assimp\matrix3x3.h" />
+    <ClInclude Include="src\include\assimp\matrix4x4.h" />
+    <ClInclude Include="src\include\assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="src\include\assimp\mesh.h" />
+    <ClInclude Include="src\include\assimp\metadata.h" />
+    <ClInclude Include="src\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="src\include\assimp\ObjMaterial.h" />
+    <ClInclude Include="src\include\assimp\ParsingUtils.h" />
+    <ClInclude Include="src\include\assimp\pbrmaterial.h" />
+    <ClInclude Include="src\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="src\include\assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
+    <ClInclude Include="src\include\assimp\postprocess.h" />
+    <ClInclude Include="src\include\assimp\Profiler.h" />
+    <ClInclude Include="src\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="src\include\assimp\qnan.h" />
+    <ClInclude Include="src\include\assimp\quaternion.h" />
+    <ClInclude Include="src\include\assimp\RemoveComments.h" />
+    <ClInclude Include="src\include\assimp\scene.h" />
+    <ClInclude Include="src\include\assimp\SceneCombiner.h" />
+    <ClInclude Include="src\include\assimp\SGSpatialSort.h" />
+    <ClInclude Include="src\include\assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="src\include\assimp\SmallVector.h" />
+    <ClInclude Include="src\include\assimp\SmoothingGroups.h" />
+    <ClInclude Include="src\include\assimp\SpatialSort.h" />
+    <ClInclude Include="src\include\assimp\StandardShapes.h" />
+    <ClInclude Include="src\include\assimp\StreamReader.h" />
+    <ClInclude Include="src\include\assimp\StreamWriter.h" />
+    <ClInclude Include="src\include\assimp\StringComparison.h" />
+    <ClInclude Include="src\include\assimp\StringUtils.h" />
+    <ClInclude Include="src\include\assimp\Subdivision.h" />
+    <ClInclude Include="src\include\assimp\texture.h" />
+    <ClInclude Include="src\include\assimp\TinyFormatter.h" />
+    <ClInclude Include="src\include\assimp\types.h" />
+    <ClInclude Include="src\include\assimp\vector2.h" />
+    <ClInclude Include="src\include\assimp\vector3.h" />
+    <ClInclude Include="src\include\assimp\version.h" />
+    <ClInclude Include="src\include\assimp\Vertex.h" />
+    <ClInclude Include="src\include\assimp\XmlParser.h" />
+    <ClInclude Include="src\include\assimp\XMLTools.h" />
+    <ClInclude Include="src\include\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="src\include\imgui\imconfig.h" />
+    <ClInclude Include="src\include\imgui\imgui.h" />
+    <ClInclude Include="src\include\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="src\include\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="src\include\imgui\imgui_internal.h" />
+    <ClInclude Include="src\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\include\json\json.hpp" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\pch.h" />
   </ItemGroup>
@@ -363,6 +448,14 @@
     <None Include="src\DFactory\D3DMgr\dxerr\DXGetErrorDescription.inl" />
     <None Include="src\DFactory\D3DMgr\dxerr\DXGetErrorString.inl" />
     <None Include="src\DFactory\D3DMgr\dxerr\DXTrace.inl" />
+    <None Include="src\include\assimp\color4.inl" />
+    <None Include="src\include\assimp\material.inl" />
+    <None Include="src\include\assimp\matrix3x3.inl" />
+    <None Include="src\include\assimp\matrix4x4.inl" />
+    <None Include="src\include\assimp\quaternion.inl" />
+    <None Include="src\include\assimp\SmoothingGroups.inl" />
+    <None Include="src\include\assimp\vector2.inl" />
+    <None Include="src\include\assimp\vector3.inl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc" />

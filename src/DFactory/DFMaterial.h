@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../pch.h"
+#include "../pch.h"
 #include "Common/DF_A.h"
 #include "Common/DF_Const.h"
 
