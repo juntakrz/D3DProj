@@ -23,6 +23,10 @@ bool RenderGraph::Pass(const char* technique) noexcept
 
 	auto pJobs = &m_PassJobs.at(technique);
 
+	std::sort(pJobs->begin(), pJobs->end(),
+		[](RenderGraph::RenderJob& j1, RenderGraph::RenderJob& j2) { return j1.pMesh->m_distanceToCamera > j2.pMesh->m_distanceToCamera; }
+	);
+
 	for (auto& it : *pJobs)
 	{
 		/*

@@ -40,8 +40,13 @@ void DFModelNode::XMUpdate(FXMMATRIX transform) noexcept
 	}
 }
 
-void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) const noexcept
+void DFModelNode::CreateRenderJob(RenderGraph* renderMgr) noexcept
 {
+	/*
+	std::sort(m_pMeshes.begin(), m_pMeshes.end(),
+		[](MeshCore* m1, MeshCore* m2) { return m1->m_distanceToCamera < m2->m_distanceToCamera; }
+	);*/
+
 	for (uint32_t i = 0; i < m_pMeshes.size(); i++)
 	{
 		// generate job using technique flags

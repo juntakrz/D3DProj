@@ -20,17 +20,13 @@ void MeshCore::XMUpdate(FXMMATRIX transform) noexcept
 
 		XMVECTOR v0 = p0 - camPos;
 		XMVECTOR v1 = p1 - camPos;
-		XMVECTOR vP = xmMain.r[3] - camPos;		// retrieving mesh origin
 
-		XMFLOAT3 d0, d1, dP;
+		XMFLOAT3 d0, d1;
 
 		XMStoreFloat3(&d0, XMVector3Length(v0));
 		XMStoreFloat3(&d1, XMVector3Length(v1));
-		XMStoreFloat3(&dP, XMVector3Length(vP));
 
-		m_distanceToCamera = d0.x;
-		m_distanceToCamera = std::min(d1.x, m_distanceToCamera);
-		m_distanceToCamera = std::min(dP.x, m_distanceToCamera);
+		(d0.x < d1.x) ? m_distanceToCamera = d0.x : m_distanceToCamera = d1.x;
 	}
 }
 
