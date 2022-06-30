@@ -33,7 +33,7 @@ public:
 	DFModelNode(std::vector<MeshCore*> pMeshes, const XMMATRIX& transform) noexcept;
 	DFModelNode(std::vector<MeshCore*> pMeshes, std::vector<MeshCore*> pAABBs, const XMMATRIX& transform) noexcept;
 	void XMUpdate(FXMMATRIX transform) noexcept;
-	void CreateRenderJob(RenderGraph* renderMgr) const noexcept;
+	void CreateRenderJob(RenderGraph* renderMgr) noexcept;
 };
 
 class DFModelMgr

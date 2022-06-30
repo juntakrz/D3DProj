@@ -268,6 +268,8 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	// create AABB for this mesh if required
 	newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
+	newMesh.pMesh->m_isPredicateEnabled = createAABB;
+	newMesh.pMesh->m_hasOwnAABB = createAABB;
 
 	return newMesh;
 }

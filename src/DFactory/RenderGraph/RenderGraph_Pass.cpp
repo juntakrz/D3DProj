@@ -23,6 +23,10 @@ bool RenderGraph::Pass(const char* technique) noexcept
 
 	auto pJobs = &m_PassJobs.at(technique);
 
+	std::sort(pJobs->begin(), pJobs->end(),
+		[](RenderGraph::RenderJob& j1, RenderGraph::RenderJob& j2) { return j1.pMesh->m_distanceToCamera > j2.pMesh->m_distanceToCamera; }
+	);
+
 	for (auto& it : *pJobs)
 	{
 		/*
@@ -200,7 +204,7 @@ bool RenderGraph::PassQuery(const char* technique) noexcept
 
 		for (auto& it : *pJobs)
 		{
-			it.pMesh->m_QueryResult = 100;
+			it.pMesh->m_queryResult = 100;
 		}
 		break;
 	}
@@ -308,8 +312,8 @@ bool RenderGraph::PostBloom(const char* in_RT) noexcept
 
 	DCB("stepBlur").BindToPS(1u);
 	PostBlur("rtPPStore2X");
-	DF::D3DM->RTCopyTarget("rtPPBlur", "rtPPStore2X", false);
-	PostBlur("rtPPStore2X");
+	//DF::D3DM->RTCopyTarget("rtPPBlur", "rtPPStore2X", false);
+	//PostBlur("rtPPStore2X");
 
 	return true;
 }

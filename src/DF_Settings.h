@@ -6,11 +6,11 @@
 
 //default app definitions
 #ifndef CWND_WNDNAME
-#define CWND_WNDNAME L"Direct3D Window"
+#define CWND_WNDNAME L"DFactory"
 #endif
 
 #ifndef CWND_WNDCLASS
-#define CWND_WNDCLASS L"D3DRenderer"
+#define CWND_WNDCLASS L"Direct3D Renderer"
 #endif
 
 #ifndef CWND_DEFAULTWIDTH

@@ -6,6 +6,7 @@ namespace DF
 	// variable definitions
 	bool isCullingEnabled = true;
 	uint64_t framesRendered = 0;
+	bool isLoadScreen = false;
 
 	namespace CSM
 	{

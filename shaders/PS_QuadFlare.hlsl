@@ -86,7 +86,7 @@ float4 main(float2 tex : TEXCOORD0, float1 inAlpha : TEXCOORD1, float2 fpos : TE
     float4 albedo = float4(color, 1.0) + tex2D.Sample(smplr, coords - tex) * 0.5;
     
     // add lens dust effect to flare
-    float3 lensColor = texLens.Sample(smplr, tex).rgb * albedo.rgb * 1.5;
+    float3 lensColor = texLens.Sample(smplr, tex).rgb * albedo.rgb;
     
     return float4(albedo.rgb + lensColor, alpha * inAlpha);
 }

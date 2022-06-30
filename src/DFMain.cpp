@@ -98,6 +98,8 @@ void DFMain::LoadScreen() noexcept
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
+	DF::isLoadScreen = true;
+
 	DF.BeginFrame();
 	
 	DF.ModelM->Create(DF::idPlane, "MdlLoadScr", false);
@@ -110,6 +112,8 @@ void DFMain::LoadScreen() noexcept
 	DF.DrawFrame();
 
 	DF.EndFrame();
+
+	DF::isLoadScreen = false;
 	
 	//Mat_Mars
 	DFMatDesc = {};
@@ -221,7 +225,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.material.pow_roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
 	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
+	DFMatDesc.effects = DF::Pass::Blur | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
