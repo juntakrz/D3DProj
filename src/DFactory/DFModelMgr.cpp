@@ -38,6 +38,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		// generate AABB if required
 		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
 		newMesh.pMesh->m_isPredicateEnabled = createAABB;
+		newMesh.pMesh->m_hasOwnAABB = createAABB;
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -66,6 +67,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		// generate AABB if required
 		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
 		newMesh.pMesh->m_isPredicateEnabled = createAABB;
+		newMesh.pMesh->m_hasOwnAABB = createAABB;
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -95,6 +97,7 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		// generate AABB if required
 		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
 		newMesh.pMesh->m_isPredicateEnabled = createAABB;
+		newMesh.pMesh->m_hasOwnAABB = createAABB;
 
 		newModel.id = newID;
 		newModel.name = name;

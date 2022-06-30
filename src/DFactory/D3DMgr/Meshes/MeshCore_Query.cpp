@@ -23,7 +23,7 @@ void MeshCore::GetQueryResult(MeshCore* pMesh) noexcept
 	if (m_framesElapsed == m_queryDelay)
 	{
 		//while (S_OK != DF::D3DM->Context()->GetData(m_pQuery.Get(), &pMesh->m_QueryResult, sizeof(UINT64), 0))
-		while (S_OK != DF::D3DM->Context()->GetData(m_pQuery.Get(), &pMesh->m_QueryResult, sizeof(BOOL), 0))
+		while (S_OK != DF::D3DM->Context()->GetData(m_pQuery.Get(), &pMesh->m_queryResult, sizeof(BOOL), 0))
 		{
 		}
 	}
