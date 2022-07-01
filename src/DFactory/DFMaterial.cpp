@@ -2,26 +2,28 @@
 
 // MATERIALS
 
-uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
+DFMaterial::Material& DFMaterial::Mat(const char* name) noexcept
 {
-	uint16_t index = 0;
+	if (m_Materials.find(name) == m_Materials.end()) {
+#ifdef _DEBUG || _DFDEBUG
+		std::string msg = "Material '" + std::string(name) + "' not found.";
+		OutputDebugStringA(msg.c_str());
+#endif
+		return *m_Materials.at(DF::Default::material);
+	}
 
-	for (const auto& it : m_Materials)
-	{
-		if (it->name == pDesc->name)
-		{
-			return index;
-		}
+	return *m_Materials.at(name);
+}
 
-		if (index < it->id)
-		{
-			break;
-		}
-		index++;
+DFMaterial::Material& DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
+{
+	// if material already exists - return the reference to an existing one
+	if (!m_Materials.try_emplace(pDesc->name).second) {
+		return *m_Materials.at(pDesc->name);
 	}
 
 	DFMaterial::Material newMat;
-	newMat.id = index;
+
 	newMat.name = pDesc->name;
 	newMat.shaderPixel = pDesc->shaders.pixel;
 	newMat.shaderGeometry = pDesc->shaders.geometry;
@@ -64,109 +66,39 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 	newMat.manageTextures = pDesc->manageTextures;
 	newMat.passes = pDesc->passes;
 
-	m_Materials.emplace_back(std::make_unique<DFMaterial::Material>(std::move(newMat)));
-	return index;
+	m_Materials.at(pDesc->name) = std::make_unique<DFMaterial::Material>(std::move(newMat));
+	return *m_Materials.at(pDesc->name);
 }
 
-DFMaterial::Material& DFMaterial::Mat(std::string name) noexcept
+bool DFMaterial::MatDelete(const char* name) noexcept
 {
-	for (const auto& it : m_Materials)
-	{
-		if (name == it->name)
-		{
-			return *it;
+	if (m_Materials.find(name) == m_Materials.end()) {
+#ifdef _DEBUG || _DFDEBUG
+		std::string msg = "Material '" + std::string(name) + "' does not exist, could not delete.";
+		OutputDebugStringA(msg.c_str());
+#endif
+		return false;
+	}
+	
+	if (m_Materials.at(name)->manageTextures) {
+
+		for (uint32_t i = 0; i < sizeof(m_Materials.at(name)->idTex) / sizeof(uint32_t); i++) {
+
+			(m_Materials.at(name)->idTex[i] != "") ? TextureDelete(m_Materials.at(name)->idTex[i]) : 0;
 		}
 	}
-
-#ifdef _DEBUG || _DFDEBUG
-	name = "Material '" + name + "' not found.";
-	OutputDebugStringA(name.c_str());
-#endif
-	return *m_Materials[0];
+	m_Materials.erase(name);
+	return true;
 }
 
-DFMaterial::Material& DFMaterial::Mat(uint16_t index) noexcept
+bool DFMaterial::MatExists(const char* name) noexcept
 {
-	for (const auto& it : m_Materials)
-	{
-		if (it->id == index)
-		{
-			return *m_Materials[index];
-		}
-	}
-
-#ifdef _DEBUG || _DFDEBUG
-	OutputDebugStringA("Material index out of bounds.");
-#endif
-	return *m_Materials[0];
-}
-
-uint16_t DFMaterial::MatIndex(std::string name) const noexcept
-{
-	uint16_t index = 0;
-	for (const auto& it : m_Materials)
-	{
-		if (name == it->name)
-		{
-			return index;
-		}
-		index++;
-	}
-
-#ifdef _DEBUG || _DFDEBUG
-	name = "DFMaterial: Index for '" + name + "' not found.\n";
-	OutputDebugStringA(name.c_str());
-#endif
-	return 0;
+	return (m_Materials.find(name) == m_Materials.end()) ? false : true;
 }
 
 uint16_t DFMaterial::MatCount() const noexcept
 {
 	return m_Materials.size();
-}
-
-void DFMaterial::MatDelete(uint16_t index) noexcept {
-
-	uint16_t it_n = 0;
-
-	for (auto& it : m_Materials) {
-
-		if (it->id == index && index > 0) {
-			
-			if (it->manageTextures) {
-
-				for (uint32_t i = 0; i < DF::maxTextures; i++) {
-
-					(it->idTex[i] != "") ? TextureDelete(it->idTex[i]) : 0;
-				}
-			}
-			m_Materials.erase(m_Materials.begin() + it_n);
-			return;
-		}
-		it_n++;
-	}
-}
-
-void DFMaterial::MatDelete(std::string name) noexcept
-{
-	uint16_t it_n = 0;
-
-	for (auto& it : m_Materials) {
-
-		if (it->name == name && it_n > 0) {
-
-			if (it->manageTextures) {
-
-				for (uint32_t i = 0; i < sizeof(it->idTex) / sizeof(uint32_t); i++) {
-
-					(it->idTex[i] != "") ? TextureDelete(it->idTex[i]) : 0;
-				}
-			}
-			m_Materials.erase(m_Materials.begin() + it_n);
-			return;
-		}
-		it_n++;
-	}
 }
 
 // DEBUG
@@ -189,9 +121,9 @@ void DFMaterial::DEBUG_ShowMaterialIndex(uint16_t begin, uint16_t end) const noe
 
 		if (index >= begin)
 		{
-			sstr << "[" << index << ": " << it->id << "] " << it->name << ": ";
+			sstr << "[" << it.second->name << "]: ";
 			for (uint32_t i = 0; i < 6; i++) {
-				sstr << it->idTex[i].c_str() << ", ";
+				sstr << it.second->idTex[i].c_str() << ", ";
 			}
 
 			sstr << "\n";

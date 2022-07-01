@@ -6,5 +6,5 @@
 class MeshCube : public MeshBase<MeshCube>
 {
 public:
-	MeshCube(uint16_t matId, uint16_t paramA = 1, uint16_t paramB = 1);
+	MeshCube(const char* matId, uint16_t paramA = 1, uint16_t paramB = 1);
 };

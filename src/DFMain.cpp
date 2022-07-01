@@ -140,7 +140,7 @@ void DFMain::DrawFrame()
 int32_t DFMain::Run()
 {
 	// 1. Load map
-	LoadMap(DF::defaultMap);
+	LoadMap(DF::Default::map);
 
 	// 2. Run message and rendering loops
 
@@ -173,15 +173,11 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	// get load screen material name
 	std::string loadScreenMat = jsonData.at("loadScreen").at("useMaterial").get<std::string>();
 
-	// start rendering loading screen
-	DF::isLoadScreen = true;
-
-	DF.MatM->BindTextureToPS(DF.MatM->Mat(DF.MatM->MatIndex(loadScreenMat)).idTex[0], 0u);
-
+	// render loading screen
 	DF.BeginFrame();
 
 	DF.pD3DMgr->RTBind("rtBack", "dsBack");
-
+	DF.MatM->BindTextureToPS(DF.MatM->Mat(loadScreenMat.c_str()).idTex[0], 0u);
 	DF.pD3DMgr->RenderSurface("sfcMain");
 
 	DF.EndFrame();
@@ -518,7 +514,7 @@ void DFMain::LoadMap() noexcept
 	
 	DF.ModelM->Select(0);
 	DF.ModelM->Delete();
-	DF.MatM->MatDelete(1);
+	DF.MatM->MatDelete("Mat_LoadScr");
 
 	DF.Camera()->SetPos(-1.4f, 0.3f, 1.0f);			// test position
 	//DF.Camera()->SetRotation(-7, 25);

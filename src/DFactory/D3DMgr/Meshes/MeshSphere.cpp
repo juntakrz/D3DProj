@@ -1,6 +1,6 @@
 #include "MeshSphere.h"
 
-MeshSphere::MeshSphere(uint16_t matId, uint16_t divisions, bool invertFaces)
+MeshSphere::MeshSphere(const char* matId, uint16_t divisions, bool invertFaces)
 {
 	// create instance
 	auto model = CSphere::Create<DF::Vertex>(divisions, invertFaces);

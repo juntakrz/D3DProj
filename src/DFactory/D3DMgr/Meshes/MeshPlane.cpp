@@ -1,6 +1,6 @@
 #include "MeshPlane.h"
 
-MeshPlane::MeshPlane(uint16_t matId, uint16_t divisionsX, uint16_t divisionsY)
+MeshPlane::MeshPlane(const char* matId, uint16_t divisionsX, uint16_t divisionsY)
 {
 	//create instance
 	auto model = CPlane::Create<DF::Vertex>(divisionsX, divisionsY);

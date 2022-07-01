@@ -5,7 +5,7 @@
 class MeshPoint : public MeshBase<MeshPoint>
 {
 public:
-	MeshPoint(uint16_t matId) noexcept;
+	MeshPoint(const char* matId) noexcept;
 
 	// override to bind only a vertex buffer
 	void BindCore() const noexcept override;

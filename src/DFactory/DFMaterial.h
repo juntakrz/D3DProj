@@ -12,7 +12,6 @@ class DFMaterial
 
 	struct Material
 	{
-		uint16_t id;
 		std::string name;
 
 		std::string shaderVertex, shaderPixel, shaderGeometry;
@@ -55,7 +54,7 @@ class DFMaterial
 		COMPTR<ID3DBlob>				pSData;
 	};
 
-	std::vector<std::unique_ptr<Material>> m_Materials;
+	std::unordered_map<std::string, std::unique_ptr<Material>> m_Materials;
 	std::unordered_map<std::string, DFTexture> m_DFTextures;
 	std::unordered_map<std::string, DFShader> m_Shaders;
 
@@ -100,14 +99,11 @@ public:
 
 	// MATERIALS
 
-	uint16_t MatAdd(DFMATERIAL_DESC* pDesc) noexcept;
-
-	Material& Mat(std::string name) noexcept;
-	Material& Mat(uint16_t index) noexcept;
-	uint16_t MatIndex(std::string name) const noexcept;
-	uint16_t MatCount() const noexcept;
-	void MatDelete(uint16_t index) noexcept;
-	void MatDelete(std::string name) noexcept;
+	Material& Mat(const char* name) noexcept;			// retrieves the material from the database
+	Material& MatAdd(DFMATERIAL_DESC* pDesc) noexcept;	// adds new material to the database 
+	bool MatDelete(const char* name) noexcept;			// removes the material from the database and returns the result
+	bool MatExists(const char* name) noexcept;			// checks if material is already present in the database
+	uint16_t MatCount() const noexcept;					// retrieves the number of materials stored in the database
 
 	// TEXTURES
 

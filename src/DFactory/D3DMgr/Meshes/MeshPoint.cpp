@@ -1,6 +1,6 @@
 #include "MeshPoint.h"
 
-MeshPoint::MeshPoint(uint16_t matId) noexcept
+MeshPoint::MeshPoint(const char* matId) noexcept
 {
 	std::vector<DF::Vertex> vertices;
 	DF::Vertex v;

@@ -99,8 +99,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 		//get material name and check if it exists
 		matName = pMaterial->GetName().C_Str();
-
-		if (pMatMgr->MatIndex(matName) == 0)
+		if (!pMatMgr->MatExists(matName.c_str()))
 		{
 			//create new material
 			DFMaterial::DFMATERIAL_DESC DFMatDesc{};
@@ -220,11 +219,11 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			DFMatDesc.passes = DF::Pass::Standard;
 
 			pMatMgr->MatAdd(&DFMatDesc);
-			pDFMat = &pMatMgr->Mat(newMesh.meshMat);
+			pDFMat = &pMatMgr->Mat(newMesh.meshMat.c_str());
 		}
 		else
 		{	// use existing material
-			pDFMat = &pMatMgr->Mat(matName);
+			pDFMat = &pMatMgr->Mat(matName.c_str());
 			newMesh.meshMat = matName;
 
 			for (uint16_t i = 0; i < 6; i++) {

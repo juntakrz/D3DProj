@@ -1,6 +1,9 @@
 #include "../../pch.h"
 #include "DF_Const.h"
 
+const std::wstring DF::Default::map = L"default";
+const std::string DF::Default::material = "Mat_Default";
+
 namespace DF
 {
 	// variable definitions

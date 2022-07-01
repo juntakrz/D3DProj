@@ -42,12 +42,12 @@ void MeshCore::DrawIndexed() noexcept
 }
 /*	//////////	*/
 
-void MeshCore::AddMaterialBind(uint16_t matIndex) noexcept
+void MeshCore::AddMaterialBind(const char* material) noexcept
 {
 	//prepare material buffer
-	matCBuffer.ambientColor = MatMgr.Mat(matIndex).ambientColor;
-	matCBuffer.data = MatMgr.Mat(matIndex).data;
-	matCBuffer.F0 = MatMgr.Mat(matIndex).F0;
+	matCBuffer.ambientColor = MatMgr.Mat(material).ambientColor;
+	matCBuffer.data = MatMgr.Mat(material).data;
+	matCBuffer.F0 = MatMgr.Mat(material).F0;
 
 	//bind it to pixel shader cbuffer slot 0
 	m_Binds[Bind::idConstPixelBuf0] =
@@ -63,7 +63,7 @@ void MeshCore::SetMaterial(uint16_t matIndex) noexcept
 void MeshCore::SetMaterial(std::string name) noexcept
 {
 	// get material object
-	const auto& mat = MatMgr.Mat(name);
+	const auto& mat = MatMgr.Mat(name.c_str());
 
 	// get techniques
 	m_TechniqueIds = mat.passes;
@@ -102,7 +102,7 @@ void MeshCore::SetMaterialRT(std::string name) noexcept
 	isRenderTarget = true;
 	
 	// get material object
-	const auto& mat = MatMgr.Mat(name);
+	const auto& mat = MatMgr.Mat(name.c_str());
 
 	//get buffer copy resource
 	m_Binds[Bind::idTexture0] = std::make_unique<Bind::Texture>(

@@ -1,6 +1,6 @@
 #include "MeshCube.h"
 
-MeshCube::MeshCube(uint16_t matId, uint16_t paramA, uint16_t paramB)
+MeshCube::MeshCube(const char* matId, uint16_t paramA, uint16_t paramB)
 {
 	auto model = CCube::Create<DF::Vertex>();
 	model.SetTangentBinormalNormal();

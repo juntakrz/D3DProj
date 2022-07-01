@@ -74,7 +74,7 @@ public:
 	float m_distanceToCamera = 0.0f;		// distance to camera, used in depth sorting and occlusion querying
 
 protected:
-	void AddMaterialBind(uint16_t matIndex) noexcept;	
+	void AddMaterialBind(const char* material) noexcept;	
 	void SetMaterial(uint16_t matIndex) noexcept;
 
 #ifdef _DEBUG

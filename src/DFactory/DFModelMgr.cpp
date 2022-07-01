@@ -31,9 +31,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		paramA < 1 ? paramA = 1 : paramA;
 		paramB < 1 ? paramB = 1 : paramB;
 		newMesh.meshid = 1;
-		newMesh.meshMat = pMatMgr->Mat(0).name;
+		newMesh.meshMat = DF::Default::material;
 		newMesh.meshName = "Plane" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshPlane>(0, paramA, paramB);
+		newMesh.pMesh = std::make_unique<MeshPlane>(DF::Default::material.c_str(), paramA, paramB);
 
 		// generate AABB if required
 		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
@@ -60,9 +60,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 	case DF::idCube:
 	{
 		newMesh.meshid = 1;
-		newMesh.meshMat = pMatMgr->Mat(0).name;
+		newMesh.meshMat = DF::Default::material;
 		newMesh.meshName = "Cube" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshCube>(0);
+		newMesh.pMesh = std::make_unique<MeshCube>(DF::Default::material.c_str());
 
 		// generate AABB if required
 		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
@@ -90,9 +90,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		(paramA < 1) ? paramA = 32 : paramA;
 		
 		newMesh.meshid = 1;
-		newMesh.meshMat = pMatMgr->Mat(0).name;
+		newMesh.meshMat = DF::Default::material;
 		newMesh.meshName = "Sphere" + std::to_string(newID);
-		newMesh.pMesh = std::make_unique<MeshSphere>(0, paramA);
+		newMesh.pMesh = std::make_unique<MeshSphere>(DF::Default::material.c_str(), paramA);
 
 		// generate AABB if required
 		newMesh.pOTMesh = (createAABB) ? std::make_unique<MeshAABB>(newMesh.pMesh->AABBPoints()) : nullptr;
@@ -122,9 +122,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		(paramA < 1) ? paramA = 12 : paramA;
 
 		newMesh.meshid = 1;
-		newMesh.meshMat = pMatMgr->Mat(0).name;
+		newMesh.meshMat = DF::Default::material;
 		newMesh.meshName = "SkySphere" + std::to_string(newMesh.meshid);
-		newMesh.pMesh = std::make_unique<MeshSphere>(0, paramA, true);
+		newMesh.pMesh = std::make_unique<MeshSphere>(DF::Default::material.c_str(), paramA, true);
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -141,9 +141,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 	case DF::idPoint:
 	{
 		newMesh.meshid = 1;
-		newMesh.meshMat = pMatMgr->Mat(0).name;
+		newMesh.meshMat = DF::Default::material;
 		newMesh.meshName = "Point" + std::to_string(newMesh.meshid);
-		newMesh.pMesh = std::make_unique<MeshPoint>(0);
+		newMesh.pMesh = std::make_unique<MeshPoint>(DF::Default::material.c_str());
 
 		newModel.id = newID;
 		newModel.name = name;
@@ -219,41 +219,37 @@ void DFModelMgr::UpdateRenderer() noexcept
 
 void DFModelMgr::SetMaterial(std::string material, uint32_t meshID) noexcept
 {
-	uint16_t matIndex = pMatMgr->MatIndex(material);
-
 	// if ID is 0 - set material for all meshes
 	if (meshID == 0)
 	{
 		for (auto& it : m_Models[m_curModel].meshes)
 		{
 			it.pMesh->SetMaterial(material);
-			it.meshMat = matIndex;
+			it.meshMat = material;
 		}
 	}
 	else
 	{
 		m_Models[m_curModel].meshes[meshID].pMesh->SetMaterial(material);
-		m_Models[m_curModel].meshes[meshID].meshMat = matIndex;
+		m_Models[m_curModel].meshes[meshID].meshMat = material;
 	}
 }
 
 void DFModelMgr::SetMaterialRT(std::string material, uint32_t meshID) noexcept
 {
-	uint16_t matIndex = pMatMgr->MatIndex(material);
-
 	// if ID is 0 - set material for all meshes
 	if (meshID == 0)
 	{
 		for (auto& it : m_Models[m_curModel].meshes)
 		{
 			it.pMesh->SetMaterialRT(material);
-			it.meshMat = matIndex;
+			it.meshMat = material;
 		}
 	}
 	else
 	{
 		m_Models[m_curModel].meshes[meshID].pMesh->SetMaterialRT(material);
-		m_Models[m_curModel].meshes[meshID].meshMat = matIndex;
+		m_Models[m_curModel].meshes[meshID].meshMat = material;
 	}
 }
 
