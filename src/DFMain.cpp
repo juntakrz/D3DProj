@@ -79,17 +79,18 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	JSONLoad(initPath.c_str(), jsonData);
 
 	// parse loaded JSON file and get materials data
-	//JSONParseMaterials(jsonData.at("materials"));
-	t1 = std::thread(&DFMain::JSONParseMaterials, this, jsonData.at("materials"));
+	JSONParseMaterials(jsonData.at("materials"));
 
 	// get load screen material name
 	std::string loadScreenMat = jsonData.at("loadScreen").at("useMaterial").get<std::string>();
+
+	JSONLoad(matPath.c_str(), jsonData);
+	t1 = std::thread(&DFMain::JSONParseMaterials, this, jsonData.at("materials"));
 
 	// render loading screen
 	DF.BeginFrame();
 
 	DF.pD3DMgr->RTBind("rtBack", "dsBack");
-	t1.join();
 	DF.MatM->BindTextureToPS(DF.MatM->Mat(loadScreenMat.c_str()).idTex[0], 0u);		// texture from pre-created load screen material
 	DF.pD3DMgr->RenderSurface("sfcMain");
 
@@ -103,8 +104,7 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	JSONParseCameras(jsonData);
 
 	// load map materials
-	JSONLoad(matPath.c_str(), jsonData);
-	t1 = std::thread(&DFMain::JSONParseMaterials, this, jsonData.at("materials"));
+	//JSONLoad(matPath.c_str(), jsonData);
 	//JSONParseMaterials(jsonData.at("materials"));
 
 	// load map lights
@@ -114,8 +114,7 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	t1.join();
 
 	JSONLoad(objPath.c_str(), jsonData);
-	t1 = std::thread(&DFMain::JSONParseObjects, this, jsonData.at("objects"));
-	t1.join();
+	JSONParseObjects(jsonData.at("objects"));
 
 	JSONLoad(commPath.c_str(), jsonData);
 	JSONParseCommands(jsonData.at("commands"));

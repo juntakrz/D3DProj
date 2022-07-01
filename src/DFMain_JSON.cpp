@@ -133,9 +133,9 @@ void DFMain::JSONParseMaterials(const nlohmann::json& materials) noexcept
 
 		// passes
 		if (it.contains("passes")) {
+			DFMatDesc.passes = 0;
 			auto passes = it.at("passes");
 			for (const auto& pass : passes) {
-
 				std::string passName = pass.get<std::string>();
 
 				(passName == "background") ? DFMatDesc.passes |= DF::Pass::Background : 0;
@@ -232,6 +232,12 @@ void DFMain::JSONParseObjects(const json& objects) noexcept
 			created = true;
 		}
 
+		if (it.at("type") == "skySphere") {
+
+			DF.ModelM->Create(DF::idSkySphere, name);
+			created = true;
+		}
+
 		if (created) {
 
 			DF.ModelM->SetPos(translation[0], translation[1], translation[2]);
@@ -300,6 +306,16 @@ void DFMain::JSONParseCommands(const json& commands) noexcept
 					tgtObj = it.at("tgtCamera");
 					DF.Camera(srcObj)->LockToCameraTarget(DF.Camera(tgtObj));
 				}
+			}
+		}
+
+		// command: make object always stay in the same position relative to camera
+		if (command == "followCamera") {
+
+			if (it.contains("srcModel")) {
+
+				DF.ModelM->Select(it.at("srcModel").get<std::string>());
+				DF.ModelM->Model().FollowCamera(it.at("state"));
 			}
 		}
 	}

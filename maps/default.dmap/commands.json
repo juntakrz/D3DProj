@@ -11,6 +11,24 @@
       "command": "lockTo",
       "srcCamera": "camLight",
       "tgtCamera": "camMain"
+    },
+
+    "2": {
+      "command": "followCamera",
+      "srcModel": "mdlSkySphere",
+      "state": true
+    },
+
+    "3": {
+      "command": "followCamera",
+      "srcModel": "mdlMars",
+      "state": true
+    },
+
+    "4": {
+      "command": "followCamera",
+      "srcModel": "mdlMarsAtmo",
+      "state": true
     }
   }
 }

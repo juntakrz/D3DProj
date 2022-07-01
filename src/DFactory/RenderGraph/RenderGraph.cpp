@@ -29,7 +29,7 @@ RenderGraph::RenderGraph() noexcept
 
 	// calculate pixel step for blur shaders
 	DirectX::XMFLOAT2 resolution = XMFLOAT2(1.0f / (DF::D3DM->GetResolution().x * 0.5f), 1.0f / (DF::D3DM->GetResolution().y * 0.5f));
-	DCB("stepBlur").GenerateBuffer(resolution.x, resolution.y);
+	DCB("stepBlur").GenerateBuffer(resolution.x * 1.0f, resolution.y * 1.0f);
 	DCB("stepBloom").GenerateBuffer(resolution.x * 5.0f, resolution.y * 3.0f);
 
 	DCB("GaussCoef").GenerateBuffer(std::move(coef));

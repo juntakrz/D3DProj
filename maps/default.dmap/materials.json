@@ -62,6 +62,23 @@
       ]
     },
 
+    "Mat_SkySphere": {
+      "name": "Mat_SkySphere",
+      "shaders": {
+        "vs": "VS_FlatTexture",
+        "ps": "PS_FlatTexture"
+      },
+      "textures": {
+        "tex0": "stars_6k_color.dds"
+      },
+      "variables": {
+        "intensity": 0.1
+      },
+      "passes": [
+        "background"
+      ]
+    },
+
     "Mat_Atmo": {
       "name": "Mat_Atmo",
       "shaders": {
