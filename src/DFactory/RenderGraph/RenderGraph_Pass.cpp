@@ -331,6 +331,9 @@ void RenderGraph::MixLayers(const char* renderTgt, const char* depthTgt, const c
 	DF::D3DM->Surface("sfcMix")->SetShaders("surface/VS_Surface", "surface/PS_Surface_Mix");
 
 	DF::D3DM->RenderBufferToSurface(renderRes1, "sfcMix");
+
+	// reset shader resources
+	DF::D3DM->RTResetShaderResource(DF::ShaderType::PS, 3u);
 }
 
 void RenderGraph::MergeDepthBuffers(const char* idA, const char* idB, const char* dsTarget, const char* surface) noexcept

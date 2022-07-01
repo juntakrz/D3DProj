@@ -37,6 +37,11 @@ void DFMain::LoadMaterialsFromJSON(const nlohmann::json& materials) noexcept
 		}
 		DFMatDesc.name = it.at("name").get<std::string>();
 
+#ifdef _DEBUG || _DFDEBUG
+		std::string msg = "JSON: processing " + DFMatDesc.name + "\n";
+		OutputDebugStringA(msg.c_str());
+#endif
+
 		(it.contains("manageTextures")) ? it.at("manageTextures").get_to(DFMatDesc.manageTextures) : 0;
 
 		// shaders
@@ -104,7 +109,7 @@ void DFMain::DrawFrame()
 {
 	//deltaA += 0.002f;
 
-	DF.ModelM->Select("MdlTachi");
+	//DF.ModelM->Select("MdlTachi");
 	//DF.ModelM->SetRotation(-0.6f - deltaA*0.7f , -0.4f + deltaA, -0.3f + deltaA * 0.7f);
 
 	//DF.LightM->PL(0).pMesh->DEBUG_Rotate(0.01f);
@@ -116,7 +121,7 @@ void DFMain::DrawFrame()
 	
 	if (DF.DevUIMode())
 	{
-		DF.ShowEditModelWindow();
+		//DF.ShowEditModelWindow();
 		DF.ShowCameraWindow();
 		DF.ShowStatsWindow();
 	}
@@ -177,10 +182,15 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	DF.BeginFrame();
 
 	DF.pD3DMgr->RTBind("rtBack", "dsBack");
-	DF.MatM->BindTextureToPS(DF.MatM->Mat(loadScreenMat.c_str()).idTex[0], 0u);
+	DF.MatM->BindTextureToPS(DF.MatM->Mat(loadScreenMat.c_str()).idTex[0], 0u);		// texture from pre-created load screen material
 	DF.pD3DMgr->RenderSurface("sfcMain");
 
 	DF.EndFrame();
+
+	// load map materials
+	jsonData.clear();
+	LoadJSON(matPath.c_str(), jsonData);
+	LoadMaterialsFromJSON(jsonData["materials"]);
 }
 
 void DFMain::LoadMap() noexcept
@@ -276,7 +286,7 @@ void DFMain::LoadMap() noexcept
 	DFMatDesc.name = "Mat_PBSMetal";
 	DFMatDesc.shaders.vertex = "VS_PBS_Shadow";
 	DFMatDesc.shaders.pixel = "PS_PBS_Shadow";
-	DFMatDesc.textures.tex0 = "PBR/iron/rustediron2_basecolor.dds";
+	DFMatDesc.textures.tex0 = "PBR/iron/rustediron2_albedo.dds";
 	DFMatDesc.textures.tex1 = "PBR/iron/rustediron2_normal.dds";
 	DFMatDesc.textures.tex2 = "PBR/iron/rustediron2_metallic.dds";
 	DFMatDesc.textures.tex3 = "PBR/iron/rustediron2_roughness.dds";

@@ -57,6 +57,17 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	DFMesh newMesh;
 	DFMaterial::Material* pDFMat = nullptr;
 
+	// default const buffer
+	struct PSConstBuffer
+	{
+		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		XMFLOAT3A F0 = { 0.1f, 0.1f, 0.1f };
+		float intensity = 1.0f;
+		float metalness = 1.0f;
+		float roughness = 1.0f;
+		float bumpiness = 1.0f;
+	} matCB;
+
 	newMesh.meshid = meshID;
 
 	mesh.mName.C_Str() ? newMesh.meshName = mesh.mName.C_Str() : newMesh.meshName = "AIMesh" + std::to_string(meshID);
@@ -210,9 +221,6 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			DFMatDesc.shaders.vertex = "VS_FlatTexture";
 			DFMatDesc.shaders.pixel = "PS_FlatTexture";
 
-			// default normal mapping intensity
-			DFMatDesc.material.bumpiness = 1.5f;
-
 			// try to delete textures if unused by anything else
 			DFMatDesc.manageTextures = true;
 			
@@ -231,6 +239,13 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 					pMatMgr->TextureGet(pDFMat->idTex[i]), i
 					);
 			}
+
+			matCB.intensity = pDFMat->data.x;
+			matCB.metalness = pDFMat->data.y;
+			matCB.roughness = pDFMat->data.z;
+			matCB.bumpiness = pDFMat->data.w;
+			matCB.ambientColor = pDFMat->ambientColor;
+			matCB.F0 = pDFMat->F0;
 		}
 	}
 
@@ -249,19 +264,7 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 
 	pBinds[Bind::idInputLayout] = std::make_unique<Bind::InputLayout>(DF::D3DLayout, pVSByteCode);
 
-	struct PSConstBuffer
-	{
-		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.25f, 1.0f };
-		XMFLOAT3A F0 = { 0.1f, 0.1f, 0.1f };
-		float intensity = 2.0f;
-		float metalness = 1.12f;
-		float pow_rough = 0.8f;
-		float bumpiness = 1.5f;
-	} material;
-
-	material.bumpiness = pDFMat->data.w;
-
-	pBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<PSConstBuffer>>(material, 0u);
+	pBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<PSConstBuffer>>(matCB, 0u);
 
 	newMesh.pMesh = std::make_unique<MeshImport>(std::move(pBinds), vertices);
 

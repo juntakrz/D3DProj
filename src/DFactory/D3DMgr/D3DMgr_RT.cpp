@@ -331,8 +331,8 @@ void D3DMgr::RTBind(const std::string& renderTarget, const std::string& depthTar
 	// no error prevention for speed, define targets with care
 	D3D_THROW_INFO(m_pContext->OMSetRenderTargets(
 		num,
-		(renderTarget != "") ? renderTargets.at(renderTarget)->pRTV.GetAddressOf() : &nullRTV,
-		(depthTarget != "") ? depthTargets.at(depthTarget)->pDSV.Get() : nullDSV)
+		(renderTarget != "") ? renderTargets.at(renderTarget)->pRTV.GetAddressOf() : &pNullRTV,
+		(depthTarget != "") ? depthTargets.at(depthTarget)->pDSV.Get() : pNullDSV)
 	);
 
 	if (renderTarget != "")
@@ -362,8 +362,8 @@ void D3DMgr::RTCopyTarget(const std::string& srcTarget, const std::string& destT
 		(m_DSId == srcTarget || m_DSId == destTarget)
 			? Context()->OMSetRenderTargets(
 				m_RTNum,
-				(m_RTId != "") ? renderTargets.at(m_RTId)->pRTV.GetAddressOf() : &nullRTV,
-				(m_DSId != "") ? depthTargets.at(m_DSId)->pDSV.Get() : nullDSV
+				(m_RTId != "") ? renderTargets.at(m_RTId)->pRTV.GetAddressOf() : &pNullRTV,
+				(m_DSId != "") ? depthTargets.at(m_DSId)->pDSV.Get() : pNullDSV
 			) : void();
 
 		return;
@@ -380,8 +380,8 @@ void D3DMgr::RTCopyTarget(const std::string& srcTarget, const std::string& destT
 		(m_RTId == srcTarget || m_RTId == destTarget)
 			? Context()->OMSetRenderTargets(
 				m_RTNum,
-				(m_RTId != "") ? renderTargets.at(m_RTId)->pRTV.GetAddressOf() : &nullRTV,
-				(m_DSId != "") ? depthTargets.at(m_DSId)->pDSV.Get() : nullDSV
+				(m_RTId != "") ? renderTargets.at(m_RTId)->pRTV.GetAddressOf() : &pNullRTV,
+				(m_DSId != "") ? depthTargets.at(m_DSId)->pDSV.Get() : pNullDSV
 			) : void();
 
 		return;
@@ -477,10 +477,8 @@ bool D3DMgr::RTSetAsShaderResource(const char* id, const uint8_t& shaderType, co
 	return false;
 }
 
-void D3DMgr::RTClearShaderResource(const uint8_t& shaderType, const uint8_t& slot) noexcept
+void D3DMgr::RTResetShaderResource(const uint8_t& shaderType, const uint8_t& slot) noexcept
 {
-	ID3D11ShaderResourceView* pNullSRV = nullptr;
-
 	switch (shaderType)
 	{
 	case(DF::ShaderType::GS):

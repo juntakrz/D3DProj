@@ -43,66 +43,62 @@ void RenderGraph::RenderFrame() noexcept
 	//
 	// PASS PROCESSOR
 	//
-	if (!DF::isLoadScreen)
-	{
-		// LAYER: SHADOW
-		PassCSM("Shadow");					// cascade shadow mapping pass
-		//
+	// LAYER: SHADOW
+	PassCSM("Shadow");					// cascade shadow mapping pass
+	//
 
-		// LAYER: MAIN
-		Pass("Background");					// depth-off background pass
-	}
+	// LAYER: MAIN
+	Pass("Background");					// depth-off background pass
 	Pass("Standard");					// standard pass
 	//
-	if (!DF::isLoadScreen)
-	{
-		// LAYER: BLUR
-		Pass("Blur");						// draw to 'rtBlur' and 'dsBlur'
-		// copy to an extra depth texture as 'dsMain' will get refilled with combined depth data of 'Main' and 'Blur' layers
-		DF::D3DM->RTCopyTarget("dsMain", "dsMainCopy", true);
 
-		DCB("stepBlur").BindToPS(1u);
-		PostBlur("rtBlur");					// post process blur using defined texture as a source, outputs to rtPPBlur
-		//
-		/* NEEDS TO BE DONE BETTER
-		Pass("AABBShow");
-		COMPTR<ID3D11RasterizerState> pRState;
-		D3D11_RASTERIZER_DESC RDesc{};
-		RDesc.CullMode = D3D11_CULL_BACK;
-		RDesc.FillMode = D3D11_FILL_SOLID;
-		DF::Device()->CreateRasterizerState(&RDesc, &pRState);
-		DF::Context()->RSSetState(pRState.Get());
-		*/
+	// LAYER: BLUR
+	Pass("Blur");						// draw to 'rtBlur' and 'dsBlur'
+	// copy to an extra depth texture as 'dsMain' will get refilled with combined depth data of 'Main' and 'Blur' layers
+	DF::D3DM->RTCopyTarget("dsMain", "dsMainCopy", true);
 
-		// mix standard and blur layers to get unified visuals and depth
-		MixLayers("rtMix", "dsMain", "rtMain", "rtPPBlur", "dsMainCopy", "dsBlur");
+	DCB("stepBlur").BindToPS(1u);
+	PostBlur("rtBlur");					// post process blur using defined texture as a source, outputs to rtPPBlur
+	//
+	/* NEEDS TO BE DONE BETTER
+	Pass("AABBShow");
+	COMPTR<ID3D11RasterizerState> pRState;
+	D3D11_RASTERIZER_DESC RDesc{};
+	RDesc.CullMode = D3D11_CULL_BACK;
+	RDesc.FillMode = D3D11_FILL_SOLID;
+	DF::Device()->CreateRasterizerState(&RDesc, &pRState);
+	DF::Context()->RSSetState(pRState.Get());
+	*/
+	
+	// mix standard and blur layers to get unified visuals and depth
+	MixLayers("rtMix", "dsMain", "rtMain", "rtPPBlur", "dsMainCopy", "dsBlur");
 
-		// store layer-merged depth buffer in an extra texture for later re-use
-		DF::D3DM->RTCopyTarget("dsMain", "dsMainCopy", true);
+	// store layer-merged depth buffer in an extra texture for later re-use
+	DF::D3DM->RTCopyTarget("dsMain", "dsMainCopy", true);
 
-		PassQuery("Occlusion");				// draw occluders to depth buffer (twice) and query occlusion in depth buffer
+	PassQuery("Occlusion");				// draw occluders to depth buffer (twice) and query occlusion in depth buffer
 
-		//m_Passes[7].Draw();				// fxOutline stencil writing step
-		//m_Passes[8].Draw();				// fxOutline stencil masking step
+	//m_Passes[7].Draw();				// fxOutline stencil writing step
+	//m_Passes[8].Draw();				// fxOutline stencil masking step
 
-		// disable stencil
-		DF::D3DM->SetDepthStencilState(DF::DS_Mode::Default);
+	// disable stencil
+	DF::D3DM->SetDepthStencilState(DF::DS_Mode::Default);
 
-		// LAYER: SPRITES
-		// draw sprites, use the provided depth buffer to check if these are occluded
-		DF::D3DM->RTCopyTarget("rtMix", "rtMixCopy", false);
-		PassSprites("PointSprites", "dsMainCopy");
+	// LAYER: SPRITES
+	// draw sprites, use the provided depth buffer to check if these are occluded
+	DF::D3DM->RTCopyTarget("rtMix", "rtMixCopy", false);
+	PassSprites("PointSprites", "dsMainCopy");
 
-		// do bloom post processing with multiple passes on the final image
-		PostBloom("rtMain");
-	}
+	// do bloom post processing with multiple passes on the final image
+	PostBloom("rtMain");
+
 	// bind main back buffer and its depth buffer
 	DF::D3DM->RTBind("rtBack", "dsBack");
 
 	// mix in PP bloom results and lens dust effect
 	// bind lens dirt texture to PS to use in the final surface rendering
 	DF::D3DM->RTSetAsShaderResource("rtPPBlur", DF::ShaderType::PS, 1u);
-	DF::Engine->MatM->BindTextureToPS("Lens/lensDust.dds", 2u);
+	DF::Engine->MatM->BindTextureToPS("lens/lensDust.dds", 2u);
 	DCB("bloomPow").BindToPS(0u);
 	DF::D3DM->Surface("sfcMain")->SetShaders("surface/VS_Surface", "surface/PS_Surface_MixBloom");
 
@@ -110,6 +106,9 @@ void RenderGraph::RenderFrame() noexcept
 	(DF::D3DM->GetShowDepth())
 		? DF::D3DM->RenderDepthToSurface(DF::DEBUG.depthView, "sfcDepth")
 		: DF::D3DM->RenderBufferToSurface("rtMain", "sfcMain");
+
+	// reset shader resources
+	DF::D3DM->RTResetShaderResource(DF::ShaderType::PS, 1u);
 
 	DF::D3DM->Surface("sfcMain")->SetShaders("surface/VS_Surface", "surface/PS_Surface");
 }

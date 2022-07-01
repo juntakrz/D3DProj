@@ -58,8 +58,10 @@ private:
 		bool isShaderResource = false;
 	};
 
-	ID3D11RenderTargetView* nullRTV = nullptr;
-	ID3D11DepthStencilView* nullDSV = nullptr;
+	// null resources
+	ID3D11RenderTargetView* pNullRTV = nullptr;
+	ID3D11DepthStencilView* pNullDSV = nullptr;
+	ID3D11ShaderResourceView* pNullSRV = nullptr;
 
 	HRESULT hr;
 	bool m_imguiEnabled = CWND_IMGUIENABLED;
@@ -195,7 +197,7 @@ public:
 	bool RTRemove(const std::string& name) noexcept;	// deletes render or depth target by its name
 
 	bool RTSetAsShaderResource(const char* id, const uint8_t& shaderType, const uint8_t& slot) noexcept;
-	void RTClearShaderResource(const uint8_t& shaderType, const uint8_t& slot) noexcept;
+	void RTResetShaderResource(const uint8_t& shaderType, const uint8_t& slot) noexcept;
 
 	/* * * * * * * * * * * * * * */
 
