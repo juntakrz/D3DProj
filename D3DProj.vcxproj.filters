@@ -240,6 +240,9 @@
     <ClCompile Include="src\include\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFMain_JSON.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -743,7 +746,8 @@
     </None>
     <None Include="maps\default.dmap\materials.json" />
     <None Include="maps\default.dmap\init.json" />
-    <None Include="maps\default.dmap\objects.json" />
+    <None Include="maps\default.dmap\cameras.json" />
+    <None Include="maps\default.dmap\lights.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc">

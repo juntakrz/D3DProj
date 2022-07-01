@@ -12,8 +12,15 @@ class DFMain
 
 	std::string mapName = "";										// current map
 
-	void LoadJSON(const wchar_t* path, json& out_j) noexcept;		// loads JSON file into a provided object
-	void LoadMaterialsFromJSON(const json& materials) noexcept;		// parses JSON file and loads materials from it
+	// JSON
+	void JSONLoad(const wchar_t* path, json& out_j) noexcept;		// loads JSON file into a provided object
+	void JSONParseCameras(const json& cameras) noexcept;			// parses JSON file with camera settings
+	void JSONParseMaterials(const json& materials) noexcept;		// parses JSON file and loads materials from it
+	void JSONParseLights(const json& lights) noexcept;				// parses JSON file for lights
+	void JSONParseObjects(const json& objects) noexcept;			// parses JSON file with meshes to be pre-loaded
+	void JSONParseCommands(const json& commands) noexcept;			// parses initial commands for preloaded objects
+
+	// COMMON
 	void DrawFrame();												// generic frame drawing method
 
 

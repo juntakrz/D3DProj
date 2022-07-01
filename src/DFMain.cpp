@@ -7,104 +7,6 @@ DFMain::DFMain(DFactory::DFACTORY_INIT_DESC* pDesc) : DF(DFactory::Init(pDesc))
 {
 }
 
-void DFMain::LoadJSON(const wchar_t* path, json& out_j) noexcept
-{
-	std::ifstream fStream(path);
-
-	if (!fStream.good()) {
-		std::wstring msg = L"Failed to load '" + std::wstring(mapName.begin(), mapName.end()) + L".dmap'.\nThe map files are corrupt or missing.";
-		MessageBoxW(nullptr, msg.c_str(), L"Critical Error", MB_OK | MB_ICONERROR);
-		exit(404);
-	}
-
-	fStream >> out_j;
-}
-
-void DFMain::LoadMaterialsFromJSON(const nlohmann::json& materials) noexcept
-{
-	DFMaterial::DFMATERIAL_DESC DFMatDesc{};
-
-	for (const auto& it : materials)
-	{
-		// clear material description
-		DFMatDesc = {};
-
-		// get material name, must always be defined
-		if (!it.contains("name")) {
-			std::wstring msg = L"Failed to load '" + std::wstring(mapName.begin(), mapName.end()) + L"'\n.Definitions of materials are corrupt.";
-			MessageBoxW(nullptr, L"Critical Error", msg.c_str(), MB_OK | MB_ICONERROR);
-			exit(405);
-		}
-		DFMatDesc.name = it.at("name").get<std::string>();
-
-#ifdef _DEBUG || _DFDEBUG
-		std::string msg = "JSON: processing " + DFMatDesc.name + "\n";
-		OutputDebugStringA(msg.c_str());
-#endif
-
-		(it.contains("manageTextures")) ? it.at("manageTextures").get_to(DFMatDesc.manageTextures) : 0;
-
-		// shaders
-		if (it.contains("shaders")) {
-			auto container = it.at("shaders");
-			(container.contains("vs")) ? container.at("vs").get_to(DFMatDesc.shaders.vertex) : "";
-			(container.contains("gs")) ? container.at("gs").get_to(DFMatDesc.shaders.geometry) : "";
-			(container.contains("ps")) ? container.at("ps").get_to(DFMatDesc.shaders.pixel) : "";
-		}
-
-		// textures
-		if (it.contains("textures")) {
-			auto container = it.at("textures");
-			(container.contains("tex0")) ? container.at("tex0").get_to(DFMatDesc.textures.tex0) : "";
-			(container.contains("tex1")) ? container.at("tex1").get_to(DFMatDesc.textures.tex1) : "";
-			(container.contains("tex2")) ? container.at("tex2").get_to(DFMatDesc.textures.tex2) : "";
-			(container.contains("tex3")) ? container.at("tex3").get_to(DFMatDesc.textures.tex3) : "";
-			(container.contains("tex4")) ? container.at("tex4").get_to(DFMatDesc.textures.tex4) : "";
-			(container.contains("tex5")) ? container.at("tex5").get_to(DFMatDesc.textures.tex5) : "";
-		}
-
-		// variables
-		if (it.contains("variables")) {
-			auto container = it.at("variables");
-
-			(container.contains("intensity")) ? container.at("intensity").get_to(DFMatDesc.material.intensity) : 0;
-			(container.contains("bumpiness")) ? container.at("bumpiness").get_to(DFMatDesc.material.bumpiness) : 0;
-			(container.contains("metalness")) ? container.at("metalness").get_to(DFMatDesc.material.metalness) : 0;
-			(container.contains("roughness")) ? container.at("roughness").get_to(DFMatDesc.material.roughness) : 0;
-
-			if (container.contains("ambient")) {
-				float colors[3];
-				container.at("ambient").get_to(colors);
-				DFMatDesc.material.ambientColor = { colors[0], colors[1], colors[2], 1.0 };
-			}
-
-			if (container.contains("F0")) {
-				float colors[3];
-				container.at("F0").get_to(colors);
-				DFMatDesc.material.F0 = { colors[0], colors[1], colors[2] };
-			}
-		}
-
-		// passes
-		if (it.contains("passes")) {
-			auto passes = it.at("passes");
-			for (const auto& pass : passes) {
-
-				std::string passName = pass.get<std::string>();
-
-				(passName == "background") ? DFMatDesc.passes |= DF::Pass::Background : 0;
-				(passName == "standard") ? DFMatDesc.passes |= DF::Pass::Standard : 0;
-				(passName == "blur") ? DFMatDesc.passes |= DF::Pass::Blur : 0;
-				(passName == "sprite") ? DFMatDesc.passes |= DF::Pass::PointSprites : 0;
-				(passName == "shadow") ? DFMatDesc.passes |= DF::Pass::Shadow : 0;
-				(passName == "null") ? DFMatDesc.passes = 0 : 0;
-			}
-		}
-
-		DF.MatM->MatAdd(&DFMatDesc);
-	}
-}
-
 void DFMain::DrawFrame()
 {
 	//deltaA += 0.002f;
@@ -167,13 +69,15 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	const std::wstring mapPath = L"maps/" + map + L".dmap/";
 	const std::wstring initPath = mapPath + L"init.json";
 	const std::wstring matPath = mapPath + L"materials.json";
+	const std::wstring lightPath = mapPath + L"lights.json";
+	const std::wstring camPath = mapPath + L"cameras.json";
 	const std::wstring objPath = mapPath + L"objects.json";
 
 	// loading "load screen" data
-	LoadJSON(initPath.c_str(), jsonData);
+	JSONLoad(initPath.c_str(), jsonData);
 
 	// parse loaded JSON file and get materials data
-	LoadMaterialsFromJSON(jsonData["materials"]);
+	JSONParseMaterials(jsonData.at("materials"));
 
 	// get load screen material name
 	std::string loadScreenMat = jsonData.at("loadScreen").at("useMaterial").get<std::string>();
@@ -187,10 +91,20 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 
 	DF.EndFrame();
 
+	// delete load screen material
+	DF.MatM->MatDelete(loadScreenMat.c_str());
+
+	// load map cameras
+	JSONLoad(camPath.c_str(), jsonData);
+	JSONParseCameras(jsonData);
+
 	// load map materials
-	jsonData.clear();
-	LoadJSON(matPath.c_str(), jsonData);
-	LoadMaterialsFromJSON(jsonData["materials"]);
+	JSONLoad(matPath.c_str(), jsonData);
+	JSONParseMaterials(jsonData.at("materials"));
+
+	// load map lights
+	JSONLoad(lightPath.c_str(), jsonData);
+	JSONParseLights(jsonData.at("lights"));
 }
 
 void DFMain::LoadMap() noexcept

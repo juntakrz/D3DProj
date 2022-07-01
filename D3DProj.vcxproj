@@ -264,6 +264,7 @@
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshCube.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshPlane.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshSphere.cpp" />
+    <ClCompile Include="src\DFMain_JSON.cpp" />
     <ClCompile Include="src\include\imgui\imgui.cpp" />
     <ClCompile Include="src\include\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\include\imgui\imgui_draw.cpp" />
@@ -443,8 +444,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="maps\default.dmap\init.json" />
+    <None Include="maps\default.dmap\lights.json" />
     <None Include="maps\default.dmap\materials.json" />
-    <None Include="maps\default.dmap\objects.json" />
+    <None Include="maps\default.dmap\cameras.json" />
     <None Include="shaders\include\HPS_PBS_Func.hlsli" />
     <None Include="shaders\include\HPS_PBS_H.hlsli" />
     <None Include="shaders\include\HVS_Transform.hlsli" />

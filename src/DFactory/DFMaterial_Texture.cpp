@@ -136,6 +136,7 @@ bool DFMaterial::TextureDelete(std::string name) noexcept
 	if (name == "default//default.dds"
 		|| name == "default//default_n.dds"
 		|| name == "default//default_s.dds"
+		|| name == "default//default_metallic.dds"
 		|| m_DFTextures.find(name) == m_DFTextures.end()
 		)
 	{

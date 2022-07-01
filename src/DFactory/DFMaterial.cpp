@@ -82,7 +82,7 @@ bool DFMaterial::MatDelete(const char* name) noexcept
 	
 	if (m_Materials.at(name)->manageTextures) {
 
-		for (uint32_t i = 0; i < sizeof(m_Materials.at(name)->idTex) / sizeof(uint32_t); i++) {
+		for (uint32_t i = 0; i < DF::maxTextures; i++) {
 
 			(m_Materials.at(name)->idTex[i] != "") ? TextureDelete(m_Materials.at(name)->idTex[i]) : 0;
 		}
