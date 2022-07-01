@@ -6,11 +6,11 @@ class CSphere
 {
 public:
 	template<class V>
-	static CTriangleIndex<V> Create(const uint16_t divisions, bool invertFaces)
+	static CTriangleIndex<V> Create(uint16_t divisions, bool invertFaces)
 	{
 		constexpr float radius = 1.0f;
 
-		ASSERT(divisions > 2);
+		(divisions > 2) ? 0 : divisions = 3;
 
 		//generate vertices
 		std::vector<V> vertices;

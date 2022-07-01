@@ -87,7 +87,7 @@ std::pair<uint16_t, uint16_t> WndMgr::GetWindowSize() const noexcept
 
 std::optional<int32_t> WndMgr::PeekMessages(MSG& msg)
 {
-	std::this_thread::sleep_for(std::chrono::milliseconds(m_PeekMsgDelay));
+	//std::this_thread::sleep_for(std::chrono::milliseconds(m_PeekMsgDelay));
 	while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
 		if (msg.message == WM_QUIT)

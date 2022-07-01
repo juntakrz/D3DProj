@@ -44,8 +44,13 @@ LightMgr::PLight& LightMgr::PL(std::string name) noexcept {
 		index++;
 	}
 
-	name = "Point light '" + name + "' not found.";
-	MessageBoxA(nullptr, name.c_str(), "LightMgr Error", MB_OK | MB_ICONWARNING);
+#ifdef _DEBUG || _DFDEBUG
+	std::string msg = "Point light '" + name + "' not found. Creating...";
+	OutputDebugStringA(msg.c_str());
+#endif
+	
+	m_selPLight = PLAdd(name);
+
 	return m_PLights[m_selPLight];
 }
 

@@ -1,0 +1,16 @@
+{
+  "commands": {
+
+    "0": {
+      "command": "translateTo",
+      "srcCamera": "camLight",
+      "tgtLight": "$directLight"
+    },
+
+    "1": {
+      "command": "lockTo",
+      "srcCamera": "camLight",
+      "tgtCamera": "camMain"
+    }
+  }
+}

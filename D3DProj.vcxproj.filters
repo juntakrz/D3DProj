@@ -748,6 +748,8 @@
     <None Include="maps\default.dmap\init.json" />
     <None Include="maps\default.dmap\cameras.json" />
     <None Include="maps\default.dmap\lights.json" />
+    <None Include="maps\default.dmap\commands.json" />
+    <None Include="maps\default.dmap\objects.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc">

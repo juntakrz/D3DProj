@@ -16,20 +16,5 @@
         "variables": [ 8.0, 4.5, 0.001, 100.0 ]
       }
     }
-  },
-
-  "cameraSetUp": {
-    "translateTo": {
-      "0": {
-        "camera": "camLight",
-        "targetLight": "$DirectLight"
-      }
-    },
-    "lockTo": {
-      "0": {
-        "camera": "camLight",
-        "targetCamera": "camMain"
-      }
-    }
   }
 }

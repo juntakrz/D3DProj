@@ -153,12 +153,12 @@ void DFMain::JSONParseMaterials(const nlohmann::json& materials) noexcept
 
 void DFMain::JSONParseLights(const json& lights) noexcept
 {
-	for (const auto& it : lights)
-	{
+	for (const auto& it : lights) {
+
+		float pos[3], color[3], intensity;
+
 		// special code for direct light, as it is unique
-		if (it.at("name") == "$directLight")
-		{
-			float pos[3], color[3], intensity;
+		if (it.at("name") == "$directLight") {
 
 			if (it.contains("position")) {
 				it.at("position").get_to(pos);
@@ -170,37 +170,135 @@ void DFMain::JSONParseLights(const json& lights) noexcept
 				DF.LightM->DL().color = { color[0], color[1], color[2], 1.0 };
 			}
 		}
+
+		if (it.at("type") == "PL") {
+
+			if (it.contains("position")) {
+
+				it.at("position").get_to(pos);
+				DF.LightM->PL(it.at("name").get<std::string>()).pMesh->SetPos(pos[0], pos[1], pos[2]);
+			}
+
+			if (it.contains("color")) {
+
+				it.at("color").get_to(color);
+				DF.LightM->PL(it.at("name").get<std::string>()).color = { color[0], color[1], color[2], 1.0 };
+			}
+		}
 	}
 }
 
 void DFMain::JSONParseObjects(const json& objects) noexcept
 {
+	std::string name, material = DF::Default::material;
+	bool createAABB = false, created = false;
+
+	for (const auto& it : objects) {
+
+		created = false;
+
+		uint16_t paramA = 0, paramB = 0;
+		float translation[3] = { 0.0f, 0.0f, 0.0f };
+		float rotation[3] = { 0.0f, 0.0f, 0.0f };
+		float scaling[3] = { 1.0f, 1.0f, 1.0f };
+
+		name = it.at("name");
+		(it.contains("createAABB")) ? createAABB = it.at("createAABB") : createAABB = false;
+		(it.contains("divisionsH")) ? paramA = it.at("divisionsH") : 0;
+		(it.contains("divisionsV")) ? paramB = it.at("divisionsV") : 0;
+		(it.contains("divisions")) ? paramA = it.at("divisions") : 0;
+
+		(it.contains("position")) ? it.at("position").get_to(translation) : 0;
+		(it.contains("rotation")) ? it.at("rotation").get_to(rotation) : 0;
+		(it.contains("scaling")) ? it.at("scaling").get_to(scaling) : 0;
+
+		(it.contains("material")) ? material = it.at("material") : material = DF::Default::material;
+
+		if (it.at("type") == "plane") {
+
+			DF.ModelM->Create(DF::idPlane, name, createAABB, paramA, paramB);
+			created = true;
+		}
+
+		if (it.at("type") == "cube") {
+
+			DF.ModelM->Create(DF::idCube, name, createAABB);
+			created = true;
+		}
+
+		if (it.at("type") == "sphere") {
+
+			DF.ModelM->Create(DF::idSphere, name, createAABB, paramA);
+			created = true;
+		}
+
+		if (created) {
+
+			DF.ModelM->SetPos(translation[0], translation[1], translation[2]);
+			DF.ModelM->SetRotation(rotation[0], rotation[1], rotation[2]);
+			DF.ModelM->SetScaling(scaling[0], scaling[1], scaling[2]);
+
+			DF.ModelM->SetMaterial(material, 0u);
+		}
+	}
 }
 
 void DFMain::JSONParseCommands(const json& commands) noexcept
 {
-	// set up cameras
-	if (commands.contains("cameraCommands")) {
+	/*
+	* command design styles:
+	* A: command, source object type, target object type
+	* B: command, source object type, variable type to set
+	*/
 
-		auto dataset = commands.at("cameraCommands");
+	std::string command, srcObj, tgtObj;
 
-		for (const auto& it : dataset) {
+	for (const auto& it : commands) {
 
-			// translate objects
-			if (it.contains("translateTo")) {
+		command = it.at("command");
 
-				auto commTranslate = it.at("translateTo");
+		// command: "translateTo" - moves source object to target object's position
+		if (command == "translateTo") {
 
-				for (const auto& itTranslate : commTranslate) {
+			// source: srcCamera - perform command with the defined camera
+			if (it.contains("srcCamera")) {
 
-					if (itTranslate.contains("camera")) {
+				srcObj = it.at("srcCamera");
 
-						std::string camera = itTranslate.at("camera");
+				// target: tgtCamera - perform command using the target camera
+				if (it.contains("tgtCamera")) {
 
-						if (itTranslate.contains("targetLight")) {
-							std::string target = itTranslate.at("target");
-						}
+					tgtObj = it.at("tgtCamera");
+
+
+				}
+
+				// target: tgtLight - perform command using the target light
+				if (it.contains("tgtLight")) {
+
+					tgtObj = it.at("tgtLight");
+
+					// if target light is a direct light - execute direct light method
+					if (tgtObj == "$directLight") {
+
+						DF.Camera(srcObj)->SetPos(DF.LightM->DLGetPosA());
+						DF.LightM->DLSetCamera(DF.Camera(srcObj));
 					}
+				}
+			}
+		}
+
+		// command: lock object relative to the position (and focus of) another object
+		if (command == "lockTo") {
+
+			if (it.contains("srcCamera")) {
+				
+				srcObj = it.at("srcCamera");
+
+				if(it.contains("tgtCamera")) {
+
+					tgtObj = it.at("tgtCamera");
+					DF.Camera(srcObj)->LockToCameraTarget(DF.Camera(tgtObj));
 				}
 			}
 		}
