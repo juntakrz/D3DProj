@@ -52,17 +52,17 @@ uint16_t DFMaterial::MatAdd(DFMATERIAL_DESC* pDesc) noexcept
 		: newMat.idTex[5] = TextureAdd("default//default_s.dds");
 
 	newMat.ambientColor = pDesc->material.ambientColor;
-	newMat.data.x = pDesc->material.matIntensity;
-	newMat.data.y = pDesc->material.spec_metal;
-	newMat.data.z = pDesc->material.pow_roughness;
+	newMat.data.x = pDesc->material.intensity;
+	newMat.data.y = pDesc->material.metalness;
+	newMat.data.z = pDesc->material.roughness;
 
 	// bump coefficient for shader needs to be reversed, so 2 times bump intensity will equal 0.5 in the shader
-	float bumpCoef = 1.0f - ((pDesc->material.bumpIntensity - 1.0f) * 0.5);
+	float bumpCoef = 1.0f - ((pDesc->material.bumpiness - 1.0f) * 0.5);
 	newMat.data.w = std::max(0.05f, bumpCoef);		// safeguard against zero or negative values
 
 	newMat.F0 = pDesc->material.F0;
 	newMat.manageTextures = pDesc->manageTextures;
-	newMat.effects = pDesc->effects;
+	newMat.passes = pDesc->passes;
 
 	m_Materials.emplace_back(std::make_unique<DFMaterial::Material>(std::move(newMat)));
 	return index;

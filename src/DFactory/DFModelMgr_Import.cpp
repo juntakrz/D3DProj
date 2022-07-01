@@ -212,12 +212,12 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 			DFMatDesc.shaders.pixel = "PS_FlatTexture";
 
 			// default normal mapping intensity
-			DFMatDesc.material.bumpIntensity = 1.5f;
+			DFMatDesc.material.bumpiness = 1.5f;
 
 			// try to delete textures if unused by anything else
 			DFMatDesc.manageTextures = true;
 			
-			DFMatDesc.effects = DF::Pass::Standard;
+			DFMatDesc.passes = DF::Pass::Standard;
 
 			pMatMgr->MatAdd(&DFMatDesc);
 			pDFMat = &pMatMgr->Mat(newMesh.meshMat);
@@ -254,13 +254,13 @@ DFMesh DFModelMgr::ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterial
 	{
 		XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.25f, 1.0f };
 		XMFLOAT3A F0 = { 0.1f, 0.1f, 0.1f };
-		float matIntensity = 2.0f;
-		float spec_metal = 1.12f;
+		float intensity = 2.0f;
+		float metalness = 1.12f;
 		float pow_rough = 0.8f;
-		float bumpIntensity = 1.5f;
+		float bumpiness = 1.5f;
 	} material;
 
-	material.bumpIntensity = pDFMat->data.w;
+	material.bumpiness = pDFMat->data.w;
 
 	pBinds[Bind::idConstPixelBuf0] = std::make_unique<Bind::ConstPixelBuffer<PSConstBuffer>>(material, 0u);
 

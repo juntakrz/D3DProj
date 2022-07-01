@@ -7,9 +7,102 @@ DFMain::DFMain(DFactory::DFACTORY_INIT_DESC* pDesc) : DF(DFactory::Init(pDesc))
 {
 }
 
+void DFMain::LoadJSON(const wchar_t* path, json& out_j) noexcept
+{
+	std::ifstream fStream(path);
+
+	if (!fStream.good()) {
+		std::wstring msg = L"Failed to load '" + std::wstring(mapName.begin(), mapName.end()) + L".dmap'.\nThe map files are corrupt or missing.";
+		MessageBoxW(nullptr, msg.c_str(), L"Critical Error", MB_OK | MB_ICONERROR);
+		exit(404);
+	}
+
+	fStream >> out_j;
+}
+
+void DFMain::LoadMaterialsFromJSON(const nlohmann::json& materials) noexcept
+{
+	DFMaterial::DFMATERIAL_DESC DFMatDesc{};
+
+	for (const auto& it : materials)
+	{
+		// clear material description
+		DFMatDesc = {};
+
+		// get material name, must always be defined
+		if (!it.contains("name")) {
+			std::wstring msg = L"Failed to load '" + std::wstring(mapName.begin(), mapName.end()) + L"'\n.Definitions of materials are corrupt.";
+			MessageBoxW(nullptr, L"Critical Error", msg.c_str(), MB_OK | MB_ICONERROR);
+			exit(405);
+		}
+		DFMatDesc.name = it.at("name").get<std::string>();
+
+		(it.contains("manageTextures")) ? it.at("manageTextures").get_to(DFMatDesc.manageTextures) : 0;
+
+		// shaders
+		if (it.contains("shaders")) {
+			auto container = it.at("shaders");
+			(container.contains("vs")) ? container.at("vs").get_to(DFMatDesc.shaders.vertex) : "";
+			(container.contains("gs")) ? container.at("gs").get_to(DFMatDesc.shaders.geometry) : "";
+			(container.contains("ps")) ? container.at("ps").get_to(DFMatDesc.shaders.pixel) : "";
+		}
+
+		// textures
+		if (it.contains("textures")) {
+			auto container = it.at("textures");
+			(container.contains("tex0")) ? container.at("tex0").get_to(DFMatDesc.textures.tex0) : "";
+			(container.contains("tex1")) ? container.at("tex1").get_to(DFMatDesc.textures.tex1) : "";
+			(container.contains("tex2")) ? container.at("tex2").get_to(DFMatDesc.textures.tex2) : "";
+			(container.contains("tex3")) ? container.at("tex3").get_to(DFMatDesc.textures.tex3) : "";
+			(container.contains("tex4")) ? container.at("tex4").get_to(DFMatDesc.textures.tex4) : "";
+			(container.contains("tex5")) ? container.at("tex5").get_to(DFMatDesc.textures.tex5) : "";
+		}
+
+		// variables
+		if (it.contains("variables")) {
+			auto container = it.at("variables");
+
+			(container.contains("intensity")) ? container.at("intensity").get_to(DFMatDesc.material.intensity) : 0;
+			(container.contains("bumpiness")) ? container.at("bumpiness").get_to(DFMatDesc.material.bumpiness) : 0;
+			(container.contains("metalness")) ? container.at("metalness").get_to(DFMatDesc.material.metalness) : 0;
+			(container.contains("roughness")) ? container.at("roughness").get_to(DFMatDesc.material.roughness) : 0;
+
+			if (container.contains("ambient")) {
+				float colors[3];
+				container.at("ambient").get_to(colors);
+				DFMatDesc.material.ambientColor = { colors[0], colors[1], colors[2], 1.0 };
+			}
+
+			if (container.contains("F0")) {
+				float colors[3];
+				container.at("F0").get_to(colors);
+				DFMatDesc.material.F0 = { colors[0], colors[1], colors[2] };
+			}
+		}
+
+		// passes
+		if (it.contains("passes")) {
+			auto passes = it.at("passes");
+			for (const auto& pass : passes) {
+
+				std::string passName = pass.get<std::string>();
+
+				(passName == "background") ? DFMatDesc.passes |= DF::Pass::Background : 0;
+				(passName == "standard") ? DFMatDesc.passes |= DF::Pass::Standard : 0;
+				(passName == "blur") ? DFMatDesc.passes |= DF::Pass::Blur : 0;
+				(passName == "sprite") ? DFMatDesc.passes |= DF::Pass::PointSprites : 0;
+				(passName == "shadow") ? DFMatDesc.passes |= DF::Pass::Shadow : 0;
+				(passName == "null") ? DFMatDesc.passes = 0 : 0;
+			}
+		}
+
+		DF.MatM->MatAdd(&DFMatDesc);
+	}
+}
+
 void DFMain::DrawFrame()
 {
-	deltaA += 0.002f;
+	//deltaA += 0.002f;
 
 	DF.ModelM->Select("MdlTachi");
 	//DF.ModelM->SetRotation(-0.6f - deltaA*0.7f , -0.4f + deltaA, -0.3f + deltaA * 0.7f);
@@ -46,33 +139,10 @@ void DFMain::DrawFrame()
 
 int32_t DFMain::Run()
 {
-	//DF.font = 
+	// 1. Load map
+	LoadMap(DF::defaultMap);
 
-	LoadScreen();
-
-	// -------
-	/*
-	std::mt19937 randomSeed(std::random_device{}());
-	std::uniform_real_distribution<float> aDist(0.0f, 2 * PI32);
-	std::uniform_real_distribution<float> dDist(0.0f, 2 * PI32);
-	std::uniform_real_distribution<float> oDist(0.0f, 0.3 * PI32);
-	std::uniform_real_distribution<float> rDist(6.0f, 20.0f);
-	*/
-
-	/*CSurface texture(1024, 1024);
-	std::uniform_int_distribution starDist(0xFF000000u, 0xFFFFFFFFu);
-	std::uniform_int_distribution colorDist(0xFF22AACCu, 0xFFFFFFFFu);
-	for (int x = 0; x < 1024; x++)
-	{
-		for (int y = 0; y < 1024; y++)
-		{
-			int dword = starDist(randomSeed);
-			(dword < 0xFFFEEFFFu) ? dword = 0xFF000000u : dword = colorDist(randomSeed);
-			texture.SetPixel(x, y, CSurface::Color(dword));
-		}
-	}
-
-	texture.SaveToFile(L"test.png");*/
+	// 2. Run message and rendering loops
 
 	MSG msg;
 	while (true)
@@ -85,7 +155,39 @@ int32_t DFMain::Run()
 	}
 }
 
-void DFMain::LoadScreen() noexcept
+void DFMain::LoadMap(const std::wstring& map) noexcept
+{
+	// initial setup
+	json jsonData;
+	const std::wstring mapPath = L"maps/" + map + L".dmap/";
+	const std::wstring initPath = mapPath + L"init.json";
+	const std::wstring matPath = mapPath + L"materials.json";
+	const std::wstring objPath = mapPath + L"objects.json";
+
+	// loading "load screen" data
+	LoadJSON(initPath.c_str(), jsonData);
+
+	// parse loaded JSON file and get materials data
+	LoadMaterialsFromJSON(jsonData["materials"]);
+
+	// get load screen material name
+	std::string loadScreenMat = jsonData.at("loadScreen").at("useMaterial").get<std::string>();
+
+	// start rendering loading screen
+	DF::isLoadScreen = true;
+
+	DF.MatM->BindTextureToPS(DF.MatM->Mat(DF.MatM->MatIndex(loadScreenMat)).idTex[0], 0u);
+
+	DF.BeginFrame();
+
+	DF.pD3DMgr->RTBind("rtBack", "dsBack");
+
+	DF.pD3DMgr->RenderSurface("sfcMain");
+
+	DF.EndFrame();
+}
+
+void DFMain::LoadMap() noexcept
 {
 	DFMaterial::DFMATERIAL_DESC DFMatDesc{};
 
@@ -123,9 +225,9 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex0 = "PBR/mars/mars_4k_albedo.dds";
 	DFMatDesc.textures.tex1 = "PBR/mars/mars_4k_normal.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.06f, 0.0f, 0.0f };
-	DFMatDesc.material.matIntensity = 1.0f;
-	DFMatDesc.material.spec_metal = 0.0f;
-	DFMatDesc.material.pow_roughness = 0.0f;
+	DFMatDesc.material.intensity = 1.0f;
+	DFMatDesc.material.metalness = 0.0f;
+	DFMatDesc.material.roughness = 0.0f;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -140,12 +242,12 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex3 = "PBR/mars/mars_4k_roughness.dds";
 	DFMatDesc.textures.tex4 = "PBR/mars/mars_4k_ao.dds";
 	DFMatDesc.material.ambientColor = { 0.06f, 0.03f, 0.0f, 1.0f };
-	DFMatDesc.material.spec_metal = 0.08f;
-	DFMatDesc.material.pow_roughness = 0.8f;
+	DFMatDesc.material.metalness = 0.08f;
+	DFMatDesc.material.roughness = 0.8f;
 	DFMatDesc.material.F0 = { 0.25f, 0.23f, 0.00f };
-	DFMatDesc.material.matIntensity = 2.2f;
-	DFMatDesc.material.bumpIntensity = 1.5f;
-	DFMatDesc.effects = DF::Pass::Background;
+	DFMatDesc.material.intensity = 2.2f;
+	DFMatDesc.material.bumpiness = 1.5f;
+	DFMatDesc.passes = DF::Pass::Background;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -155,10 +257,10 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.vertex = "VS_Atmosphere";
 	DFMatDesc.shaders.pixel = "PS_Atmosphere";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.15f, 1.0f };
-	DFMatDesc.material.spec_metal = 0.0f;
-	DFMatDesc.material.pow_roughness = 1.0f;
-	DFMatDesc.material.matIntensity = 1.0f;
-	DFMatDesc.effects = DF::Pass::Blur;
+	DFMatDesc.material.metalness = 0.0f;
+	DFMatDesc.material.roughness = 1.0f;
+	DFMatDesc.material.intensity = 1.0f;
+	DFMatDesc.passes = DF::Pass::Blur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -168,8 +270,8 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.vertex = "VS_FlatTexture";
 	DFMatDesc.shaders.pixel = "PS_FlatTexture";
 	DFMatDesc.textures.tex0 = "stars_6k_color.dds";
-	DFMatDesc.material.matIntensity = 0.1f;
-	DFMatDesc.effects = DF::Pass::Background;
+	DFMatDesc.material.intensity = 0.1f;
+	DFMatDesc.passes = DF::Pass::Background;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -183,11 +285,11 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex2 = "PBR/iron/rustediron2_metallic.dds";
 	DFMatDesc.textures.tex3 = "PBR/iron/rustediron2_roughness.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.01f, 1.0f };
-	DFMatDesc.material.spec_metal = 1.0f;
-	DFMatDesc.material.pow_roughness = 1.0f;
+	DFMatDesc.material.metalness = 1.0f;
+	DFMatDesc.material.roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.0f, 0.0f, 0.0f };
-	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
+	DFMatDesc.material.bumpiness = 2.0f;
+	DFMatDesc.passes = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -202,11 +304,11 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex3 = "PBR/gold_ornate/roughness.dds";
 	DFMatDesc.textures.tex4 = "PBR/gold_ornate/ao.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.01f, 1.0f };
-	DFMatDesc.material.spec_metal = 1.0f;
-	DFMatDesc.material.pow_roughness = 1.0f;
+	DFMatDesc.material.metalness = 1.0f;
+	DFMatDesc.material.roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
-	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
+	DFMatDesc.material.bumpiness = 2.0f;
+	DFMatDesc.passes = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -221,11 +323,11 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex3 = "PBR/steel_plate/roughness.dds";
 	DFMatDesc.textures.tex4 = "PBR/steel_plate/ao.dds";
 	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.01f, 1.0f };
-	DFMatDesc.material.spec_metal = 1.0f;
-	DFMatDesc.material.pow_roughness = 1.0f;
+	DFMatDesc.material.metalness = 1.0f;
+	DFMatDesc.material.roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
-	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Pass::Blur | DF::Pass::Shadow;
+	DFMatDesc.material.bumpiness = 2.0f;
+	DFMatDesc.passes = DF::Pass::Blur | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -238,13 +340,13 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex1 = "PBR/bricks/normal.dds";
 	DFMatDesc.textures.tex3 = "PBR/bricks/roughness.dds";
 	DFMatDesc.textures.tex4 = "PBR/bricks/ao.dds";
-	DFMatDesc.material.matIntensity = 5.0f;
+	DFMatDesc.material.intensity = 5.0f;
 	DFMatDesc.material.ambientColor = { 0.1f, 0.1f, 0.25f, 1.0f };
-	DFMatDesc.material.spec_metal = 2.0f;
-	DFMatDesc.material.pow_roughness = 3.0f;
+	DFMatDesc.material.metalness = 2.0f;
+	DFMatDesc.material.roughness = 3.0f;
 	DFMatDesc.material.F0 = { 0.07f, 0.06f, 0.05f };
-	DFMatDesc.material.bumpIntensity = 2.2f;
-	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
+	DFMatDesc.material.bumpiness = 2.2f;
+	DFMatDesc.passes = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -259,11 +361,11 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.textures.tex3 = "PBR/gold_ornate/roughness.dds";
 	DFMatDesc.textures.tex4 = "PBR/gold_ornate/ao.dds";
 	DFMatDesc.material.ambientColor = { 0.2f, 0.2f, 0.02f, 1.0f };
-	DFMatDesc.material.spec_metal = 1.0f;
-	DFMatDesc.material.pow_roughness = 1.0f;
+	DFMatDesc.material.metalness = 1.0f;
+	DFMatDesc.material.roughness = 1.0f;
 	DFMatDesc.material.F0 = { 0.25f, 0.25f, 0.05f };
-	DFMatDesc.material.bumpIntensity = 2.0f;
-	DFMatDesc.effects = DF::Pass::Standard | DF::Pass::Shadow;
+	DFMatDesc.material.bumpiness = 2.0f;
+	DFMatDesc.passes = DF::Pass::Standard | DF::Pass::Shadow;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -272,7 +374,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.name = "Mat_Sun";
 	DFMatDesc.shaders.vertex = "VS_Default";
 	DFMatDesc.shaders.pixel = "PS_Default";
-	DFMatDesc.effects = DF::Pass::Blur;
+	DFMatDesc.passes = DF::Pass::Blur;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 
@@ -284,7 +386,7 @@ void DFMain::LoadScreen() noexcept
 	DFMatDesc.shaders.pixel = "PS_QuadFlare";
 	DFMatDesc.textures.tex0 = "Lens/sunFlare.dds";
 	DFMatDesc.textures.tex1 = "Lens/lensDust.dds";		// make it a separate command maybe
-	DFMatDesc.effects = DF::Pass::PointSprites;
+	DFMatDesc.passes = DF::Pass::PointSprites;
 
 	DF.MatM->MatAdd(&DFMatDesc);
 	
@@ -431,9 +533,4 @@ void DFMain::LoadScreen() noexcept
 
 	DF.Camera()->SetAsOrthographic(8.0f, 4.5f, 0.001f, 100.0f);
 	DF.Camera()->LockToCameraTarget(DF.Camera("camMain"));
-}
-
-void DFMain::CreateMaterials() noexcept 
-{
-	//
 }

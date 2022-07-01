@@ -742,8 +742,8 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="maps\default.dmap\materials.json" />
-    <None Include="maps\default.dmap\loadscreen.json" />
-    <None Include="maps\default.dmap\models.json" />
+    <None Include="maps\default.dmap\init.json" />
+    <None Include="maps\default.dmap\objects.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DProj.rc">

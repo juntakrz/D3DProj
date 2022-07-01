@@ -54,10 +54,10 @@ DFactory& DFactory::Init(DFACTORY_INIT_DESC* pDescription)
 	DFMatDesc.shaders.pixel = "PS_FlatTexture";
 	DFMatDesc.textures.tex0 = "default/default.dds";
 	DFMatDesc.material.ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
-	DFMatDesc.material.matIntensity = 1.0f;
-	DFMatDesc.material.spec_metal = 0.0f;
-	DFMatDesc.material.pow_roughness = 0.5f;
-	DFMatDesc.effects = DF::Pass::Standard;
+	DFMatDesc.material.intensity = 1.0f;
+	DFMatDesc.material.metalness = 0.0f;
+	DFMatDesc.material.roughness = 0.5f;
+	DFMatDesc.passes = DF::Pass::Standard;
 	_SInstance.MatM->MatAdd(&DFMatDesc);
 
 	//create and add default RTT material

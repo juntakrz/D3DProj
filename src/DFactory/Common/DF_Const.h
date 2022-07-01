@@ -151,4 +151,5 @@ namespace DF
 	extern bool isCullingEnabled;
 	extern uint64_t framesRendered;
 	extern bool isLoadScreen;
+	const std::wstring defaultMap = L"default";
 }

@@ -442,9 +442,9 @@
     <Image Include="res\c-logo-icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="maps\default.dmap\loadscreen.json" />
+    <None Include="maps\default.dmap\init.json" />
     <None Include="maps\default.dmap\materials.json" />
-    <None Include="maps\default.dmap\models.json" />
+    <None Include="maps\default.dmap\objects.json" />
     <None Include="shaders\include\HPS_PBS_Func.hlsli" />
     <None Include="shaders\include\HPS_PBS_H.hlsli" />
     <None Include="shaders\include\HVS_Transform.hlsli" />

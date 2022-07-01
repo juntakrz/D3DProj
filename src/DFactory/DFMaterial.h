@@ -30,8 +30,8 @@ class DFMaterial
 		*/
 		XMFLOAT4 data;
 
-		// add effects using bitwise ops
-		uint32_t effects;
+		// set related render passes using bitwise ops
+		uint32_t passes;
 
 		// will MatMgr automatically try to delete textures
 		// from memory if unused by any other material
@@ -80,13 +80,13 @@ public:
 		{
 			XMFLOAT4 ambientColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 			XMFLOAT3A F0 = { 0.4f, 0.4f, 0.4f };		//basic metal
-			float matIntensity = 1.0f;
-			float spec_metal = 1.0f;
-			float pow_roughness = 1.0f;
-			float bumpIntensity = 1.0f;
+			float intensity = 1.0f;
+			float metalness = 1.0f;
+			float roughness = 1.0f;
+			float bumpiness = 1.0f;
 		} material;
 
-		uint32_t effects = DF::Pass::Standard;
+		uint32_t passes = DF::Pass::Standard;
 	};
 
 	DFMaterial() {};

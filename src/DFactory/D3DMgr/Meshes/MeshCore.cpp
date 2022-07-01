@@ -66,7 +66,7 @@ void MeshCore::SetMaterial(std::string name) noexcept
 	const auto& mat = MatMgr.Mat(name);
 
 	// get techniques
-	m_TechniqueIds = mat.effects;
+	m_TechniqueIds = mat.passes;
 
 	// prepare material PS const buffer
 	matCBuffer.ambientColor = mat.ambientColor;
