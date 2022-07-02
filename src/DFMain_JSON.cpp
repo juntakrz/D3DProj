@@ -26,7 +26,7 @@ void DFMain::JSONParseCameras(const json& cameraData) noexcept
 			float pos[3] = { 0.0f, 0.0f, 0.0f };
 			float rotation[2] = { 0.0f, 0.0f };
 
-			DF.CameraAdd(name);
+			void* ptr = DF.CameraAdd(name);
 
 			// set camera position
 			if (it.contains("position")) {
@@ -62,6 +62,8 @@ void DFMain::JSONParseCameras(const json& cameraData) noexcept
 					DF.Camera(name)->SetAsPerspective(vars[0], vars[1], vars[2], vars[3]);
 				}
 			}
+
+			DF.RefM->Add(name, ptr, DFRefMgr::Type::Camera);
 		}
 	}
 }
@@ -153,6 +155,8 @@ void DFMain::JSONParseMaterials(const nlohmann::json& materials) noexcept
 
 void DFMain::JSONParseLights(const json& lights) noexcept
 {
+	std::string id;
+
 	for (const auto& it : lights) {
 
 		float pos[3], color[3], intensity;
@@ -172,18 +176,22 @@ void DFMain::JSONParseLights(const json& lights) noexcept
 		}
 
 		if (it.at("type") == "PL") {
+			
+			id = it.at("name");
 
 			if (it.contains("position")) {
 
 				it.at("position").get_to(pos);
-				DF.LightM->PL(it.at("name").get<std::string>()).pMesh->SetPos(pos[0], pos[1], pos[2]);
+				DF.LightM->PL(id)->pMesh->SetPos(pos[0], pos[1], pos[2]);
 			}
 
 			if (it.contains("color")) {
 
 				it.at("color").get_to(color);
-				DF.LightM->PL(it.at("name").get<std::string>()).color = { color[0], color[1], color[2], 1.0 };
+				DF.LightM->PL(id)->color = { color[0], color[1], color[2], 1.0 };
 			}
+
+			DF.RefM->Add(id, DF.LightM->PL(id), DFRefMgr::Type::Light);
 		}
 	}
 }
@@ -216,31 +224,31 @@ void DFMain::JSONParseObjects(const json& objects) noexcept
 
 		if (it.at("type") == "plane") {
 
-			DF.ModelM->Create(DF::idPlane, name, createAABB, paramA, paramB);
+			DF.RefM->Add(name, DF.ModelM->Create(DF::idPlane, name, createAABB, paramA, paramB), DFRefMgr::Type::Model);
 			created = true;
 		}
 
 		if (it.at("type") == "cube") {
-
-			DF.ModelM->Create(DF::idCube, name, createAABB);
+			
+			DF.RefM->Add(name, DF.ModelM->Create(DF::idCube, name, createAABB), DFRefMgr::Type::Model);
 			created = true;
 		}
 
 		if (it.at("type") == "sphere") {
 
-			DF.ModelM->Create(DF::idSphere, name, createAABB, paramA);
+			DF.RefM->Add(name, DF.ModelM->Create(DF::idSphere, name, createAABB, paramA), DFRefMgr::Type::Model);
 			created = true;
 		}
 
 		if (it.at("type") == "skySphere") {
 
-			DF.ModelM->Create(DF::idSkySphere, name);
+			DF.RefM->Add(name, DF.ModelM->Create(DF::idSkySphere, name), DFRefMgr::Type::Model);
 			created = true;
 		}
 
 		if (it.at("type") == "sprite") {
 
-			DF.ModelM->Create(DF::idPoint, name);
+			DF.RefM->Add(name, DF.ModelM->Create(DF::idPoint, name), DFRefMgr::Type::Model);
 			created = true;
 		}
 

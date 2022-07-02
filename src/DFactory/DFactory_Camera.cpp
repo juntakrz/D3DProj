@@ -1,23 +1,27 @@
 #include "DFactory.h"
 
-void DFactory::CameraAdd(std::string name, float x, float y, float z) noexcept
+CCamera* DFactory::CameraAdd(std::string name, float x, float y, float z) noexcept
 {
 	// if camera exists - exit
-	if (m_Cameras.find(name) == m_Cameras.end())
+	if (m_Cameras.find(name) != m_Cameras.end())
 	{
-		// create camera
-		m_Cameras[name] = std::make_unique<CCamera>(-x, -y, -z);
+		return m_Cameras.at(name).get();
 	}
+
+#ifdef _DEBUG || _DFDEBUG
+	std::string msg = "WARNING: couldn't create camera '" + name + "'. Already exists.\n";
+	OutputDebugStringA(msg.c_str());
+#endif
+
+	// create camera
+	m_Cameras[name] = std::make_unique<CCamera>(-x, -y, -z);
+
+	return m_Cameras[name].get();
 }
 
-void DFactory::CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept
+CCamera* DFactory::CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept
 {
-	// if camera exists - exit
-	if (m_Cameras.find(name) == m_Cameras.end())
-	{
-		// create camera
-		m_Cameras[name] = std::make_unique<CCamera>(-pos.x, -pos.y, -pos.z);
-	}
+	return CameraAdd(name, pos.x, pos.y, pos.z);
 }
 
 void DFactory::CameraActivate(std::string name, bool select) noexcept

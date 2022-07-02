@@ -2,7 +2,7 @@
 
 // DF MODEL MANAGER
 
-void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, uint16_t paramA, uint16_t paramB) noexcept
+DFModelMgr::DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, uint16_t paramA, uint16_t paramB) noexcept
 {
 	DFModel newModel;
 	DFMesh newMesh;
@@ -10,9 +10,9 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 	std::vector<MeshCore*> pAABBs;
 	uint32_t newID = 0;
 
-	for (const auto& it : m_Models)
+	for (auto& it : m_Models)
 	{
-		if (it.name == name) return;
+		if (it.name == name) return &it;
 
 		if (newID == it.id)
 		{
@@ -154,10 +154,13 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 		m_Models.emplace_back(std::move(newModel));
 		m_Models.back().pRootNode = std::make_unique<DFModelNode>(std::move(pMeshes), XMMatrixIdentity());
 		m_curModel = m_Models.size() - 1;
+
 		break;
 	}
 	}
 	m_curModel = newID;
+
+	return &m_Models.back();
 }
 
 DFModelMgr::DFModel& DFModelMgr::Select(std::string name) noexcept

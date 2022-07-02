@@ -107,8 +107,8 @@ public:
 		return _SInstance;
 	}
 
-	void Create(uint8_t type, std::string name, const bool& createAABB = true, uint16_t paramA = 0, uint16_t paramB = 0) noexcept;
-	void Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept;
+	DFModel* Create(uint8_t type, std::string name, const bool& createAABB = true, uint16_t paramA = 0, uint16_t paramB = 0) noexcept;
+	DFModel* Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept;
 
 	// select current model
 	DFModel& Select(std::string name) noexcept;		// searches, selects and returns model by name (slow)

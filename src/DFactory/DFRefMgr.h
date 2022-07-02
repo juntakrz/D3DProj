@@ -1,6 +1,6 @@
 #pragma once
 
-class DFObjList
+class DFRefMgr
 {
 public:
 	enum class Type {
@@ -14,15 +14,15 @@ private:
 		Type type;
 	};
 
-	std::map<std::string, ListObject> m_objList;
+	std::map<std::string, ListObject> m_refList;
 public:
-	static DFObjList& Get() {
+	static DFRefMgr& Get() {
 
-		static DFObjList _SInstance;
+		static DFRefMgr _SInstance;
 		return _SInstance;
 	}
 
-	void Add(const std::string& id, void* ptr, Type type);
+	bool Add(const std::string& id, void* ptr, Type type);
 	std::pair<void*, Type> Get(const std::string& id);
-	void Remove(const std::string& id);
+	bool Remove(const std::string& id);
 };

@@ -243,7 +243,7 @@
     <ClCompile Include="src\DFMain_JSON.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\DFObjList.cpp">
+    <ClCompile Include="src\DFactory\DFRefMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -704,7 +704,7 @@
     <ClInclude Include="src\include\json\json.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\DFObjList.h">
+    <ClInclude Include="src\DFactory\DFRefMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

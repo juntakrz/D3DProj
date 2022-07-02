@@ -4,7 +4,7 @@
 #include "WndMgr/WndMgr.h"
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
-#include "DFObjList.h"
+#include "DFRefMgr.h"
 #include "RenderGraph/RenderGraph.h"
 
 class DFactory
@@ -81,7 +81,7 @@ public:
 	DFModelMgr* ModelM = nullptr;
 	LightMgr* LightM = nullptr;
 	DFMaterial* MatM = &DFMaterial::Get();
-	DFObjList* ObjListM = &DFObjList::Get();
+	DFRefMgr* RefM = &DFRefMgr::Get();
 	imGuiMgr& imGUIMgr = imGuiMgr::Get();
 
 private:
@@ -130,8 +130,8 @@ public:
 	// CAMERA ------------------------
 
 	// create and add new camera
-	void CameraAdd(std::string name, float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
-	void CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept;
+	CCamera* CameraAdd(std::string name, float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
+	CCamera* CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept;
 
 	// select and set an active camera
 	void CameraActivate(std::string name, bool select = false) noexcept;

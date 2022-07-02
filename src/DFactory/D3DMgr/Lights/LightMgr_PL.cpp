@@ -25,13 +25,13 @@ uint16_t LightMgr::PLAdd(std::string name, float x, float y, float z) noexcept {
 	return index;
 }
 
-LightMgr::PLight& LightMgr::PL() noexcept {
+LightMgr::PLight* LightMgr::PL() noexcept {
 	if (m_selPLight < m_PLights.size()) {
-		return m_PLights[m_selPLight];
+		return &m_PLights[m_selPLight];
 	}
 }
 
-LightMgr::PLight& LightMgr::PL(std::string name) noexcept {
+LightMgr::PLight* LightMgr::PL(std::string name) noexcept {
 	
 	uint16_t index = 0;
 	for (auto& it : m_PLights)
@@ -39,7 +39,7 @@ LightMgr::PLight& LightMgr::PL(std::string name) noexcept {
 		if (it.name == name)
 		{
 			m_selPLight = index;
-			return it;
+			return &it;
 		}
 		index++;
 	}
@@ -51,18 +51,18 @@ LightMgr::PLight& LightMgr::PL(std::string name) noexcept {
 	
 	m_selPLight = PLAdd(name);
 
-	return m_PLights[m_selPLight];
+	return &m_PLights[m_selPLight];
 }
 
-LightMgr::PLight& LightMgr::PL(uint16_t index) noexcept {
+LightMgr::PLight* LightMgr::PL(uint16_t index) noexcept {
 	if (index < m_PLights.size())
 	{
 		m_selPLight = index;
-		return m_PLights[index];
+		return &m_PLights[index];
 	}
 
 	MessageBoxA(nullptr, "Index out of boundaries.", "LightMgr Error", MB_OK | MB_ICONWARNING);
-	return m_PLights[m_selPLight];
+	return &m_PLights[m_selPLight];
 }
 
 bool& LightMgr::ShowPLMeshes() noexcept

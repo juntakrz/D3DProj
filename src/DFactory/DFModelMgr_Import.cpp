@@ -1,12 +1,12 @@
 #include "DFModelMgr.h"
 
-void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept
+DFModelMgr::DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept
 {
 	uint32_t newID = 0;
 
-	for (const auto& it : m_Models)
+	for (auto& it : m_Models)
 	{
-		if (it.name == name) return;
+		if (it.name == name) return &it;
 	}
 
 	for (const auto& it : m_Models)
@@ -49,6 +49,8 @@ void DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, 
 
 		m_Models.emplace_back(std::move(newModel));
 		m_curModel = newID;
+
+		return &m_Models.back();
 	}
 }
 

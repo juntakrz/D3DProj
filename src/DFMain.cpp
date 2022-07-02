@@ -423,31 +423,31 @@ void DFMain::LoadMap() noexcept
 	DF.LightM->PLAdd("Light1", 0.17f, 0.515f, 8.55f);
 	//DF.LightM->PL().pMesh->SetPos(0.0f, 0.0f, 0.0f);
 	//DF.LightM->PL().pMesh->SetRotationZ(0.05f);
-	DF.LightM->PL().intensity = 0.07f;
-	DF.LightM->PL().color = { 1.0f, 0.02f, 0.02f, 1.0f };
+	DF.LightM->PL()->intensity = 0.07f;
+	DF.LightM->PL()->color = { 1.0f, 0.02f, 0.02f, 1.0f };
 
 	DF.LightM->PLAdd("Light2", -0.6f, 0.345f, 8.36f);
 	//DF.LightM->PL().pMesh->SetRotationZ(-0.05f);
-	DF.LightM->PL().intensity = 0.07f;
-	DF.LightM->PL().color = { 1.0f, 0.02f, 0.02f, 1.0f };
+	DF.LightM->PL()->intensity = 0.07f;
+	DF.LightM->PL()->color = { 1.0f, 0.02f, 0.02f, 1.0f };
 
 	DF.LightM->PLAdd("Light3", 0.62f, -1.1f, 6.4f);
-	DF.LightM->PL().intensity = 0.2f;
-	DF.LightM->PL().color = { 0.0f, 0.25f, 1.0f, 1.0f };
+	DF.LightM->PL()->intensity = 0.2f;
+	DF.LightM->PL()->color = { 0.0f, 0.25f, 1.0f, 1.0f };
 	
 	//
 	
 	DF.LightM->PLAdd("Light4", -0.7f, 0.25f, 2.0f);
-	DF.LightM->PL().intensity = 0.05f;
-	DF.LightM->PL().color = { 1.0f, 0.25f, 0.02f, 1.0f };
+	DF.LightM->PL()->intensity = 0.05f;
+	DF.LightM->PL()->color = { 1.0f, 0.25f, 0.02f, 1.0f };
 	
 	DF.LightM->PLAdd("Light5", -0.35f, 0.5f, 2.0f);		//???? something wrong with distance algo
-	DF.LightM->PL().intensity = 0.08f;
-	DF.LightM->PL().color = { 0.02f, 1.02f, 0.02f, 1.0f };
+	DF.LightM->PL()->intensity = 0.08f;
+	DF.LightM->PL()->color = { 0.02f, 1.02f, 0.02f, 1.0f };
 	
 	DF.LightM->PLAdd("Light6", -1.05f, -0.5f, 2.0f);
-	DF.LightM->PL().intensity = 0.05f;
-	DF.LightM->PL().color = { 1.02f, 0.02f, 0.02f, 1.0f };
+	DF.LightM->PL()->intensity = 0.05f;
+	DF.LightM->PL()->color = { 1.02f, 0.02f, 0.02f, 1.0f };
 	
 	DF.ModelM->Select(0);
 	DF.ModelM->Delete();

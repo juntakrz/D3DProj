@@ -85,9 +85,9 @@ public:
 
 	uint16_t PLAdd(std::string name, float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
 
-	PLight& PL() noexcept;
-	PLight& PL(std::string name) noexcept;
-	PLight& PL(uint16_t index) noexcept;
+	PLight* PL() noexcept;
+	PLight* PL(std::string name) noexcept;
+	PLight* PL(uint16_t index) noexcept;
 
 	bool& ShowPLMeshes() noexcept;
 
