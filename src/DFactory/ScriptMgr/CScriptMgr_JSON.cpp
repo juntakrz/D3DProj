@@ -267,20 +267,15 @@ void CScriptMgr::JSONParseObjects(const json& objects) noexcept
 
 void CScriptMgr::JSONParseCommands(const json& commands) noexcept
 {
-	enum class CommandType
+	enum CommandType
 	{
 		null = 0, translateTo, faceTo, translateWith
 	};
 
-	enum class ObjectType
-	{
-		null = 0, model, light, camera
-	};
-
 	struct CommandData {
-		CommandType cType;
+		uint16_t cType;
 		void* obj = nullptr, * tgt = nullptr;
-		ObjectType objType, tgtType;
+		uint8_t objType, tgtType;
 		bool state;
 	};
 
@@ -288,29 +283,32 @@ void CScriptMgr::JSONParseCommands(const json& commands) noexcept
 
 	std::string objName = "", tgtName = "";
 
+	/*
+	DF.Camera(srcObj)->SetPos(DF.LightM->DLGetPosA());
+	DF.LightM->DLSetCamera(DF.Camera(srcObj));
+	*/
+
 	// generate command list
 	for (const auto& it : commands) {
 
 		CommandData cData{};
 
 		// determine command type
-		if (it.at("command") == "translateTo") cData.cType = CommandType::translateTo;
-		if (it.at("command") == "faceTo") cData.cType = CommandType::faceTo;
-		if (it.at("command") == "translateWith") cData.cType = CommandType::translateWith;
+		if (it.at("command") == "translateTo") cData.cType = translateTo;
+		if (it.at("command") == "faceTo") cData.cType = faceTo;
+		if (it.at("command") == "translateWith") cData.cType = translateWith;
 
 		// get object and target (if exists) names
 		objName = it.at("object");
-		//(it.contains("target")) ? tgtName = it.at("target") : tgtName = "";
+		DF.RefM->Get(tgtName, cData.obj, cData.objType);
 
-		// find object's and target's (if exists) type and get pointer to it
-		if (cData.obj = DF.ModelM->Find(objName.c_str())) {
-			cData.objType = ObjectType::model;
-		};
+		(it.contains("target")) ? tgtName = it.at("target") : tgtName = "";
+		if (tgtName != "" && tgtName[0] != '$') {
 
-		if (!cData.obj) {
-			if (cData.obj = DF.Camera(objName.c_str())) {
-				cData.objType = ObjectType::camera;
-			}
+			if (!DF.RefM->Get(tgtName, cData.obj, cData.objType)) {
+
+				throw std::invalid_argument("JSON parser: invalid target id.");
+			};
 		}
 	}
 }

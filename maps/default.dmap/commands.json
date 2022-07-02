@@ -16,7 +16,7 @@
     "2": {
       "command": "translateWith",
       "object": "mdlSkySphere",
-      "target": true
+      "state": true
     },
 
     "3": {

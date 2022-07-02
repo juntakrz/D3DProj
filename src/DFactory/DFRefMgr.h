@@ -22,7 +22,8 @@ public:
 		return _SInstance;
 	}
 
-	bool Add(const std::string& id, void* ptr, Type type);
-	std::pair<void*, Type> Get(const std::string& id);
-	bool Remove(const std::string& id);
+	bool Add(const std::string& id, void* ptr, Type type) noexcept;
+	std::pair<void*, Type> Get(const std::string& id) noexcept;
+	bool Get(const std::string& id, void* out_ptr, uint8_t type) noexcept;
+	bool Remove(const std::string& id) noexcept;
 };

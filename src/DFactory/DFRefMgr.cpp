@@ -1,7 +1,7 @@
 #include "../pch.h"
 #include "DFRefMgr.h"
 
-bool DFRefMgr::Add(const std::string& id, void* ptr, Type type)
+bool DFRefMgr::Add(const std::string& id, void* ptr, Type type) noexcept
 {
 	if (m_refList.try_emplace(id).second) {
 
@@ -19,7 +19,7 @@ bool DFRefMgr::Add(const std::string& id, void* ptr, Type type)
 	return false;
 }
 
-std::pair<void*, DFRefMgr::Type> DFRefMgr::Get(const std::string& id)
+std::pair<void*, DFRefMgr::Type> DFRefMgr::Get(const std::string& id) noexcept
 {
 	if (m_refList.find(id) != m_refList.end()) {
 		
@@ -29,7 +29,20 @@ std::pair<void*, DFRefMgr::Type> DFRefMgr::Get(const std::string& id)
 	return { nullptr, DFRefMgr::Type::Null };
 }
 
-bool DFRefMgr::Remove(const std::string& id)
+bool DFRefMgr::Get(const std::string& id, void* out_ptr, uint8_t type) noexcept
+{
+	if (m_refList.find(id) != m_refList.end()) {
+
+		out_ptr = m_refList.at(id).ptr;
+		type = (uint8_t)m_refList.at(id).type;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool DFRefMgr::Remove(const std::string& id) noexcept
 {
 	return m_refList.erase(id);
 }

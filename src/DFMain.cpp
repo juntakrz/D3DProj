@@ -67,6 +67,7 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	// initial setup
 	CScriptMgr& SM = CScriptMgr::Get();
 	nlohmann::json jsonData;
+	std::thread t1;
 
 	const std::wstring mapPath = L"maps/" + map + L".dmap/";		// path to map
 	const std::wstring initPath = mapPath + L"init.json";			// load screen data
@@ -85,6 +86,9 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	// get load screen material name
 	std::string loadScreenMat = jsonData.at("loadScreen").at("useMaterial").get<std::string>();
 
+	SM.JSONLoad(matPath.c_str(), &jsonData);
+	t1 = std::thread(&CScriptMgr::JSONParseMaterials, &SM, jsonData.at("materials"));
+
 	// render loading screen
 	DF.BeginFrame();
 
@@ -98,8 +102,8 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	DF.MatM->MatDelete(loadScreenMat.c_str());
 
 	// load map materials
-	SM.JSONLoad(matPath.c_str(), &jsonData);
-	SM.JSONParseMaterials(jsonData.at("materials"));
+	//SM.JSONLoad(matPath.c_str(), &jsonData);
+	//SM.JSONParseMaterials(jsonData.at("materials"));
 
 	// load map cameras
 	SM.JSONLoad(camPath.c_str(), &jsonData);
@@ -108,6 +112,8 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	// load map lights
 	SM.JSONLoad(lightPath.c_str(), &jsonData);
 	SM.JSONParseLights(jsonData.at("lights"));
+
+	t1.join();
 
 	SM.JSONLoad(objPath.c_str(), &jsonData);
 	SM.JSONParseObjects(jsonData.at("objects"));
