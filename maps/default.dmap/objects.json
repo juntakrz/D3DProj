@@ -1,6 +1,21 @@
 {
   "objects": {
 
+    "mdlSunFlare": {
+      "name": "mdlSunFlare",
+      "type": "sprite",
+      "position": [ -48.0, 34.0, -0.4 ],
+      "material": "Mat_SunFlare"
+    },
+
+    "mdlSkySphere": {
+      "name": "mdlSkySphere",
+      "type": "skySphere",
+      "rotation": [ 0.25, 2.2, -0.4 ],
+      "scaling": [ 400.0, 400.0, 400.0 ],
+      "material": "Mat_SkySphere"
+    },
+
     "mdlIronSphere": {
       "name": "mdlIronSphere",
       "type": "sphere",
@@ -58,19 +73,11 @@
       "name": "mdlMarsAtmo",
       "type": "sphere",
       "divisions": 32,
-      "createAABB" : true,
+      "createAABB": true,
       "position": [ 60.0, -160.0, 400.0 ],
       "rotation": [ 0.0, 0.0, 0.0 ],
       "scaling": [ 265.0, 265.0, 265.0 ],
       "material": "Mat_Atmo"
-    },
-
-    "mdlSkySphere": {
-      "name": "mdlSkySphere",
-      "type": "skySphere",
-      "rotation": [ 0.25, 2.2, -0.4 ],
-      "scaling": [ 400.0, 400.0, 400.0 ],
-      "material": "Mat_SkySphere"
     }
   }
 

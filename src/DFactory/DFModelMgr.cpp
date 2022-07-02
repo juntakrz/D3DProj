@@ -200,6 +200,19 @@ DFModelMgr::DFModel& DFModelMgr::Model() noexcept
 	return m_Models[m_curModel];
 }
 
+DFModelMgr::DFModel* DFModelMgr::Find(const char* id) noexcept
+{
+	for (auto& it : m_Models)
+	{
+		if (it.name == id)
+		{
+			return &it;
+		}
+	}
+
+	return nullptr;
+}
+
 void DFModelMgr::Delete() noexcept
 {
 	m_Models.erase(m_Models.begin() + m_curModel);

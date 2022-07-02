@@ -39,6 +39,7 @@ public:
 class DFModelMgr
 {
 	friend class DFactory;
+	friend class DFMain;
 	friend class DFModelNode;
 
 private:
@@ -113,6 +114,7 @@ public:
 	DFModel& Select(std::string name) noexcept;		// searches, selects and returns model by name (slow)
 	DFModel& Select(uint32_t modelID) noexcept;		// searches, selects and returns model by Id (faster)
 	DFModel& Model() noexcept;						// returns selected model (very fast)
+	DFModel* Find(const char* id) noexcept;			// generic method that returns pointer to DFModel or nullptr if not found
 
 	void Delete() noexcept;
 	void Delete(std::string name) noexcept;

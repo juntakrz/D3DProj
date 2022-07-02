@@ -3,31 +3,43 @@
 
     "0": {
       "command": "translateTo",
-      "srcCamera": "camLight",
-      "tgtLight": "$directLight"
+      "object": "camLight",
+      "target": "$directLight"
     },
 
     "1": {
-      "command": "lockTo",
-      "srcCamera": "camLight",
-      "tgtCamera": "camMain"
+      "command": "faceTo",
+      "object": "camLight",
+      "target": "camMain"
     },
 
     "2": {
-      "command": "followCamera",
-      "srcModel": "mdlSkySphere",
-      "state": true
+      "command": "translateWith",
+      "object": "mdlSkySphere",
+      "target": true
     },
 
     "3": {
-      "command": "followCamera",
-      "srcModel": "mdlMars",
+      "command": "translateWith",
+      "object": "mdlMars",
       "state": true
     },
 
     "4": {
-      "command": "followCamera",
-      "srcModel": "mdlMarsAtmo",
+      "command": "translateWith",
+      "object": "mdlMarsAtmo",
+      "state": true
+    },
+
+    "5": {
+      "command": "translateTo",
+      "object": "mdlSunFlare",
+      "target": "camMain"
+    },
+
+    "6": {
+      "command": "translateWith",
+      "object": "mdlSunFlare",
       "state": true
     }
   }

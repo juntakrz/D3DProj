@@ -4,6 +4,7 @@
 #include "WndMgr/WndMgr.h"
 #include "DFMaterial.h"
 #include "DFModelMgr.h"
+#include "DFObjList.h"
 #include "RenderGraph/RenderGraph.h"
 
 class DFactory
@@ -80,6 +81,7 @@ public:
 	DFModelMgr* ModelM = nullptr;
 	LightMgr* LightM = nullptr;
 	DFMaterial* MatM = &DFMaterial::Get();
+	DFObjList* ObjListM = &DFObjList::Get();
 	imGuiMgr& imGUIMgr = imGuiMgr::Get();
 
 private:

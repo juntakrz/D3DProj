@@ -186,6 +186,7 @@
     <ClCompile Include="src\DFactory\DFModelMgr_Node.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Transform.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_UI.cpp" />
+    <ClCompile Include="src\DFactory\DFObjList.cpp" />
     <ClCompile Include="src\DFactory\RenderGraph\RenderGraph_Pass.cpp" />
     <ClCompile Include="src\DFactory\RenderGraph\RTechnique.cpp" />
     <ClCompile Include="src\DFactory\RenderGraph\RenderGraph.cpp" />
@@ -295,6 +296,7 @@
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshPoint.h" />
     <ClInclude Include="src\DFactory\D3DMgr\RenderSurface.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h" />
+    <ClInclude Include="src\DFactory\DFObjList.h" />
     <ClInclude Include="src\DFactory\RenderGraph\RenderGraph.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h" />
     <ClInclude Include="src\DFactory\RenderGraph\RTechnique.h" />

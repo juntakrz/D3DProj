@@ -238,6 +238,12 @@ void DFMain::JSONParseObjects(const json& objects) noexcept
 			created = true;
 		}
 
+		if (it.at("type") == "sprite") {
+
+			DF.ModelM->Create(DF::idPoint, name);
+			created = true;
+		}
+
 		if (created) {
 
 			DF.ModelM->SetPos(translation[0], translation[1], translation[2]);
@@ -251,71 +257,49 @@ void DFMain::JSONParseObjects(const json& objects) noexcept
 
 void DFMain::JSONParseCommands(const json& commands) noexcept
 {
-	/*
-	* command design styles:
-	* A: command, source object type, target object type
-	* B: command, source object type, variable type to set
-	*/
+	enum class CommandType
+	{
+		null = 0, translateTo, faceTo, translateWith
+	};
 
-	std::string command, srcObj, tgtObj;
+	enum class ObjectType
+	{
+		null = 0, model, light, camera
+	};
 
+	struct CommandData {
+		CommandType cType;
+		void *obj = nullptr, *tgt = nullptr;
+		ObjectType objType, tgtType;
+		bool state;
+	};
+
+	std::vector<CommandData> commandList;
+
+	std::string objName = "", tgtName = "";
+	
+	// generate command list
 	for (const auto& it : commands) {
 
-		command = it.at("command");
+		CommandData cData{};
 
-		// command: "translateTo" - moves source object to target object's position
-		if (command == "translateTo") {
+		// determine command type
+		if (it.at("command") == "translateTo") cData.cType = CommandType::translateTo;
+		if (it.at("command") == "faceTo") cData.cType = CommandType::faceTo;
+		if (it.at("command") == "translateWith") cData.cType = CommandType::translateWith;
 
-			// source: srcCamera - perform command with the defined camera
-			if (it.contains("srcCamera")) {
+		// get object and target (if exists) names
+		objName = it.at("object");
+		//(it.contains("target")) ? tgtName = it.at("target") : tgtName = "";
 
-				srcObj = it.at("srcCamera");
+		// find object's and target's (if exists) type and get pointer to it
+		if (cData.obj = DF.ModelM->Find(objName.c_str())) {
+			cData.objType = ObjectType::model;
+		};
 
-				// target: tgtCamera - perform command using the target camera
-				if (it.contains("tgtCamera")) {
-
-					tgtObj = it.at("tgtCamera");
-
-
-				}
-
-				// target: tgtLight - perform command using the target light
-				if (it.contains("tgtLight")) {
-
-					tgtObj = it.at("tgtLight");
-
-					// if target light is a direct light - execute direct light method
-					if (tgtObj == "$directLight") {
-
-						DF.Camera(srcObj)->SetPos(DF.LightM->DLGetPosA());
-						DF.LightM->DLSetCamera(DF.Camera(srcObj));
-					}
-				}
-			}
-		}
-
-		// command: lock object relative to the position (and focus of) another object
-		if (command == "lockTo") {
-
-			if (it.contains("srcCamera")) {
-				
-				srcObj = it.at("srcCamera");
-
-				if(it.contains("tgtCamera")) {
-
-					tgtObj = it.at("tgtCamera");
-					DF.Camera(srcObj)->LockToCameraTarget(DF.Camera(tgtObj));
-				}
-			}
-		}
-
-		// command: make object always stay in the same position relative to camera
-		if (command == "followCamera") {
-
-			if (it.contains("srcModel")) {
-
-				DF.ModelM->Select(it.at("srcModel").get<std::string>());
-				DF.ModelM->Model().FollowCamera(it.at("state"));
+		if (!cData.obj) {
+			if (cData.obj = DF.Camera(objName.c_str())) {
+				cData.objType = ObjectType::camera;
 			}
 		}
 	}
