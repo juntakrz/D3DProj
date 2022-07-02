@@ -1,20 +1,22 @@
-#include "DFMain.h"
+#include "../../pch.h"
+#include "CScriptMgr.h"
 
-void DFMain::JSONLoad(const wchar_t* path, json& out_j) noexcept
+void CScriptMgr::JSONLoad(const wchar_t* path, json* out_j) noexcept
 {
 	std::ifstream fStream(path);
-	out_j.clear();
+	(!out_j) ? out_j = &j : nullptr;
+	out_j->clear();
 
 	if (!fStream.good()) {
-		std::wstring msg = L"Failed to load '" + std::wstring(mapName.begin(), mapName.end()) + L".dmap'.\nThe map files are corrupt or missing.";
+		std::wstring msg = L"Failed to load '" + std::wstring(m_sceneName.begin(), m_sceneName.end()) + L".dmap'.\nThe map files are corrupt or missing.";
 		MessageBoxW(nullptr, msg.c_str(), L"Critical Error", MB_OK | MB_ICONERROR);
 		exit(404);
 	}
 
-	fStream >> out_j;
+	fStream >> *out_j;
 }
 
-void DFMain::JSONParseCameras(const json& cameraData) noexcept
+void CScriptMgr::JSONParseCameras(const json& cameraData) noexcept
 {
 	// parse cameras
 	for (const auto& it : cameraData.at("cameras")) {
@@ -40,7 +42,7 @@ void DFMain::JSONParseCameras(const json& cameraData) noexcept
 				it.at("rotation").get_to(rotation);
 			}
 
-			DF.Camera(name)->SetRotation( rotation[0], rotation[1] );
+			DF.Camera(name)->SetRotation(rotation[0], rotation[1]);
 
 			// set camera mode
 			/* vars:
@@ -53,12 +55,12 @@ void DFMain::JSONParseCameras(const json& cameraData) noexcept
 				it.at("mode").at("variables").get_to(vars);
 
 				if (it.at("mode").at("view") == "orthographic") {
-					
+
 					DF.Camera(name)->SetAsOrthographic(vars[0], vars[1], vars[2], vars[3]);
 				}
 
 				if (it.at("mode").at("view") == "perspective") {
-					
+
 					DF.Camera(name)->SetAsPerspective(vars[0], vars[1], vars[2], vars[3]);
 				}
 			}
@@ -68,7 +70,7 @@ void DFMain::JSONParseCameras(const json& cameraData) noexcept
 	}
 }
 
-void DFMain::JSONParseMaterials(const nlohmann::json& materials) noexcept
+void CScriptMgr::JSONParseMaterials(const nlohmann::json& materials) noexcept
 {
 	DFMaterial::DFMATERIAL_DESC DFMatDesc{};
 
@@ -79,7 +81,7 @@ void DFMain::JSONParseMaterials(const nlohmann::json& materials) noexcept
 
 		// get material name, must always be defined
 		if (!it.contains("name")) {
-			std::wstring msg = L"Failed to load '" + std::wstring(mapName.begin(), mapName.end()) + L"'\n.Definitions of materials are corrupt.";
+			std::wstring msg = L"Failed to load '" + std::wstring(m_sceneName.begin(), m_sceneName.end()) + L"'\n.Definitions of materials are corrupt.";
 			MessageBoxW(nullptr, L"Critical Error", msg.c_str(), MB_OK | MB_ICONERROR);
 			exit(405);
 		}
@@ -153,7 +155,7 @@ void DFMain::JSONParseMaterials(const nlohmann::json& materials) noexcept
 	}
 }
 
-void DFMain::JSONParseLights(const json& lights) noexcept
+void CScriptMgr::JSONParseLights(const json& lights) noexcept
 {
 	std::string id;
 
@@ -176,7 +178,7 @@ void DFMain::JSONParseLights(const json& lights) noexcept
 		}
 
 		if (it.at("type") == "PL") {
-			
+
 			id = it.at("name");
 
 			if (it.contains("position")) {
@@ -196,7 +198,7 @@ void DFMain::JSONParseLights(const json& lights) noexcept
 	}
 }
 
-void DFMain::JSONParseObjects(const json& objects) noexcept
+void CScriptMgr::JSONParseObjects(const json& objects) noexcept
 {
 	std::string name, material = DF::Default::material;
 	bool createAABB = false, created = false;
@@ -229,7 +231,7 @@ void DFMain::JSONParseObjects(const json& objects) noexcept
 		}
 
 		if (it.at("type") == "cube") {
-			
+
 			DF.RefM->Add(name, DF.ModelM->Create(DF::idCube, name, createAABB), DFRefMgr::Type::Model);
 			created = true;
 		}
@@ -263,7 +265,7 @@ void DFMain::JSONParseObjects(const json& objects) noexcept
 	}
 }
 
-void DFMain::JSONParseCommands(const json& commands) noexcept
+void CScriptMgr::JSONParseCommands(const json& commands) noexcept
 {
 	enum class CommandType
 	{
@@ -277,7 +279,7 @@ void DFMain::JSONParseCommands(const json& commands) noexcept
 
 	struct CommandData {
 		CommandType cType;
-		void *obj = nullptr, *tgt = nullptr;
+		void* obj = nullptr, * tgt = nullptr;
 		ObjectType objType, tgtType;
 		bool state;
 	};
@@ -285,7 +287,7 @@ void DFMain::JSONParseCommands(const json& commands) noexcept
 	std::vector<CommandData> commandList;
 
 	std::string objName = "", tgtName = "";
-	
+
 	// generate command list
 	for (const auto& it : commands) {
 

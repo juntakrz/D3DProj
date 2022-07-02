@@ -240,10 +240,13 @@
     <ClCompile Include="src\include\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFMain_JSON.cpp">
+    <ClCompile Include="src\DFactory\DFRefMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\DFRefMgr.cpp">
+    <ClCompile Include="src\DFactory\ScriptMgr\CScriptMgr_JSON.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DFactory\ScriptMgr\CScriptMgr_Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -705,6 +708,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\DFRefMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\ScriptMgr\CScriptMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

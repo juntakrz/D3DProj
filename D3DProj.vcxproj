@@ -190,6 +190,8 @@
     <ClCompile Include="src\DFactory\RenderGraph\RenderGraph_Pass.cpp" />
     <ClCompile Include="src\DFactory\RenderGraph\RTechnique.cpp" />
     <ClCompile Include="src\DFactory\RenderGraph\RenderGraph.cpp" />
+    <ClCompile Include="src\DFactory\ScriptMgr\CScriptMgr_Core.cpp" />
+    <ClCompile Include="src\DFactory\ScriptMgr\CScriptMgr_JSON.cpp" />
     <ClCompile Include="src\DFactory\Util\DDSTextureLoader11.cpp" />
     <ClCompile Include="src\DFactory\Common\DF_A.cpp" />
     <ClCompile Include="src\DFactory\Util\GPUConstBuffer.cpp" />
@@ -265,7 +267,6 @@
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshCube.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshPlane.cpp" />
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshSphere.cpp" />
-    <ClCompile Include="src\DFMain_JSON.cpp" />
     <ClCompile Include="src\include\imgui\imgui.cpp" />
     <ClCompile Include="src\include\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\include\imgui\imgui_draw.cpp" />
@@ -300,6 +301,7 @@
     <ClInclude Include="src\DFactory\RenderGraph\RenderGraph.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h" />
     <ClInclude Include="src\DFactory\RenderGraph\RTechnique.h" />
+    <ClInclude Include="src\DFactory\ScriptMgr\CScriptMgr.h" />
     <ClInclude Include="src\DFactory\Util\DDSTextureLoader11.h" />
     <ClInclude Include="src\DFactory\Common\DF_A.h" />
     <ClInclude Include="src\DFactory\Common\DF_Const.h" />

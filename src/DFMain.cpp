@@ -65,8 +65,9 @@ int32_t DFMain::Run()
 void DFMain::LoadMap(const std::wstring& map) noexcept
 {
 	// initial setup
-	json jsonData;
-	std::thread t1;
+	CScriptMgr& SM = CScriptMgr::Get();
+	nlohmann::json jsonData;
+
 	const std::wstring mapPath = L"maps/" + map + L".dmap/";		// path to map
 	const std::wstring initPath = mapPath + L"init.json";			// load screen data
 	const std::wstring camPath = mapPath + L"cameras.json";			// camera objects
@@ -76,16 +77,13 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	const std::wstring commPath = mapPath + L"commands.json";		// post-init commands using previously created objects
 
 	// loading "load screen" data
-	JSONLoad(initPath.c_str(), jsonData);
+	SM.JSONLoad(initPath.c_str(), &jsonData);
 
 	// parse loaded JSON file and get materials data
-	JSONParseMaterials(jsonData.at("materials"));
+	SM.JSONParseMaterials(jsonData.at("materials"));
 
 	// get load screen material name
 	std::string loadScreenMat = jsonData.at("loadScreen").at("useMaterial").get<std::string>();
-
-	JSONLoad(matPath.c_str(), jsonData);
-	t1 = std::thread(&DFMain::JSONParseMaterials, this, jsonData.at("materials"));
 
 	// render loading screen
 	DF.BeginFrame();
@@ -99,25 +97,23 @@ void DFMain::LoadMap(const std::wstring& map) noexcept
 	// delete load screen material
 	DF.MatM->MatDelete(loadScreenMat.c_str());
 
-	// load map cameras
-	JSONLoad(camPath.c_str(), jsonData);
-	JSONParseCameras(jsonData);
-
 	// load map materials
-	//JSONLoad(matPath.c_str(), jsonData);
-	//JSONParseMaterials(jsonData.at("materials"));
+	SM.JSONLoad(matPath.c_str(), &jsonData);
+	SM.JSONParseMaterials(jsonData.at("materials"));
+
+	// load map cameras
+	SM.JSONLoad(camPath.c_str(), &jsonData);
+	SM.JSONParseCameras(jsonData);
 
 	// load map lights
-	JSONLoad(lightPath.c_str(), jsonData);
-	JSONParseLights(jsonData.at("lights"));
+	SM.JSONLoad(lightPath.c_str(), &jsonData);
+	SM.JSONParseLights(jsonData.at("lights"));
 
-	t1.join();
+	SM.JSONLoad(objPath.c_str(), &jsonData);
+	SM.JSONParseObjects(jsonData.at("objects"));
 
-	JSONLoad(objPath.c_str(), jsonData);
-	JSONParseObjects(jsonData.at("objects"));
-
-	JSONLoad(commPath.c_str(), jsonData);
-	JSONParseCommands(jsonData.at("commands"));
+	SM.JSONLoad(commPath.c_str(), &jsonData);
+	SM.JSONParseCommands(jsonData.at("commands"));
 }
 
 void DFMain::LoadMap() noexcept
