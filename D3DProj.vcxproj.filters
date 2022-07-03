@@ -249,6 +249,9 @@
     <ClCompile Include="src\DFactory\ScriptMgr\CScriptMgr_Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFactory\DFEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -711,6 +714,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\ScriptMgr\CScriptMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\DFEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

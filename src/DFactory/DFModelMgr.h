@@ -39,7 +39,6 @@ public:
 class DFModelMgr
 {
 	friend class DFactory;
-	friend class DFMain;
 	friend class DFModelNode;
 
 private:

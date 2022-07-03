@@ -18,6 +18,7 @@
 #include <optional>
 #include <memory>
 #include <unordered_map>
+#include <variant>
 #include <math.h>
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
