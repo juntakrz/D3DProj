@@ -1,6 +1,6 @@
 #include "DFModelMgr.h"
 
-DFModelMgr::DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept
+DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept
 {
 	uint32_t newID = 0;
 

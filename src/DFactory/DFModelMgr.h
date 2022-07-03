@@ -2,6 +2,7 @@
 
 #include "D3DMgr/Meshes/Mesh_Includes.h"
 #include "DFactory.h"
+#include "DFEntity/DFModel.h"
 
 using namespace DirectX;
 
@@ -54,35 +55,6 @@ private:
 		XMFLOAT3A tempRotation;
 		XMFLOAT3A tempScaling;
 	} DFModelM_UIData;
-
-	struct DFModel
-	{
-		uint32_t id;
-		std::string name;
-		std::unique_ptr<DFModelNode> pRootNode;
-		std::vector<DFMesh> meshes;
-
-		bool m_followCamera = false;
-
-		struct
-		{
-			XMFLOAT3A translation = { 0.0f, 0.0f, 0.0f };
-			XMFLOAT3A rotation = { 0.0f, 0.0f, 0.0f };
-			XMFLOAT3A scaling = { 1.0f, 1.0f, 1.0f };
-		} transform;
-
-		XMMATRIX xmMain = XMMatrixIdentity();
-		FXMMATRIX GetModelXMTransform() noexcept;
-
-	public:
-		void SetPos(const XMFLOAT3A& position) noexcept;
-		void SetPos(const float& x, const float& y, const float& z) noexcept;
-
-		void AdjustPos(const XMFLOAT3A& position) noexcept;
-		void AdjustPos(const float& x, const float& y, const float& z) noexcept;
-
-		void FollowCamera(const bool& enabled) noexcept;	// add camera position to model translation
-	};
 
 	D3DMgr* pD3DMgr;
 	DFMaterial* pMatMgr;

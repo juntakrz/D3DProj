@@ -114,7 +114,7 @@ void DFactory::DrawFrame() noexcept
 	for (auto& it : ModelM->m_Models)
 	{
 		// if model follows camera - recalculate boundaries every frame
-		it.pRootNode->XMUpdate(it.GetModelXMTransform());
+		it.pRootNode->XMUpdate(it.GetXMTransform());
 	}
 
 	// clear rendering queue and generate new jobs

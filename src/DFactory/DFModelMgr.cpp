@@ -2,7 +2,7 @@
 
 // DF MODEL MANAGER
 
-DFModelMgr::DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, uint16_t paramA, uint16_t paramB) noexcept
+DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, uint16_t paramA, uint16_t paramB) noexcept
 {
 	DFModel newModel;
 	DFMesh newMesh;
@@ -163,7 +163,7 @@ DFModelMgr::DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bo
 	return &m_Models.back();
 }
 
-DFModelMgr::DFModel& DFModelMgr::Select(std::string name) noexcept
+DFModel& DFModelMgr::Select(std::string name) noexcept
 {
 	uint32_t index = 0;
 	for (auto& it : m_Models)
@@ -178,7 +178,7 @@ DFModelMgr::DFModel& DFModelMgr::Select(std::string name) noexcept
 	return m_Models[m_curModel];
 }
 
-DFModelMgr::DFModel& DFModelMgr::Select(uint32_t modelID) noexcept
+DFModel& DFModelMgr::Select(uint32_t modelID) noexcept
 {
 	uint32_t index = 0;
 	for (auto& it : m_Models)
@@ -198,12 +198,12 @@ DFModelMgr::DFModel& DFModelMgr::Select(uint32_t modelID) noexcept
 	return m_Models[m_curModel];
 }
 
-DFModelMgr::DFModel& DFModelMgr::Model() noexcept
+DFModel& DFModelMgr::Model() noexcept
 {
 	return m_Models[m_curModel];
 }
 
-DFModelMgr::DFModel* DFModelMgr::Find(const char* id) noexcept
+DFModel* DFModelMgr::Find(const char* id) noexcept
 {
 	for (auto& it : m_Models)
 	{

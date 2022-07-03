@@ -12,19 +12,19 @@ void DFModelMgr::ShowEditWindow() noexcept
 
 	if (!DFModelM_UIData.storedT)
 	{
-		DFModelM_UIData.tempTranslation = model.transform.translation;
+		DFModelM_UIData.tempTranslation = model.GetTransformData().translation;
 		DFModelM_UIData.storedT = true;
 	}
 
 	if (!DFModelM_UIData.storedR)
 	{
-		DFModelM_UIData.tempRotation = model.transform.rotation;
+		DFModelM_UIData.tempRotation = model.GetTransformData().rotation;
 		DFModelM_UIData.storedR = true;
 	}
 
 	if (!DFModelM_UIData.storedS)
 	{
-		DFModelM_UIData.tempScaling = model.transform.scaling;
+		DFModelM_UIData.tempScaling = model.GetTransformData().scaling;
 		DFModelM_UIData.storedS = true;
 	}
 
@@ -46,17 +46,17 @@ void DFModelMgr::ShowEditWindow() noexcept
 		ImGui::Text("Translation:\n");
 		ImGui::Text("X");
 		ImGui::SameLine();
-		check(ImGui::DragFloat("##X", &model.transform.translation.x, 0.01f, -100.0f, 100.0f, "%.2f", 1.0f));
+		check(ImGui::DragFloat("##X", &model.GetTransformData().translation.x, 0.01f, -100.0f, 100.0f, "%.2f", 1.0f));
 		ImGui::Text("Y");
 		ImGui::SameLine();
-		check(ImGui::DragFloat("##Y", &model.transform.translation.y, 0.01f, -100.0f, 100.0f, "%.2f", 1.0f));
+		check(ImGui::DragFloat("##Y", &model.GetTransformData().translation.y, 0.01f, -100.0f, 100.0f, "%.2f", 1.0f));
 		ImGui::Text("Z");
 		ImGui::SameLine();
-		check(ImGui::DragFloat("##Z", &model.transform.translation.z, 0.01f, -100.0f, 100.0f, "%.2f", 1.0f));
+		check(ImGui::DragFloat("##Z", &model.GetTransformData().translation.z, 0.01f, -100.0f, 100.0f, "%.2f", 1.0f));
 
 		if (ImGui::Button("Recall", ImVec2(96, 20)))
 		{
-			model.transform.translation = DFModelM_UIData.tempTranslation;
+			model.GetTransformData().translation = DFModelM_UIData.tempTranslation;
 			modelAdjusted = true;
 		}
 		ImGui::SameLine();
@@ -72,17 +72,17 @@ void DFModelMgr::ShowEditWindow() noexcept
 		ImGui::Text("\nRotation:\n");
 		ImGui::Text("X");
 		ImGui::SameLine();
-		ImGui::SliderFloat("##X", &model.transform.rotation.x, -XM_PI, XM_PI, "%.2f", 1.0f);
+		ImGui::SliderFloat("##X", &model.GetTransformData().rotation.x, -XM_PI, XM_PI, "%.2f", 1.0f);
 		ImGui::Text("Y");
 		ImGui::SameLine();
-		ImGui::SliderFloat("##Y", &model.transform.rotation.y, -XM_PI, XM_PI, "%.2f", 1.0f);
+		ImGui::SliderFloat("##Y", &model.GetTransformData().rotation.y, -XM_PI, XM_PI, "%.2f", 1.0f);
 		ImGui::Text("Z");
 		ImGui::SameLine();
-		ImGui::SliderFloat("##Z", &model.transform.rotation.z, -XM_PI, XM_PI, "%.2f", 1.0f);
+		ImGui::SliderFloat("##Z", &model.GetTransformData().rotation.z, -XM_PI, XM_PI, "%.2f", 1.0f);
 
 		if (ImGui::Button("Recall", ImVec2(96, 20)))
 		{
-			model.transform.rotation = DFModelM_UIData.tempRotation;
+			model.GetTransformData().rotation = DFModelM_UIData.tempRotation;
 			modelAdjusted = true;
 		}
 		ImGui::SameLine();
@@ -93,7 +93,7 @@ void DFModelMgr::ShowEditWindow() noexcept
 		ImGui::SameLine();
 		if (ImGui::Button("Default", ImVec2(96, 20)))
 		{
-			model.transform.rotation = { 0.0f, 0.0f, 0.0f };
+			model.GetTransformData().rotation = { 0.0f, 0.0f, 0.0f };
 			modelAdjusted = true;
 		}
 
@@ -112,9 +112,9 @@ void DFModelMgr::ShowEditWindow() noexcept
 		case true:
 		{
 			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
-			check(ImGui::DragFloat("##scale", &model.transform.scaling.x, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
-			model.transform.scaling.y = model.transform.scaling.x;
-			model.transform.scaling.z = model.transform.scaling.x;
+			check(ImGui::DragFloat("##scale", &model.GetTransformData().scaling.x, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
+			model.GetTransformData().scaling.y = model.GetTransformData().scaling.x;
+			model.GetTransformData().scaling.z = model.GetTransformData().scaling.x;
 			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.9f);
 			break;
 		}
@@ -122,20 +122,20 @@ void DFModelMgr::ShowEditWindow() noexcept
 		{
 			ImGui::Text("X");
 			ImGui::SameLine();
-			check(ImGui::DragFloat("##X", &model.transform.scaling.x, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
+			check(ImGui::DragFloat("##X", &model.GetTransformData().scaling.x, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
 			ImGui::Text("Y");
 			ImGui::SameLine();
-			check(ImGui::DragFloat("##Y", &model.transform.scaling.y, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
+			check(ImGui::DragFloat("##Y", &model.GetTransformData().scaling.y, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
 			ImGui::Text("Z");
 			ImGui::SameLine();
-			check(ImGui::DragFloat("##Z", &model.transform.scaling.z, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
+			check(ImGui::DragFloat("##Z", &model.GetTransformData().scaling.z, 0.001f, 0.001f, 10000.0f, "%.3f", 1.0f));
 			break;
 		}
 		}
 
 		if (ImGui::Button("Recall", ImVec2(96, 20)))
 		{
-			model.transform.scaling = DFModelM_UIData.tempScaling;
+			model.GetTransformData().scaling = DFModelM_UIData.tempScaling;
 			modelAdjusted = true;
 		}
 		ImGui::SameLine();
@@ -146,7 +146,7 @@ void DFModelMgr::ShowEditWindow() noexcept
 		ImGui::SameLine();
 		if (ImGui::Button("Default", ImVec2(96, 20)))
 		{
-			model.transform.scaling = { 0.1f, 0.1f, 0.1f };
+			model.GetTransformData().scaling = { 0.1f, 0.1f, 0.1f };
 			modelAdjusted = true;
 		}
 

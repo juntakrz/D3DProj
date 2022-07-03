@@ -179,11 +179,11 @@
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshImport.cpp" />
     <ClCompile Include="src\DFactory\DFactory_UI.cpp" />
     <ClCompile Include="src\DFactory\DFEntity.cpp" />
+    <ClCompile Include="src\DFactory\DFEntity\DFModel.cpp" />
     <ClCompile Include="src\DFactory\DFMaterial_Shader.cpp" />
     <ClCompile Include="src\DFactory\DFMaterial_Texture.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Import.cpp" />
-    <ClCompile Include="src\DFactory\DFModelMgr_Model.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Node.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_Transform.cpp" />
     <ClCompile Include="src\DFactory\DFModelMgr_UI.cpp" />
@@ -299,6 +299,7 @@
     <ClInclude Include="src\DFactory\D3DMgr\RenderSurface.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h" />
     <ClInclude Include="src\DFactory\DFEntity.h" />
+    <ClInclude Include="src\DFactory\DFEntity\DFModel.h" />
     <ClInclude Include="src\DFactory\DFRefMgr.h" />
     <ClInclude Include="src\DFactory\RenderGraph\RenderGraph.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Stencil.h" />
