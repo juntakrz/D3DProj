@@ -22,6 +22,11 @@ EModel::TransformData& EModel::GetTransformData() noexcept
 	return transform;
 }
 
+uint8_t EModel::TypeId()
+{
+	return 1;
+}
+
 void EModel::FollowCamera(const bool& enabled) noexcept
 {
 	m_followCamera = enabled;

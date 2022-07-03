@@ -5,8 +5,6 @@
 class ECamera : public EBase
 {
 private:
-	const uint8_t m_typeId = 2;
-
 	float m_deltaMove = 1.0f;
 	float m_deltaRotation = 0.03f;
 
@@ -38,22 +36,30 @@ public:
 	void Move(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
 	void Move(const XMFLOAT3A& delta) noexcept;
 
+	void Rotate(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
+	void Rotate(const XMFLOAT3A& delta) noexcept;
+
 	void SetAsPerspective() noexcept;
 	void SetAsPerspective(float FOV, float aspectRatio, float nearZ, float farZ) noexcept;
 	void SetAsOrthographic() noexcept;
 	void SetAsOrthographic(float width, float height, float nearZ, float farZ) noexcept;
 
-	void SetView() noexcept;						// calculate camera view
-	void SetViewProj() noexcept;					// calculate view*proj matrix
+	void SetView() noexcept;							// calculate camera view
+	void SetViewProj() noexcept;						// calculate view*proj matrix
+
+	// WIP
+	void LookAt(float x, float y, float z) noexcept;
+	void LookAt(std::string objectId) noexcept;
+	//
+	bool LookAtCameraTarget(ECamera* pCam) noexcept;	// nullptr to stop following
 
 	void EnableLookAt() noexcept;
 	void DisableLookAt() noexcept;
-	void LockToCameraTarget(ECamera* pCam) noexcept;	// nullptr to stop following
-	void LookAt(float x, float y, float z) noexcept;
-	void LookAt(std::string objectId) noexcept;
+
 	const XMFLOAT3A& GetFocus() const noexcept;
 	const XMVECTOR& GetFocusVector() const noexcept;
 
+	void SetUpVector(float x = 0.0f, float y = 1.0f, float z = 0.0f) noexcept;
 	const XMVECTOR& GetUpVector() const noexcept;
 
 	void SetMovementDelta(float delta) noexcept;
@@ -62,10 +68,5 @@ public:
 	void SetRotationDelta(float delta) noexcept;
 	const float& GetRotationDelta() const noexcept;
 
-	void Rotate(float pitch = 0.0f, float yaw = 0.0f, float roll = 0.0f) noexcept;
-	void Rotate(const XMFLOAT3A& rotation) noexcept;
-	void RotateAdd(float pitch = 0.0f, float yaw = 0.0f, float roll = 0.0f) noexcept;
-	void RotateAdd(const XMFLOAT3A& rotation) noexcept;
-
-	void SetUpDirection(float dirX = 0.0f, float dirY = 0.0f, float dirZ = 0.0f) noexcept;
+	uint8_t TypeId();
 };
