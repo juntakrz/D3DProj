@@ -7,6 +7,10 @@ struct DFMesh;
 
 struct EModel : public EBase
 {
+private:
+	const uint8_t m_typeId = 1;
+
+public:
 	uint32_t id;
 
 	std::unique_ptr<DFModelNode> pRootNode;

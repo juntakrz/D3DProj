@@ -14,18 +14,18 @@ void EBase::SetPos(const XMFLOAT3A& pos) noexcept
 	transform.translation = pos;
 }
 
-void EBase::AdjustPos(float x, float y, float z) noexcept
+void EBase::Move(float x, float y, float z) noexcept
 {
 	transform.translation.x += x;
 	transform.translation.y += y;
 	transform.translation.z += z;
 }
 
-void EBase::AdjustPos(const XMFLOAT3A& pos) noexcept
+void EBase::Move(const XMFLOAT3A& delta) noexcept
 {
-	transform.translation.x += pos.x;
-	transform.translation.y += pos.y;
-	transform.translation.z += pos.z;
+	transform.translation.x += delta.x;
+	transform.translation.y += delta.y;
+	transform.translation.z += delta.z;
 }
 
 void EBase::SetRotation(float x, float y, float z) noexcept
@@ -50,4 +50,9 @@ void EBase::SetScale(float x, float y, float z) noexcept
 void EBase::SetScale(const XMFLOAT3A& scale) noexcept
 {
 	transform.scaling = scale;
+}
+
+const uint8_t& EBase::TypeId() const noexcept
+{
+	return m_typeId;
 }

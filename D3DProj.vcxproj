@@ -179,6 +179,7 @@
     <ClCompile Include="src\DFactory\D3DMgr\Meshes\MeshImport.cpp" />
     <ClCompile Include="src\DFactory\DFactory_UI.cpp" />
     <ClCompile Include="src\DFactory\DFEntity\EBase.cpp" />
+    <ClCompile Include="src\DFactory\DFEntity\ECamera.cpp" />
     <ClCompile Include="src\DFactory\DFEntity\EModel.cpp" />
     <ClCompile Include="src\DFactory\DFMaterial_Shader.cpp" />
     <ClCompile Include="src\DFactory\DFMaterial_Texture.cpp" />
@@ -299,6 +300,7 @@
     <ClInclude Include="src\DFactory\D3DMgr\RenderSurface.h" />
     <ClInclude Include="src\DFactory\D3DMgr\IBind\Bind_Null.h" />
     <ClInclude Include="src\DFactory\DFEntity\EBase.h" />
+    <ClInclude Include="src\DFactory\DFEntity\ECamera.h" />
     <ClInclude Include="src\DFactory\DFEntity\EModel.h" />
     <ClInclude Include="src\DFactory\DFRefMgr.h" />
     <ClInclude Include="src\DFactory\RenderGraph\RenderGraph.h" />

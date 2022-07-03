@@ -252,6 +252,9 @@
     <ClCompile Include="src\DFactory\DFEntity\EModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DFactory\DFEntity\ECamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DFactory\WndMgr\CException.h">
@@ -720,6 +723,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\DFEntity\EModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DFactory\DFEntity\ECamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

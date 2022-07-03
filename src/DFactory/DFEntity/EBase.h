@@ -2,6 +2,9 @@
 
 class EBase
 {
+private:
+	const uint8_t m_typeId = 0;
+
 public:
 	std::string name;
 
@@ -22,12 +25,14 @@ public:
 	void SetPos(float x, float y, float z) noexcept;
 	void SetPos(const XMFLOAT3A& pos) noexcept;
 
-	void AdjustPos(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
-	void AdjustPos(const XMFLOAT3A& pos) noexcept;
+	void Move(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
+	void Move(const XMFLOAT3A& delta) noexcept;
 
-	void SetRotation(float x, float y, float z) noexcept;
+	void SetRotation(float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
 	void SetRotation(const XMFLOAT3A& rotation) noexcept;
 
 	void SetScale(float x, float y, float z) noexcept;
 	void SetScale(const XMFLOAT3A& scale) noexcept;
+
+	const uint8_t& TypeId() const noexcept;
 };
