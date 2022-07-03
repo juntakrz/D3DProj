@@ -1,6 +1,6 @@
 #include "DFModelMgr.h"
 
-DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept
+EModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept
 {
 	uint32_t newID = 0;
 
@@ -36,7 +36,7 @@ DFModel* DFModelMgr::Create(uint8_t type, std::string name, const bool& createAA
 			| aiProcess_CalcTangentSpace
 		);
 
-		DFModel newModel;
+		EModel newModel;
 
 		for (uint32_t i = 0; i < pScene->mNumMeshes; i++)
 		{

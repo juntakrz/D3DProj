@@ -246,10 +246,10 @@
     <ClCompile Include="src\DFactory\ScriptMgr\CScriptMgr_Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\DFEntity.cpp">
+    <ClCompile Include="src\DFactory\DFEntity\EBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\DFEntity\DFModel.cpp">
+    <ClCompile Include="src\DFactory\DFEntity\EModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -716,10 +716,10 @@
     <ClInclude Include="src\DFactory\ScriptMgr\CScriptMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\DFEntity.h">
+    <ClInclude Include="src\DFactory\DFEntity\EBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DFactory\DFEntity\DFModel.h">
+    <ClInclude Include="src\DFactory\DFEntity\EModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

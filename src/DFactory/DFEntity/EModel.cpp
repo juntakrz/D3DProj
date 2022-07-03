@@ -1,9 +1,9 @@
 #include "../../pch.h"
-#include "DFModel.h"
+#include "EModel.h"
 #include "../DFactory.h"
 #include "../Common/DF_A.h"
 
-FXMMATRIX& DFModel::GetXMTransform() noexcept
+FXMMATRIX& EModel::GetXMTransform() noexcept
 {
 	return (m_followCamera)
 		? XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z)
@@ -17,12 +17,12 @@ FXMMATRIX& DFModel::GetXMTransform() noexcept
 		* XMMatrixTranslation(transform.translation.x, transform.translation.y, transform.translation.z);
 }
 
-DFModel::TransformData& DFModel::GetTransformData() noexcept
+EModel::TransformData& EModel::GetTransformData() noexcept
 {
 	return transform;
 }
 
-void DFModel::FollowCamera(const bool& enabled) noexcept
+void EModel::FollowCamera(const bool& enabled) noexcept
 {
 	m_followCamera = enabled;
 }

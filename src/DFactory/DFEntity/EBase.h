@@ -1,6 +1,6 @@
 #pragma once
 
-class DFEntity
+class EBase
 {
 public:
 	std::string name;

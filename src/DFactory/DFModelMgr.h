@@ -2,7 +2,7 @@
 
 #include "D3DMgr/Meshes/Mesh_Includes.h"
 #include "DFactory.h"
-#include "DFEntity/DFModel.h"
+#include "DFEntity/EModel.h"
 
 using namespace DirectX;
 
@@ -60,7 +60,7 @@ private:
 	DFMaterial* pMatMgr;
 	RenderGraph* pRenderMgr;
 
-	std::vector<DFModel> m_Models;
+	std::vector<EModel> m_Models;
 
 	// ASSIMP
 	DFMesh ParseAIMesh(const aiMesh& mesh, aiMaterial** const ppMaterials, uint32_t meshID, const bool& createAABB);
@@ -78,14 +78,14 @@ public:
 		return _SInstance;
 	}
 
-	DFModel* Create(uint8_t type, std::string name, const bool& createAABB = true, uint16_t paramA = 0, uint16_t paramB = 0) noexcept;
-	DFModel* Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept;
+	EModel* Create(uint8_t type, std::string name, const bool& createAABB = true, uint16_t paramA = 0, uint16_t paramB = 0) noexcept;
+	EModel* Create(uint8_t type, std::string name, const bool& createAABB, std::string path) noexcept;
 
 	// select current model
-	DFModel& Select(std::string name) noexcept;		// searches, selects and returns model by name (slow)
-	DFModel& Select(uint32_t modelID) noexcept;		// searches, selects and returns model by Id (faster)
-	DFModel& Model() noexcept;						// returns selected model (very fast)
-	DFModel* Find(const char* id) noexcept;			// generic method that returns pointer to DFModel or nullptr if not found
+	EModel& Select(std::string name) noexcept;		// searches, selects and returns model by name (slow)
+	EModel& Select(uint32_t modelID) noexcept;		// searches, selects and returns model by Id (faster)
+	EModel& Model() noexcept;						// returns selected model (very fast)
+	EModel* Find(const char* id) noexcept;			// generic method that returns pointer to DFModel or nullptr if not found
 
 	void Delete() noexcept;
 	void Delete(std::string name) noexcept;

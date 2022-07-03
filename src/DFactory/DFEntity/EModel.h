@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../DFEntity.h"
+#include "EBase.h"
 
 class DFModelNode;
 struct DFMesh;
 
-struct DFModel : public DFEntity
+struct EModel : public EBase
 {
 	uint32_t id;
 
