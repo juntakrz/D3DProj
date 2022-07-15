@@ -8,7 +8,7 @@
 #include "../../include/imgui/imgui_impl_dx11.h"
 #include "../Util/imGuiMgr.h"
 #include "../Common/DF_Math.h"
-#include "Cameras/CCamera.h"
+#include "../DFEntity/ECamera.h"
 #include "RenderSurface.h"
 #include "../Common/DF_Const.h"
 
@@ -70,7 +70,7 @@ private:
 	float m_VWidth = CWND_DEFAULTWIDTH, m_VHeight = CWND_DEFAULTHEIGHT;
 	float m_AspectRatio = m_VWidth / m_VHeight;
 
-	class CCamera* m_pCamera;
+	class ECamera* m_pCamera;
 
 	std::unordered_map<std::string, std::unique_ptr<RenderTarget>> renderTargets;
 	std::unordered_map<std::string, std::unique_ptr<DSTarget>> depthTargets;
@@ -156,8 +156,8 @@ public:
 	void RenderWireframe(bool enable = false) noexcept;
 
 	//set and get currently active camera
-	void SetCamera(CCamera* pCamera) noexcept;
-	CCamera* Camera() const noexcept;
+	void SetCamera(ECamera* pCamera) noexcept;
+	ECamera* Camera() const noexcept;
 
 	//basic wrapper for Direct3D DrawIndexed method
 	void DrawIndexed(const UINT& count) noexcept;

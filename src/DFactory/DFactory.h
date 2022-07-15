@@ -87,7 +87,7 @@ public:
 private:
 	static DFactory _SInstance;
 
-	std::unordered_map<std::string, std::unique_ptr<CCamera>> m_Cameras;
+	std::unordered_map<std::string, std::unique_ptr<ECamera>> m_Cameras;
 	std::unique_ptr<Bind::ConstVertexBuffer<CameraConstVSBuffer>> pCamCBuf;
 
 	bool m_showDevUI = false;
@@ -130,8 +130,8 @@ public:
 	// CAMERA ------------------------
 
 	// create and add new camera
-	CCamera* CameraAdd(std::string name, float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
-	CCamera* CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept;
+	ECamera* CameraAdd(std::string name, float x = 0.0f, float y = 0.0f, float z = 0.0f) noexcept;
+	ECamera* CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept;
 
 	// select and set an active camera
 	void CameraActivate(std::string name, bool select = false) noexcept;
@@ -143,10 +143,10 @@ public:
 	void CameraUpdateVS() noexcept;
 
 	// operations with the currently selected camera / retrieve camera without selecting it
-	CCamera* Camera(const std::string& name = "") noexcept;
+	ECamera* Camera(const std::string& name = "") noexcept;
 
 	// get active camera
-	std::pair<std::string, CCamera*> CameraGetActive() noexcept;
+	std::pair<std::string, ECamera*> CameraGetActive() noexcept;
 
 	// imGui methods
 	void ShowEditModelWindow() noexcept;

@@ -31,8 +31,8 @@ protected:
 public:
 	XMMATRIX xmMain = XMMatrixIdentity();
 
-	virtual FXMMATRIX& GetXMTransform() noexcept = 0;
-	virtual TransformData& GetTransformData() noexcept = 0;
+	virtual FXMMATRIX& GetXMTransform() noexcept;			// IMPLEMENT THESE TO COMPILE
+	virtual TransformData& GetTransformData() noexcept;
 
 	void SetPos(float x, float y, float z) noexcept;
 	void SetPos(const XMFLOAT3A& pos) noexcept;

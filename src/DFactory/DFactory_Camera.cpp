@@ -1,6 +1,6 @@
 #include "DFactory.h"
 
-CCamera* DFactory::CameraAdd(std::string name, float x, float y, float z) noexcept
+ECamera* DFactory::CameraAdd(std::string name, float x, float y, float z) noexcept
 {
 	// if camera exists - exit
 	if (m_Cameras.find(name) != m_Cameras.end())
@@ -14,12 +14,13 @@ CCamera* DFactory::CameraAdd(std::string name, float x, float y, float z) noexce
 #endif
 
 	// create camera
-	m_Cameras[name] = std::make_unique<CCamera>(-x, -y, -z);
+	m_Cameras[name] = std::make_unique<ECamera>();
+	m_Cameras[name]->SetPos(-x, -y, -z);
 
 	return m_Cameras[name].get();
 }
 
-CCamera* DFactory::CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept
+ECamera* DFactory::CameraAdd(std::string name, DirectX::XMFLOAT3& pos) noexcept
 {
 	return CameraAdd(name, pos.x, pos.y, pos.z);
 }
@@ -72,7 +73,7 @@ void DFactory::CameraUpdateVS() noexcept
 	pCamCBuf->Update(cameraConstBuffer);
 }
 
-CCamera* DFactory::Camera(const std::string& name) noexcept
+ECamera* DFactory::Camera(const std::string& name) noexcept
 {
 	if (name == "")
 	{
@@ -93,7 +94,7 @@ CCamera* DFactory::Camera(const std::string& name) noexcept
 	return nullptr;
 }
 
-std::pair<std::string, CCamera*> DFactory::CameraGetActive() noexcept
+std::pair<std::string, ECamera*> DFactory::CameraGetActive() noexcept
 {
-	return std::pair<std::string, CCamera*>(vars.activeCamera, m_Cameras.at(vars.activeCamera).get());
+	return std::pair<std::string, ECamera*>(vars.activeCamera, m_Cameras.at(vars.activeCamera).get());
 }

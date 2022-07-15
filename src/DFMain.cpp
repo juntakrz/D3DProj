@@ -467,5 +467,5 @@ void DFMain::LoadMap() noexcept
 	DF.LightM->DLSetCamera(DF.Camera("camLight"));
 
 	DF.Camera()->SetAsOrthographic(8.0f, 4.5f, 0.001f, 100.0f);
-	DF.Camera()->LockToCameraTarget(DF.Camera("camMain"));
+	DF.Camera()->LookAtCameraTarget(DF.Camera("camMain"));
 }

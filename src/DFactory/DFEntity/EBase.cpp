@@ -40,14 +40,14 @@ void EBase::SetRotation(float x, float y, float z) noexcept
 {
 	transform.rotation.x = GMath::WrapAngle(x);
 	transform.rotation.y = GMath::WrapAngle(y);
-	transform.rotation.z = GMath::WrapAngle(z);
+	transform.rotation.z = GMath::WrapAngle(-z);
 
 	transform.initial.rotation = transform.rotation;
 }
 
 void EBase::SetRotation(const XMFLOAT3A& rotation) noexcept
 {
-	transform.rotation = { GMath::WrapAngle(rotation.x), GMath::WrapAngle(rotation.y), GMath::WrapAngle(rotation.z) };
+	transform.rotation = { GMath::WrapAngle(rotation.x), GMath::WrapAngle(rotation.y), GMath::WrapAngle(-rotation.z) };
 	transform.initial.rotation = transform.rotation;
 }
 
@@ -59,15 +59,15 @@ XMFLOAT3A& EBase::GetRotation() noexcept
 void EBase::Rotate(float x, float y, float z) noexcept
 {
 	transform.rotation.x = GMath::WrapAngle(transform.rotation.x + x);
-	transform.rotation.y = GMath::WrapAngle(transform.rotation.x + y);
-	transform.rotation.z = GMath::WrapAngle(transform.rotation.x + z);
+	transform.rotation.y = GMath::WrapAngle(transform.rotation.y + y);
+	transform.rotation.z = GMath::WrapAngle(transform.rotation.z - z);
 }
 
 void EBase::Rotate(const XMFLOAT3A& delta) noexcept
 {
 	transform.rotation.x = GMath::WrapAngle(transform.rotation.x + delta.x);
-	transform.rotation.y = GMath::WrapAngle(transform.rotation.x + delta.y);
-	transform.rotation.z = GMath::WrapAngle(transform.rotation.x + delta.z);
+	transform.rotation.y = GMath::WrapAngle(transform.rotation.y + delta.y);
+	transform.rotation.z = GMath::WrapAngle(transform.rotation.z - delta.z);
 }
 
 void EBase::SetScale(float x, float y, float z) noexcept

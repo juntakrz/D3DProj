@@ -331,12 +331,12 @@ void D3DMgr::RenderWireframe(bool enable) noexcept
 	m_pContext->RSSetState(pRState.Get());
 }
 
-void D3DMgr::SetCamera(CCamera* pCamera) noexcept
+void D3DMgr::SetCamera(ECamera* pCamera) noexcept
 {
 	m_pCamera = pCamera;
 }
 
-CCamera* D3DMgr::Camera() const noexcept
+ECamera* D3DMgr::Camera() const noexcept
 {
 	return m_pCamera;
 }

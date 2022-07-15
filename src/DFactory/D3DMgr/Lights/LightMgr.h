@@ -13,7 +13,7 @@ private:
 	DirectX::XMVECTOR m_vecUp = { 0.0f, 1.0f, 0.0f };
 	float m_FOV = 1.0f;
 
-	CCamera* m_pDirCamera = nullptr;
+	ECamera* m_pDirCamera = nullptr;
 
 	// point light unit
 	struct PLight
@@ -69,7 +69,7 @@ public:
 	// DIRECTIONAL LIGHT
 	DirLight_ConstPSBuffer& DL() noexcept;
 
-	void DLSetCamera(CCamera* pCam) noexcept;
+	void DLSetCamera(ECamera* pCam) noexcept;
 	void DLVSBufferClear() noexcept;
 	void DLVSBufferSetViewProj(uint8_t index) noexcept;
 	void DLVSBufferBind() noexcept;

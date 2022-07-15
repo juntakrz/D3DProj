@@ -234,7 +234,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\DFactory\D3DMgr\Cameras\CCamera.cpp" />
     <ClCompile Include="src\DFactory\DFMaterial.cpp" />
     <ClCompile Include="src\DFactory\DFactory_Camera.cpp" />
     <ClCompile Include="src\DFactory\DFactory_Proc.cpp" />
@@ -320,7 +319,6 @@
     <ClInclude Include="src\DFactory\WndMgr\CMouse.h" />
     <ClInclude Include="src\DFactory\WndMgr\WndMgr.h" />
     <ClInclude Include="src\DF_Settings.h" />
-    <ClInclude Include="src\DFactory\D3DMgr\Cameras\CCamera.h" />
     <ClInclude Include="src\DFactory\DFMaterial.h" />
     <ClInclude Include="src\DFactory\D3DMgr\Lights\LightMgr.h" />
     <ClInclude Include="src\DFactory\D3DMgr\Meshes\MeshPointLight.h" />

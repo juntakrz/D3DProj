@@ -111,9 +111,6 @@
     <ClCompile Include="src\DFactory\DFactory_Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DFactory\D3DMgr\Cameras\CCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\DFactory\D3DMgr\Lights\LightMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -375,9 +372,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\Util\imGuiMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DFactory\D3DMgr\Cameras\CCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DFactory\D3DMgr\Lights\LightMgr.h">

@@ -5,7 +5,7 @@ LightMgr::DirLight_ConstPSBuffer& LightMgr::DL() noexcept
 	return dlData;
 }
 
-void LightMgr::DLSetCamera(CCamera* pCam) noexcept
+void LightMgr::DLSetCamera(ECamera* pCam) noexcept
 {
 	m_pDirCamera = pCam;
 }

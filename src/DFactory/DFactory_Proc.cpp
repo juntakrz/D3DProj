@@ -48,7 +48,7 @@ void DFactory::CProc::ProcessCamera() noexcept
 	}
 
 	DF::D3DM->Camera()->Move(m_camDir.x, m_camDir.y, m_camDir.z);
-	DF::D3DM->Camera()->RotateAdd(m_camRot.x, m_camRot.y, 0.0f);
+	DF::D3DM->Camera()->Rotate(m_camRot.x, m_camRot.y, 0.0f);
 }
 
 void DFactory::CProc::ProcessFunctions() noexcept
