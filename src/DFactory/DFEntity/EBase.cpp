@@ -2,6 +2,16 @@
 #include "EBase.h"
 #include "../Common/DF_Math.h"
 
+FXMMATRIX& EBase::GetXMTransform() noexcept
+{
+	return xmMain;
+}
+
+EBase::TransformData& EBase::GetTransformData() noexcept
+{
+	return transform;
+}
+
 void EBase::SetPos(float x, float y, float z) noexcept
 {
 	transform.translation.x = x;
